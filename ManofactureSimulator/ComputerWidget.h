@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "ComputerWidget.generated.h"
 
+DECLARE_DELEGATE(FExitEvent);
+DECLARE_DELEGATE_TwoParams(FOrderEvent, FString, int);
+
 /**
  * 
  */
@@ -18,8 +21,16 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+
+	// Delegate for exit button, fire event to reset controller on character.
+	FExitEvent exitEvent;
+
+	// Delegate for confirm button, fire event with the order to spawn.
+	FOrderEvent orderEvent;
+
+	// 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int InitialPieceQuantity = 1;
+	int InitialPieceQuantity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString LenghtName;
@@ -40,7 +51,6 @@ public:
     class UTextBlock* OrdersTextBlock;
 
     void UpdateOrdersTextBlock(const TArray<FString> StringArray);
-	void SetBaseComputer(class ABaseComputer* NewComputer);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int L1Quantity;
@@ -52,9 +62,6 @@ public:
 	int L3Quantity;
 
 private:
-	class ABaseCharacter* Character;
-	class ABaseComputer* Computer;
-
 	//Increment or decrement Order quantity
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* IncrementButton;

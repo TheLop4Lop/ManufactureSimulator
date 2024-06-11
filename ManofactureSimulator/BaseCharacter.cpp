@@ -3,7 +3,6 @@
 #include "BaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
@@ -81,52 +80,27 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+///////////////////////////////////// BASE CHARACTER CONFIGURATION ////////////////////////////////
+// Section to declare all configuration into Character.
+
+// Move character forward method.
 void ABaseCharacter::MoveForward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector() * AxisValue);
 
 }
 
+// Move character right method.
 void ABaseCharacter::MoveRight(float AxisValue)
 {
 	AddMovementInput(GetActorRightVector() * AxisValue);
 
 }
 
-void ABaseCharacter::Interaction()
-{
-	if(!DoOnceWidget)
-	{
-		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr)
-		{
-			Computer->AddWidgetFromComputer(CharacterController);
-			
-			DisableInput(CharacterController);
-			CharacterController->SetMovement(true);
-			CharacterController->SetInputMode(FInputModeGameAndUI());
-		}else if(CharacterController != nullptr && ComputerMachine != nullptr && ComputerMachine->GetComputerWidgetClass() != nullptr)
-		{
-			ComputerMachine->AddWidgetFromComputer(CharacterController);
+///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
+// Interaction object section.
 
-			DisableInput(CharacterController);
-			CharacterController->SetMovement(true);
-			CharacterController->SetInputMode(FInputModeGameAndUI());
-		}
-	}
-
-}
-
-void ABaseCharacter::ResetMoveInput()
-{
-	if(CharacterController != nullptr)
-	{
-		EnableInput(CharacterController);
-		CharacterController->SetMovement(false);
-		CharacterController->SetInputMode(FInputModeGameOnly());
-	}
-	
-}
-
+// Checks if there's an actor in front of the character.
 AActor* ABaseCharacter::InSightLine()
 {
 	FVector SightLocation;
@@ -152,5 +126,36 @@ AActor* ABaseCharacter::InSightLine()
 	}
 
 	return nullptr;
+
+}
+
+// Method that interacts directly with the object displaying widget.
+void ABaseCharacter::Interaction()
+{
+	if(!DoOnceWidget)
+	{
+		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr)
+		{
+			Computer->AddWidgetFromComputer(CharacterController);
+			CharacterController->SetMovement(true);
+
+		}else if(CharacterController != nullptr && ComputerMachine != nullptr && ComputerMachine->GetComputerWidgetClass() != nullptr)
+		{
+			ComputerMachine->AddWidgetFromComputer(CharacterController);
+			CharacterController->SetMovement(true);
+
+		}
+	}
+
+}
+
+
+
+
+
+
+void ABaseCharacter::ResetMoveInput()
+{
+	UE_LOG(LogTemp, Display, TEXT("EXIT"));
 
 }

@@ -23,44 +23,34 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Returns the Widget Class, only for pointer reference.
 	class TSubclassOf<class UUserWidget> GetComputerWidgetClass();
+
+	// Adds widget and assign the player controller to it.
 	void AddWidgetFromComputer(class ACharacterController* CharacterController);
 
-	void SetOrderToStorage();
-	void AddToOrdersOfProduct(TArray<FString> Order);
-	TArray<FString>& GetStorageOrderHistorial();
-	TArray<FString> TemporaryHoldArray;
-
-	bool GetPieceError();
-
 private:
+	///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
+	// Sections for the actor properties.
+
+	// Base Computer actor mesh.
 	UPROPERTY(EditAnywhere, Category = "Actor Property", meta = (AllowPrivateAccess))
 	UStaticMeshComponent* ComputerMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Storage", meta = (AllowPrivateAccess))
-	class ABaseStorage* Storage;
-
+	// Holds the respective widget class for the computer.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
-	TSubclassOf<class UUserWidget> ComputerClass;
-	class UComputerWidget* ComputerWidget;
+	TSubclassOf<class UUserWidget> computerClass;
+	class UComputerWidget* computerWidget;
 
-	FString CurrentOrder;
-	TArray<FString> RawOrders;
-	TArray<FString> StorageOrdersCommands;
-	TArray<FString> ActualStorageOrders;
+	// Reference to Storage Manager in the world.
+	class AStorageManager* storageManager;
 
-	int QuantityPieces;
-	FString LengthPiece;
-	FString PieceCode;
-	bool NoPieceError;
+	// Gett the product order for pass it on to Storage manager.
+	void WidgetBindProductOrder(FString productCode, int rawProductQUantity);
 
-	bool DoOnceCnt;
-	bool DoOnce;
-	int controlCnt;
-	FTimerHandle DelayTimer;
+	// Resets the character controller to move the character around.
+	void WidgetBindResetController();
 
-	void OrderToStorage();
-
-	int NewArrayElement;
+	class ACharacterController* characterController;
 
 };
