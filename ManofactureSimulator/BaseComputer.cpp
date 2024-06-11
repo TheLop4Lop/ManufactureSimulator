@@ -3,10 +3,8 @@
 #include "BaseComputer.h"
 #include "Kismet/GameplayStatics.h"
 #include "CharacterController.h"
-#include "Components/Image.h"
+#include "StorageManager.h"
 #include "ComputerWidget.h"
-#include "BaseStorage.h"
-#include "EngineUtils.h"
 
 // Sets default values
 ABaseComputer::ABaseComputer()
@@ -23,16 +21,10 @@ ABaseComputer::ABaseComputer()
 void ABaseComputer::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	for(ABaseStorage* singleStorage: TActorRange<ABaseStorage>(GetWorld()))
-    {
-        if(singleStorage != nullptr)
-        {
-            Storage = singleStorage;
-        }
-    }
-	controlCnt = -1;
-	DoOnceCnt = true;
+
+	TArray<AActor*> actorsInWorld;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStorageManager::StaticClass(), actorsInWorld);
+	if(actorsInWorld.IsValidIndex(0)) storageManager = Cast<AStorageManager>(actorsInWorld[0]);	
 	
 }
 
@@ -41,109 +33,44 @@ void ABaseComputer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(StorageOrdersCommands.Num() > controlCnt + 1 && DoOnceCnt)
-	{
-		DoOnce = true;
-		DoOnceCnt = false;
-	}
-
-	if(Storage != nullptr && !Storage->GetbInOrder() && DoOnce)
-	{
-		DoOnceCnt = true;
-		controlCnt++;
-		SetOrderToStorage();
-		OrderToStorage();
-
-		DoOnce = false;
-	}
-
-	if(ComputerWidget != nullptr && Storage != nullptr)
-	{
-		ComputerWidget->L1Quantity = Storage->GetMinQuantityOrder();
-		ComputerWidget->L2Quantity = Storage->GetMiddleQuantityOrder();
-		ComputerWidget->L3Quantity = Storage->GetMaxQuantityOrder();
-	}
-
 }
 
-void ABaseComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
+// Gett the product order for pass it on to Storage manager.
+void ABaseComputer::WidgetBindProductOrder(FString productCode, int rawProductQUantity)
 {
-	ComputerWidget = Cast<UComputerWidget>(CreateWidget(CharacterController, ComputerClass));
-	ComputerWidget->SetBaseComputer(this);
-	ComputerWidget->AddToViewport();
-
-}
-
-void ABaseComputer::SetOrderToStorage()
-{
-	if(StorageOrdersCommands.Num() != 0)
+	if(storageManager)
 	{
-		FString CurrentPieceCode = StorageOrdersCommands[controlCnt];
-		FString stringToInt = "";
-		LengthPiece = "";
-		for (int index = 0; index < CurrentPieceCode.Len(); )
-		{
-			while (CurrentPieceCode[index] != 'x')
-			{
-				stringToInt += CurrentPieceCode[index];
-				index++;
-			}
-
-			index++;
-			while (CurrentPieceCode[index] != '-')
-			{
-				LengthPiece += CurrentPieceCode[index];
-				index++;
-			}
-
-			index++;
-			PieceCode = CurrentPieceCode.Mid(index);
-			break;
-		}
-
-		QuantityPieces = FCString::Atoi(*stringToInt);
-
+		storageManager->CanProduceProductOrder(productCode, rawProductQUantity);
 	}
 
 }
 
-TArray<FString>& ABaseComputer::GetStorageOrderHistorial()
-{
-	return StorageOrdersCommands;
-
-}
-
+// Returns the Widget Class, only for pointer reference.
 class TSubclassOf<class UUserWidget> ABaseComputer::GetComputerWidgetClass()
 {
-	return ComputerClass;
+	return computerClass;
 
 }
 
-void ABaseComputer::OrderToStorage()
+// Adds widget and assign the player controller to it.
+void ABaseComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
-	if(Storage != nullptr)
+	characterController = CharacterController;
+	computerWidget = Cast<UComputerWidget>(CreateWidget(characterController, computerClass));
+
+	if(computerWidget)
 	{
-		if(Storage->CanProduceOrder(QuantityPieces, LengthPiece))
-		{
-			UE_LOG(LogTemp, Display, TEXT("SI HAAAAAAAAAAAAY CARNAL"));
-			Storage->SetOrderQuantityToSpawn(LengthPiece);
-			Storage->SetMasterOrder(QuantityPieces, PieceCode);
-		}else
-		{
-			//SOMETHING TO ALERT THAT ORDER IS WRONG
-			NoPieceError = true;
-			if(ComputerWidget != nullptr)
-			{
-				ComputerWidget->ErrorLed->SetColorAndOpacity(FColor::Red);
-				UE_LOG(LogTemp, Display, TEXT("NNNNNNNNNNNOOOOOOOOOOOOU HAY CARNAL"));
-			}	
-		}
+		computerWidget->AddToViewport();
+		computerWidget->orderEvent.BindUObject(this, &ABaseComputer::WidgetBindProductOrder);
+		computerWidget->exitEvent.BindUObject(this, &ABaseComputer::WidgetBindResetController);
 	}
 
 }
 
-bool ABaseComputer::GetPieceError()
+// Resets the character controller to move the character around.
+void ABaseComputer::WidgetBindResetController()
 {
-	return NoPieceError;
+	characterController->SetMovement(false);
+	characterController = nullptr;
 
 }

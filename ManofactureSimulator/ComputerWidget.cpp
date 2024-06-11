@@ -1,13 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ComputerWidget.h"
-#include "Kismet/GameplayStatics.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
-#include "BaseCharacter.h"
-#include "BaseComputer.h"
 
 #define IncrementMax 10
 #define DecrementMin 1
@@ -15,13 +12,6 @@
 void UComputerWidget::NativeConstruct()
 {
     InitialPieceQuantity = 1;
-
-    if(Computer != nullptr)
-    {
-        ArrayOrdersToProduct = &Computer->GetStorageOrderHistorial();
-        TemporaryProducts = Computer->TemporaryHoldArray;
-        UpdateOrdersTextBlock(TemporaryProducts);
-    }
 
     SetQuantityButtons();
 
@@ -34,12 +24,6 @@ void UComputerWidget::NativeConstruct()
     SetConfirmExitButtons();
 
     SetRefreshButtonClick();
-
-}
-
-void UComputerWidget::SetBaseComputer(class ABaseComputer* NewComputer)
-{
-    Computer = NewComputer;
 
 }
 
@@ -225,34 +209,13 @@ void UComputerWidget::SetConfirmExitButtons()
 
 void UComputerWidget::ConfirmButtonClick()
 {
-    if(Computer != nullptr && !LenghtName.IsEmpty() && !MaterialName.IsEmpty() && !SizeName.IsEmpty())
-    {
-        FString StringQuantity = FString::FromInt(InitialPieceQuantity);
-        OrderName = StringQuantity + "x" + LenghtName + "-" + MaterialName + SizeName;
-
-        if(TemporaryProducts.Num() < 5)
-        {
-            TemporaryProducts.Add(OrderName);
-            ArrayOrdersToProduct->Add(OrderName);
-            UpdateOrdersTextBlock(TemporaryProducts);
-        }
-
-    }//Add something to make UI more visial when request denied!
+    orderEvent.ExecuteIfBound(MaterialName + SizeName + LenghtName, InitialPieceQuantity);
 
 }
 
 void UComputerWidget::ExitButtonClick()
 {
-    if(Computer != nullptr)
-    {
-        Computer->TemporaryHoldArray = TemporaryProducts;
-    }
-
-    Character = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-    if(Character != nullptr)
-    {
-        Character->ResetMoveInput();
-    }
+    exitEvent.ExecuteIfBound();
 
     RemoveFromParent();
 

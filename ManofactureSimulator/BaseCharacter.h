@@ -25,33 +25,49 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
 	void ResetMoveInput();
 
 private:
+	///////////////////////////////////// BASE CHARACTER CONFIGURATION ////////////////////////////////
+	// Section to declare all configuration into Character.
+
+	// Spring arm, responsable for holding the camera and pivot point.
 	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
 	class USpringArmComponent* SpringArm;
 
+	// Character camera.
 	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
 	class UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
-	float ObjectRangeSight = 100;
+	// Character controller pinter.
+	class ACharacterController* CharacterController;
 
+	// Move character forward method.
+	void MoveForward(float AxisValue);
+	// Move character right method.
+	void MoveRight(float AxisValue);
+
+	///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
+	// Interaction object section.
+
+	// Interaction widget.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> InteractionWidgetClass;
 	UUserWidget* InteractionWidget;
 
-	class ABaseComputer* Computer;
-	class ABaseMachinery* ComputerMachine;
-
-	class ACharacterController* CharacterController;
-
-	void MoveForward(float AxisValue);
-	void MoveRight(float AxisValue);
-	void Interaction();
-
+	// Range for object interaction.
+	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
+	float ObjectRangeSight = 100;
+	
+	// Checks if there's an actor in front of the character.
 	AActor* InSightLine();
 	bool DoOnceWidget = true;
+
+	// Method that interacts directly with the object displaying widget.
+	void Interaction(); 
+
+	class ABaseComputer* Computer;
+	class ABaseMachinery* ComputerMachine;
 
 };
