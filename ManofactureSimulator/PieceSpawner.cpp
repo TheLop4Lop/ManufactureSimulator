@@ -4,7 +4,6 @@
 #include "PieceSpawner.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "StorageManager.h"
 #include "RawProduct.h"
 
 // Sets default values
@@ -23,15 +22,6 @@ void APieceSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TArray<AActor*> actorsInWorld;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStorageManager::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) storageManager = Cast<AStorageManager>(actorsInWorld[0]);
-
-	if(storageManager)
-	{
-		storageManager->orderToProcess.AddDynamic(this, &APieceSpawner::SpawnInitialPiece);
-	}
-
 }
 
 // Called every frame
@@ -42,7 +32,7 @@ void APieceSpawner::Tick(float DeltaTime)
 }
 
 // Pawns the Initial Piece product into the world.
-void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn, int quantity)
+void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 {
 	ARawProduct* product = GetWorld()->SpawnActor<ARawProduct>(rawProductClass, arrow->GetRelativeLocation(), arrow->GetRelativeRotation());
 	

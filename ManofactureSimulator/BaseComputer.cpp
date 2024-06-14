@@ -35,7 +35,7 @@ void ABaseComputer::Tick(float DeltaTime)
 
 }
 
-// Gett the product order for pass it on to Storage manager.
+// Gett the product order for pass it on to Storage manager. INTERPRETARAAAAAAAAAAAAAAAAAAAAAAA
 void ABaseComputer::WidgetBindProductOrder(FString productCode, int rawProductQUantity)
 {
 	if(storageManager)

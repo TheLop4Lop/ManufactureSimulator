@@ -97,6 +97,8 @@ public:
 	// Checks if the Initial Piece configuration already exist on the map and add quantity, if not, creates a new entry.
 	void AddInitialPieceToMap(FInitialPieceAttribute newInitialPiece, int quantity);
 
+	void DecreacePieceFromInventory(FInitialPieceAttribute pieceCode, int quantity);
+
 	// Checks in the Initial Piece inventory the order that needs to be ordered.
 	bool OrderIsInInventory(FInitialPieceAttribute order, int quantity);
 
