@@ -24,22 +24,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Pawns the Initial Piece product into the world.
+	void SpawnInitialPiece(struct FInitialPieceAttribute orderToSpawn);
+
 protected:
 	///////////////////////////////////// SPAWNER PROPERTIES ////////////////////////////////
 	// Spawner actor properties.
 
 	// Determines the location and rotation when actor spawns.
 	class UArrowComponent* arrow;
-
-	///////////////////////////////////// SPAWNER REFERENCES ////////////////////////////////
-	// Section for Spawner references on the world.
-
-	// Holds a reference to the StorageManager in the world.
-	class AStorageManager* storageManager;
-
-	// Pawns the Initial Piece product into the world.
-	UFUNCTION()
-	void SpawnInitialPiece(struct FInitialPieceAttribute orderToSpawn, int quantity);
 
 	///////////////////////////////////// RAW PRODUCT SPAWN ////////////////////////////////
 	// Reference to spawn class.

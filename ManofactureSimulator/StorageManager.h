@@ -7,6 +7,35 @@
 #include "BaseStorage.h" // To access Enums and Struct
 #include "StorageManager.generated.h"
 
+UENUM(BlueprintType)
+enum class EStorageProductionStatus : uint8
+{
+	CAN_PRODUCE,
+	CANNOT_PRODUCE,
+	FULL_PRODUCTION
+};
+
+USTRUCT(BlueprintType)
+struct FProductQuantity
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FInitialPieceAttribute codeProduct;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int quantity;
+
+	FProductQuantity()
+		: codeProduct(), quantity(0)
+	{}
+
+	FProductQuantity(FInitialPieceAttribute InCode, int InQuantity)
+        : codeProduct(InCode), quantity(InQuantity)
+    {}
+
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnOrderProcessed, FInitialPieceAttribute, ProductID, int, Quantity);
 
 UCLASS()
@@ -30,16 +59,19 @@ public:
 	FOnOrderProcessed orderToProcess;
 
 	// Recieve a FString to convert into Enum. Returns False if not enough material or returns true othewise and trigger event for spawn product.
-	bool CanProduceProductOrder(FString Order, int quantity);
+	EStorageProductionStatus CanProduceProductOrder(FString Order, int quantity);
 
 protected:
-	///////////////////////////////////// STORAGE REFERENCES ////////////////////////////////
+	///////////////////////////////////// STORAGE/SPAWNER REFERENCES ////////////////////////////////
 	// Section for Storages references
 
 	// Reference in world of Base Storage, responsable of holding raw material for production.
 	class ABaseStorage* baseStorage;
 	// Reference in world of Final Storage, responsable of holding produced materials by producton.
 	class AFinalStorage* finalStorage;
+
+	// Reference in the world of PieceSpawner, responsable of spawning product.
+	class APieceSpawner* productSpawner;
 
 	///////////////////////////////////// CONVERT TO ENUMS ////////////////////////////////
 	// Methods for convert FString to enum.
@@ -52,5 +84,22 @@ protected:
 
 	// Retrieves a string and convert it into a EMaterialLength enum.
 	EMaterialLength ConverStringToEnumLength(FString quality);
+
+	///////////////////////////////////// PRODUCT QUANTITY MANAGER ////////////////////////////////
+	// Section manages the order quantity the player can make.
+
+	// Holds the max quantity of orders.
+	UPROPERTY(EditAnywhere, Category = "Product Order Manager", meta = (AllowPrivateAccess))
+	int maxProductOrder = 5;
+
+	// Holds the actual number of orders to spawn.
+	TArray<int> quantityOrders;
+
+	FTimerHandle spawnTimer;
+
+	void SpawnProductOrder();
+
+	TArray<FProductQuantity> ordersToSpawn;
+	bool doOnce;
 
 };

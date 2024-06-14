@@ -46,6 +46,15 @@ void ABaseStorage::AddInitialPieceToMap(FInitialPieceAttribute newInitialPiece, 
 
 }
 
+void ABaseStorage::DecreacePieceFromInventory(FInitialPieceAttribute pieceCode, int quantity)
+{
+	if(initialPieceMap.Contains(pieceCode))
+	{
+		initialPieceMap[pieceCode] -= quantity;
+	}
+
+}
+
 // Checks in the Initial Piece inventory the order that needs to be ordered.
 bool ABaseStorage::OrderIsInInventory(FInitialPieceAttribute order, int quantity)
 {
