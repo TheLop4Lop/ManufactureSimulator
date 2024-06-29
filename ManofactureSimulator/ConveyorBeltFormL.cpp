@@ -5,7 +5,6 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "BaseMachinery.h"
 
 AConveyorBeltFormL::AConveyorBeltFormL()
 {
@@ -37,8 +36,7 @@ void AConveyorBeltFormL::Tick(float DeltaTime)
 		{
 			if (Actor != nullptr && Actor != this)
 			{
-				MachineOwner = Cast<ABaseMachinery>(Actor);
-				if (MachineOwner == nullptr && ConveyorBox->IsOverlappingActor(Actor))
+				if (ConveyorBox->IsOverlappingActor(Actor))
 				{
 					Actor->AddActorWorldOffset(SelfForwardVector * DeltaSpeed);
 					bPiecesInCoveyor = true;
@@ -50,8 +48,7 @@ void AConveyorBeltFormL::Tick(float DeltaTime)
 		{
 			if (Actor != nullptr && Actor != this)
 			{
-				MachineOwner = Cast<ABaseMachinery>(Actor);
-				if (MachineOwner == nullptr && ConveyorBoxL->IsOverlappingActor(Actor))
+				if (ConveyorBoxL->IsOverlappingActor(Actor))
 				{
 					Actor->AddActorWorldOffset(SelfForwardVectorL * DeltaSpeed);
 					bPiecesInCoveyor = true;

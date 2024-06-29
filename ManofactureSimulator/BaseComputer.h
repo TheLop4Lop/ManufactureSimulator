@@ -40,7 +40,7 @@ private:
 	// Holds the respective widget class for the computer.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> computerClass;
-	class UComputerWidget* computerWidget;
+	class UComputerProductWidget* computerWidget;
 
 	// Reference to Storage Manager in the world.
 	class AStorageManager* storageManager;

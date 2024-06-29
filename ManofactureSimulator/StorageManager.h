@@ -92,14 +92,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Product Order Manager", meta = (AllowPrivateAccess))
 	int maxProductOrder = 5;
 
-	// Holds the actual number of orders to spawn.
-	TArray<int> quantityOrders;
-
+	// Timer for handle Raw Piece Spawn.
 	FTimerHandle spawnTimer;
 
-	void SpawnProductOrder();
-
+	// Holds the orders to spawn.
 	TArray<FProductQuantity> ordersToSpawn;
-	bool doOnce;
+
+	// Spawn product.
+	void SpawnProductOrder();
 
 };

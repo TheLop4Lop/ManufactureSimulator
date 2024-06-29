@@ -37,6 +37,9 @@ protected:
 	///////////////////////////////////// RAW PRODUCT SPAWN ////////////////////////////////
 	// Reference to spawn class.
 
+	// Holds the product code for the spawning product.
+	FInitialPieceAttribute productCode;
+
 	// Holds a reference to RawProduct template for spawning.
 	UPROPERTY(EditAnywhere, Category = "Spawn Product", meta = (AllowPrivateMessage))
 	TSubclassOf<class ARawProduct> rawProductClass;

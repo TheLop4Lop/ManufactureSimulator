@@ -50,8 +50,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Maintenance Property", meta = (AllowPrivateAccess))
 	float MaintenanceTime;
 
-	class ABaseMachinery* MachineOwner;
-
 	TArray<AActor*> Actors;
 
 	FTimerHandle MaintenanceTimer;

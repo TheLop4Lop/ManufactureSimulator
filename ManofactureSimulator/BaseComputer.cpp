@@ -2,9 +2,9 @@
 
 #include "BaseComputer.h"
 #include "Kismet/GameplayStatics.h"
+#include "ComputerProductWidget.h"
 #include "CharacterController.h"
 #include "StorageManager.h"
-#include "ComputerWidget.h"
 
 // Sets default values
 ABaseComputer::ABaseComputer()
@@ -56,13 +56,13 @@ class TSubclassOf<class UUserWidget> ABaseComputer::GetComputerWidgetClass()
 void ABaseComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
 	characterController = CharacterController;
-	computerWidget = Cast<UComputerWidget>(CreateWidget(characterController, computerClass));
+	computerWidget = Cast<UComputerProductWidget>(CreateWidget(characterController, computerClass));
 
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
-		computerWidget->orderEvent.BindUObject(this, &ABaseComputer::WidgetBindProductOrder);
-		computerWidget->exitEvent.BindUObject(this, &ABaseComputer::WidgetBindResetController);
+		computerWidget->confirmEvent.BindUObject(this, &ABaseComputer::WidgetBindProductOrder);
+		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::WidgetBindResetController);
 	}
 
 }
