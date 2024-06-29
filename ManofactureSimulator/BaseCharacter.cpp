@@ -6,7 +6,6 @@
 #include "Camera/CameraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
-#include "BaseMachinery.h"
 #include "BaseComputer.h"
 
 // Sets default values
@@ -44,12 +43,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 		if(ActorInSight->IsA(ABaseComputer::StaticClass()))
 		{
 			Computer = Cast<ABaseComputer>(ActorInSight);
-			ComputerMachine = nullptr;
-		}else if(ActorInSight->IsA(ABaseMachinery::StaticClass()))
-		{
-			ComputerMachine = Cast<ABaseMachinery>(ActorInSight);
-			Computer = nullptr;
-		}
+		}// Restructure
 		
 		InteractionWidget = CreateWidget(CharacterController, InteractionWidgetClass);
 		if(InteractionWidget != nullptr)
@@ -139,12 +133,7 @@ void ABaseCharacter::Interaction()
 			Computer->AddWidgetFromComputer(CharacterController);
 			CharacterController->SetMovement(true);
 
-		}else if(CharacterController != nullptr && ComputerMachine != nullptr && ComputerMachine->GetComputerWidgetClass() != nullptr)
-		{
-			ComputerMachine->AddWidgetFromComputer(CharacterController);
-			CharacterController->SetMovement(true);
-
-		}
+		}// Restructure
 	}
 
 }

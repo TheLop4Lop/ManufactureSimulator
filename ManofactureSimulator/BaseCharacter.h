@@ -65,9 +65,8 @@ private:
 	bool DoOnceWidget = true;
 
 	// Method that interacts directly with the object displaying widget.
-	void Interaction(); 
-
+	void Interaction();
+	
 	class ABaseComputer* Computer;
-	class ABaseMachinery* ComputerMachine;
 
 };

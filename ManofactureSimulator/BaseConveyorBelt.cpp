@@ -5,7 +5,6 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "BaseMachinery.h"
 
 // Sets default values
 ABaseConveyorBelt::ABaseConveyorBelt()
@@ -47,8 +46,7 @@ void ABaseConveyorBelt::Tick(float DeltaTime)
 		{
 			if(Actor != nullptr)
 			{
-				MachineOwner = Cast<ABaseMachinery>(Actor);
-				if(Actor != MachineOwner && Actor != this)
+				if(Actor != this)
 				{
 					Actor->AddActorWorldOffset(SelfForwardVector * DeltaSpeed);
 					bPiecesInCoveyor = true;
