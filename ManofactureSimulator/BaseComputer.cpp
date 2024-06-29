@@ -1,16 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BaseComputer.h"
-#include "Kismet/GameplayStatics.h"
-#include "ComputerProductWidget.h"
 #include "CharacterController.h"
-#include "StorageManager.h"
 
 // Sets default values
 ABaseComputer::ABaseComputer()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	ComputerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Computer Mesh"));
 	ComputerMesh->SetupAttachment(RootComponent);
@@ -21,10 +18,6 @@ ABaseComputer::ABaseComputer()
 void ABaseComputer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	TArray<AActor*> actorsInWorld;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStorageManager::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) storageManager = Cast<AStorageManager>(actorsInWorld[0]);	
 	
 }
 
@@ -32,16 +25,6 @@ void ABaseComputer::BeginPlay()
 void ABaseComputer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-}
-
-// Gett the product order for pass it on to Storage manager. INTERPRETARAAAAAAAAAAAAAAAAAAAAAAA
-void ABaseComputer::WidgetBindProductOrder(FString productCode, int rawProductQUantity)
-{
-	if(storageManager)
-	{
-		storageManager->CanProduceProductOrder(productCode, rawProductQUantity);
-	}
 
 }
 
@@ -56,14 +39,7 @@ class TSubclassOf<class UUserWidget> ABaseComputer::GetComputerWidgetClass()
 void ABaseComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
 	characterController = CharacterController;
-	computerWidget = Cast<UComputerProductWidget>(CreateWidget(characterController, computerClass));
-
-	if(computerWidget)
-	{
-		computerWidget->AddToViewport();
-		computerWidget->confirmEvent.BindUObject(this, &ABaseComputer::WidgetBindProductOrder);
-		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::WidgetBindResetController);
-	}
+	// Implement respective logic for computer widget class.
 
 }
 

@@ -138,11 +138,6 @@ void ABaseCharacter::Interaction()
 
 }
 
-
-
-
-
-
 void ABaseCharacter::ResetMoveInput()
 {
 	UE_LOG(LogTemp, Display, TEXT("EXIT"));

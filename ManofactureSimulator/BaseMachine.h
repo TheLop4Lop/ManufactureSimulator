@@ -153,7 +153,7 @@ protected:
 	class UPointLightComponent* machineStatusLight;
 
 	// Arrow for spawn location and rotation of the objects.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UArrowComponent* spawnArrow;
 
 	// Holds reference to conveyor belt that provides product for production.
@@ -193,24 +193,28 @@ protected:
 	///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 	// Section for all the logic in process the product.
 
+	// Reference to type of WidgetClass, Depending on the machine widgets change, but mainly is for product code config.
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> widgetClass;
+
 	// Holds the max quantity of orders.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int maxProductOrder = 5;
 
 	// Quantity of Products entered to the machine.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int productsEntered;
 
 	// Quantity of products produced.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int productsProduced;
 
 	// Product class to transform. This will depend on the type of machine.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	TSubclassOf<class ABaseProduct> classToTransform;
 
 	// Holds the reference to the products that had enter the machine.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int productsToProcess;
 
 	// Checks the actors on the boxEntrance, this will change depending on the machine.

@@ -27,9 +27,9 @@ public:
 	class TSubclassOf<class UUserWidget> GetComputerWidgetClass();
 
 	// Adds widget and assign the player controller to it.
-	void AddWidgetFromComputer(class ACharacterController* CharacterController);
+	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);
 
-private:
+protected:
 	///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
 	// Sections for the actor properties.
 
@@ -40,17 +40,11 @@ private:
 	// Holds the respective widget class for the computer.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> computerClass;
-	class UComputerProductWidget* computerWidget;
-
-	// Reference to Storage Manager in the world.
-	class AStorageManager* storageManager;
-
-	// Gett the product order for pass it on to Storage manager.
-	void WidgetBindProductOrder(FString productCode, int rawProductQUantity);
 
 	// Resets the character controller to move the character around.
 	void WidgetBindResetController();
 
+	// Hold reference to character controller.
 	class ACharacterController* characterController;
 
 };
