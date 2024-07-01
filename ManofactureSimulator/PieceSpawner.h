@@ -38,7 +38,7 @@ protected:
 	// Reference to spawn class.
 
 	// Holds the product code for the spawning product.
-	FInitialPieceAttribute productCode;
+	FString productCode;
 
 	// Holds a reference to RawProduct template for spawning.
 	UPROPERTY(EditAnywhere, Category = "Spawn Product", meta = (AllowPrivateMessage))

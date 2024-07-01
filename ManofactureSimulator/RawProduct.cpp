@@ -4,14 +4,14 @@
 #include "RawProduct.h"
 
 // Sets product code based on initial BaseStorage struct.
-void ARawProduct::SetProductCode(FInitialPieceAttribute productCode)
+void ARawProduct::SetProductCode(FString productCode)
 {
 	rawProductCode = productCode;
 
 }
 
 // Gets the Product code, this will be readed by the respective machines.
-FInitialPieceAttribute ARawProduct::GetRawProductCode()
+FString ARawProduct::GetRawProductCode()
 {
     return rawProductCode;
 

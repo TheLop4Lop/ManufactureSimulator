@@ -41,7 +41,7 @@ protected:
 	virtual void CheckEntranceForProduct() override;
 
 	// Gets the initialPieceAtributes and convert it to BaseMachine product code.
-	void ManageInitialProductProperties(FInitialPieceAttribute properties);
+	void ManageInitialProductProperties(FString properties);
 
 	///////////////////////////////////// SPAWN PRODUCT ////////////////////////////////
 	// Section for spawn product and set properties.

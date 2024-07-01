@@ -15,6 +15,7 @@ enum class EMachineStatus : uint8
 	ON_PRODUCTION,
 	ON_HOLD,
 	FULL_PRODUCTION,
+	PRODUCT_ERROR,
 	CODE_ERROR
 
 };
@@ -34,6 +35,15 @@ enum class EProductSize : uint8
 	S1,
 	S2,
 	S3
+
+};
+
+UENUM(BlueprintType)
+enum class EProductLength : uint8
+{
+	L1,
+	L2,
+	L3
 
 };
 
@@ -98,6 +108,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Sets value of order code for the machinery to process.
+	void SetProductionMachineOrder(FString orderToProduce);
+
 private:
 	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
 	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
@@ -107,6 +120,9 @@ private:
 
 	// Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
 	static std::map<FString, EProductSize> StringToEnumSizeMap;
+
+	// Static LENGTH map for string to ENUM data, this is used for product interpretation in respective machine.
+	static std::map<FString, EProductLength> StringToEnumLengthMap;
 
 	// Static FORM map for string to ENUM data, this is used for product interpretation in respective machine.
 	static std::map<FString, EProductForm> StringToEnumFormMap;
@@ -126,6 +142,9 @@ protected:
 
 	// Gets the StringToEnumSizeMap
 	EProductSize GetStringToEnumSizeMap(const FString& sizeString) const;
+
+	// Gets the StringToEnumLengthMap
+	EProductLength GetStringToEnumLengthMap(const FString& lengthString) const;
 
 	// Gets the StringToEnumFormMap
 	EProductForm GetStringToEnumFormMap(const FString& formString) const;
@@ -216,6 +235,9 @@ protected:
 	// Holds the reference to the products that had enter the machine.
 	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int productsToProcess;
+
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
+	FString codeToProcess;
 
 	// Checks the actors on the boxEntrance, this will change depending on the machine.
 	virtual void CheckEntranceForProduct();

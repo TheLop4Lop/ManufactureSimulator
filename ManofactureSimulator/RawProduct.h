@@ -17,15 +17,15 @@ class MANOFACTURESIMULATOR_API ARawProduct : public ABaseProduct
 
 public:
 	// Sets product code based on initial BaseStorage struct.
-	void SetProductCode(FInitialPieceAttribute productCode);
+	void SetProductCode(FString productCode);
 	// Gets the Product code, this will be readed by the respective machines.
-	FInitialPieceAttribute GetRawProductCode();
+	FString GetRawProductCode();
 
 protected:
 	///////////////////////////////////// RAW PRODUCT SETTINGS ////////////////////////////////
 	// Section for Raw product properties.
 
 	// Struct for piece identification and properties settings.
-	FInitialPieceAttribute rawProductCode;
+	FString rawProductCode;
 	
 };

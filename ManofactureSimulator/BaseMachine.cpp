@@ -14,6 +14,9 @@ std::map<FString, EProductMaterial> ABaseMachine::StringToEnumMaterialMap;
 // Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
 std::map<FString, EProductSize> ABaseMachine::StringToEnumSizeMap;
 
+// Static LENGTH map for string to ENUM data, this is used for product interpretation in respective machine.
+std::map<FString, EProductLength> ABaseMachine::StringToEnumLengthMap;
+
 // Static FORM map for string to ENUM data, this is used for product interpretation in respective machine.
 std::map<FString, EProductForm> ABaseMachine::StringToEnumFormMap;
 
@@ -79,6 +82,8 @@ void ABaseMachine::InitializeConversionMaps()
 
 	StringToEnumSizeMap = {{"S1", EProductSize::S1}, {"S2", EProductSize::S2}, {"S3", EProductSize::S3}};
 
+	StringToEnumLengthMap = {{"L1", EProductLength::L1}, {"L2", EProductLength::L2}, {"L3", EProductLength::L3}};
+
 	StringToEnumFormMap = {{"F1", EProductForm::F1}, {"F2", EProductForm::F2}, {"F3", EProductForm::F3}};
 
 	StringToEnumColorMap = {{"C1", EProductColor::C1}, {"C2", EProductColor::C2}, {"C3", EProductColor::C3}};
@@ -108,6 +113,19 @@ EProductSize ABaseMachine::GetStringToEnumSizeMap(const FString& sizeString) con
 	}
 
 	return EProductSize::S1;
+
+}
+
+// Gets the StringToEnumLengthMap
+EProductLength ABaseMachine::GetStringToEnumLengthMap(const FString& lengthString) const
+{
+	auto it = StringToEnumLengthMap.find(lengthString);
+	if(it != StringToEnumLengthMap.end())
+	{
+		return it->second;
+	}
+
+	return EProductLength::L1;
 
 }
 
@@ -215,7 +233,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 	switch (newStatus)
 	{
 	case EMachineStatus::ON_MAINTENANCE:
-		machineStatusLight->SetLightColor(FColor::Yellow);
+		machineStatusLight->SetLightColor(FColor::Blue);
 		break;
 
 	case EMachineStatus::ON_PRODUCTION:
@@ -231,14 +249,25 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		// PAUSE CONVEYOR BELT
 		break;
 
-	case EMachineStatus::CODE_ERROR:
+	case EMachineStatus::PRODUCT_ERROR:
 		machineStatusLight->SetLightColor(FColor::Red);
+		// PAUSE CONVEYOR BELT
+		break;
+
+	case EMachineStatus::CODE_ERROR:
+		machineStatusLight->SetLightColor(FColor::Yellow);
 		// PAUSE CONVEYOR BELT
 		break;
 	
 	default:
 		break;
 	}
+
+}
+
+void ABaseMachine::SetProductionMachineOrder(FString orderToProduce)
+{
+	codeToProcess = orderToProduce;
 
 }
 
