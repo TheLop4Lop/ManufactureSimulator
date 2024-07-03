@@ -22,33 +22,31 @@ void AMachineCutter::CheckEntranceForProduct()
     	{
         	if (singleActor && singleActor->IsA(classToTransform))
         	{
-				UE_LOG(LogTemp, Display, TEXT("YES"));
             	ARawProduct* productOnEntrance = Cast<ARawProduct>(singleActor);
                 if(productOnEntrance->GetRawProductCode().Equals(codeToProcess))
                 {
                     if((productOnEntrance && productsToProcess < maxProductOrder)) // THIS CHANGE DEPENDING ON THE MACHINE
 				    {   
-					    UE_LOG(LogTemp, Display, TEXT("PADENTRO"));
                         ManageInitialProductProperties(productOnEntrance->GetRawProductCode());
 					    ChangeProductionStatus(EMachineStatus::ON_PRODUCTION);
 
 					    productOnEntrance->DestroyProduct();
 				    }else
 				    {
-					    UE_LOG(LogTemp, Display, TEXT("OCUPADO"));
 					    ChangeProductionStatus(EMachineStatus::FULL_PRODUCTION);
 				    }
                 }else
                 {
-                    UE_LOG(LogTemp, Display, TEXT("WHAT'S THIS?"));
 				    ChangeProductionStatus(EMachineStatus::CODE_ERROR);
+                    UE_LOG(LogTemp, Warning, TEXT("codeToProcess: %s, productCode: %s"), *codeToProcess, *productOnEntrance->GetRawProductCode());
                 }
         	}else
 			{
-				UE_LOG(LogTemp, Display, TEXT("WHAT'S THIS?"));
 				ChangeProductionStatus(EMachineStatus::PRODUCT_ERROR);
 			}
     	}
+
+        if(actorsOnEntrance.Num() == 0) ChangeProductionStatus(EMachineStatus::ON_HOLD);
 	}
 
 }
@@ -171,7 +169,7 @@ void AMachineCutter::SpawnProducedProduct()
         }
 	}
 
-    ACuttedProduct* cuttedProduct = GetWorld()->SpawnActor<ACuttedProduct>(productClass, spawnArrow->GetComponentLocation(), spawnArrow->GetComponentRotation());
+    ACuttedProduct* cuttedProduct = GetWorld()->SpawnActor<ACuttedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
     cuttedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
     cuttedProduct->SetCuttedProductCode(productCode);
     productsToProcess --;

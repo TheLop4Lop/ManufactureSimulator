@@ -8,7 +8,9 @@ void UComputerCutterWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
+    SetLengthsButtonsEvent();
 
+    SetConfirmButton();
 
 }
 

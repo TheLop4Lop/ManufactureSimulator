@@ -77,7 +77,7 @@ void AStorageManager::Tick(float DeltaTime)
 
 	if (!GetWorldTimerManager().IsTimerActive(spawnTimer) && ordersToSpawn.Num() > 0)
 	{
-		GetWorldTimerManager().SetTimer(spawnTimer, this, &AStorageManager::SpawnProductOrder, 5.0f, true);
+		GetWorldTimerManager().SetTimer(spawnTimer, this, &AStorageManager::TryToSpawnProduct, 5.0f, true);
 	}
 
 }
@@ -93,8 +93,6 @@ EStorageProductionStatus AStorageManager::CanProduceProductOrder(FString Order, 
 
 	if (baseStorage->OrderIsInInventory(productToOrder, quantity) && (ordersToSpawn.Num() < maxProductOrder))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Quantity of orders: %i"), ordersToSpawn.Num());
-
 		UE_LOG(LogTemp, Display, TEXT("ENOUGH FOR PRODUCT!"));
 		FProductQuantity productToSpawn(productToOrder, quantity);
 		ordersToSpawn.Add(productToSpawn);
@@ -143,6 +141,15 @@ EMaterialLength AStorageManager::ConverStringToEnumLength(FString length)
 	auto iTable = tableLength.find(order);
 	
 	return (iTable != tableLength.end()) ? iTable->second : EMaterialLength::LENGTH_SHORT;
+
+}
+
+void AStorageManager::TryToSpawnProduct()
+{
+	if(productSpawner->CheckClearExit())
+	{
+		SpawnProductOrder();
+	}
 
 }
 

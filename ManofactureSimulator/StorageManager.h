@@ -98,6 +98,9 @@ protected:
 	// Holds the orders to spawn.
 	TArray<FProductQuantity> ordersToSpawn;
 
+	// First check if exit is clear and then calls SpawnProductOrder.
+	void TryToSpawnProduct();
+
 	// Spawn product.
 	void SpawnProductOrder();
 

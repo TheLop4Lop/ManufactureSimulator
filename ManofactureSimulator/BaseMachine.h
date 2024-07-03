@@ -8,6 +8,8 @@
 #include <string>
 #include "BaseMachine.generated.h"
 
+DECLARE_DELEGATE_TwoParams(FActiveConveyor, FName, bool);
+
 UENUM(BlueprintType)
 enum class EMachineStatus : uint8
 {
@@ -111,6 +113,9 @@ public:
 	// Sets value of order code for the machinery to process.
 	void SetProductionMachineOrder(FString orderToProduce);
 
+	// Delegate event for active or desable a single conveyor belt.
+	FActiveConveyor conveyorEvent;
+
 private:
 	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
 	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
@@ -163,17 +168,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	UStaticMeshComponent* computerMesh;
 
-	// Box Entrance that manages the product and determines it properties and actions.
+	// Box Entrance, manages the product and determines it properties and actions.
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UBoxComponent* boxEntrance;
+
+	// Box Exit, the spawn location and rotation of the product, also check first if the procuct can be spawned.
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	class UBoxComponent* boxExit;
 
 	// Light Status for machine.
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UPointLightComponent* machineStatusLight;
-
-	// Arrow for spawn location and rotation of the objects.
-	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
-	class UArrowComponent* spawnArrow;
 
 	// Holds reference to conveyor belt that provides product for production.
 	class ABaseConveyorBelt* entranceConveyor;
@@ -239,11 +244,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	FString codeToProcess;
 
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
+	FName machineName;
+
 	// Checks the actors on the boxEntrance, this will change depending on the machine.
 	virtual void CheckEntranceForProduct();
 
 	// Changes the production status light and actions.
 	void ChangeProductionStatus(EMachineStatus newStatus);
+
+	// Checks if boxExit is clear for spawn product.
+	bool CheckClearExit();
 
 	///////////////////////////////////// PRODUCTION TIMES ////////////////////////////////
 	// Production times to spawn produced piece and get machine ready.
@@ -347,6 +358,9 @@ protected:
 
 	// Checks all the conditions for spawn a product and spawn it.
 	void CheckConditionsForSpawnProduct();
+
+	// Is a callback function by a timer, first check is exit is clear, then spawn product.
+	void TryToSpawnProduct();
 
 	// Spawn product based on a specific ABaseProduct child, dependes on the process and machine.
 	virtual void SpawnProducedProduct();

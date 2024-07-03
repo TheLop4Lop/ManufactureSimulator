@@ -33,7 +33,7 @@ void ACutterComputer::AddWidgetFromComputer(ACharacterController* CharacterContr
 
 }
 
-// Gett the product order for pass it on to Storage manager. INTERPRETARAAAAAAAAAAAAAAAAAAAAAAA
+// Gett the product order for pass it on to Storage manager.
 void ACutterComputer::WidgetBindProductOrder(FString productCode)
 {
 	if(cutterMachine)

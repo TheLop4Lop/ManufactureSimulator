@@ -3,7 +3,6 @@
 
 #include "BaseMachine.h"
 #include "Components/PointLightComponent.h"
-#include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "BaseConveyorBelt.h"
 #include "BaseProduct.h"
@@ -38,8 +37,8 @@ ABaseMachine::ABaseMachine()
 	boxEntrance = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Entrance"));
 	boxEntrance->SetupAttachment(machineMesh);
 
-	spawnArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Spawn Arrow"));
-	spawnArrow->SetupAttachment(machineMesh);
+	boxExit = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Exit"));
+	boxExit->SetupAttachment(machineMesh);
 
 	machineStatusLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Machine Status Light"));
 	machineStatusLight->SetupAttachment(machineMesh);
@@ -203,23 +202,19 @@ void ABaseMachine::CheckEntranceForProduct()
     	{
         	if (singleActor && singleActor->IsA(classToTransform))
         	{
-				UE_LOG(LogTemp, Display, TEXT("YES"));
             	ABaseProduct* productOnEntrance = Cast<ABaseProduct>(singleActor); // THIS CHANGE DEPENDING ON THE MACHINE
 				if(productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
 				{
-					UE_LOG(LogTemp, Display, TEXT("PADENTRO"));
 					ChangeProductionStatus(EMachineStatus::ON_PRODUCTION);
 					productsToProcess++;
 
 					productOnEntrance->DestroyProduct();
 				}else
 				{
-					UE_LOG(LogTemp, Display, TEXT("OCUPADO"));
 					ChangeProductionStatus(EMachineStatus::FULL_PRODUCTION);
 				}
         	}else
 			{
-				UE_LOG(LogTemp, Display, TEXT("WHAT'S THIS?"));
 				ChangeProductionStatus(EMachineStatus::CODE_ERROR);
 			}
     	}
@@ -234,29 +229,32 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 	{
 	case EMachineStatus::ON_MAINTENANCE:
 		machineStatusLight->SetLightColor(FColor::Blue);
+		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::ON_PRODUCTION:
 		machineStatusLight->SetLightColor(FColor::Green);
+		conveyorEvent.ExecuteIfBound(machineName, true);
 		break;
 
 	case EMachineStatus::ON_HOLD:
 		machineStatusLight->SetLightColor(FColor::White);
+		conveyorEvent.ExecuteIfBound(machineName, true);
 		break;
 
 	case EMachineStatus::FULL_PRODUCTION:
 		machineStatusLight->SetLightColor(FColor::Orange);
-		// PAUSE CONVEYOR BELT
+		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::PRODUCT_ERROR:
 		machineStatusLight->SetLightColor(FColor::Red);
-		// PAUSE CONVEYOR BELT
+		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::CODE_ERROR:
 		machineStatusLight->SetLightColor(FColor::Yellow);
-		// PAUSE CONVEYOR BELT
+		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 	
 	default:
@@ -268,6 +266,19 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 void ABaseMachine::SetProductionMachineOrder(FString orderToProduce)
 {
 	codeToProcess = orderToProduce;
+	UE_LOG(LogTemp, Display, TEXT("codeToProcess: %s"), *codeToProcess);
+}
+
+bool ABaseMachine::CheckClearExit()
+{
+	TArray<AActor*> overlappingActors;
+	boxExit->GetOverlappingActors(overlappingActors);
+	if(overlappingActors.Num() != 0)
+	{
+		return false;
+	}
+
+	return true;
 
 }
 
@@ -283,7 +294,17 @@ void ABaseMachine::CheckConditionsForSpawnProduct()
 	}else if(isPowered && isReady && !isOnHold && !isInMaintenance && productsToProcess > 0 && !GetWorldTimerManager().IsTimerActive(spawnTimer))
 	{
 		// CONFIGURE PRODCUTION STATE LIGHT ON PRODUCTION.
-		GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::SpawnProducedProduct, totalProductionPerPiece, true);
+		GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::TryToSpawnProduct, totalProductionPerPiece, true);
+	}
+
+}
+
+// Is a callback function by a timer, first check is exit is clear, then spawn product.
+void ABaseMachine::TryToSpawnProduct()
+{
+	if(CheckClearExit())
+	{
+		SpawnProducedProduct();
 	}
 
 }
@@ -291,7 +312,7 @@ void ABaseMachine::CheckConditionsForSpawnProduct()
 // Spawn product based on a specific ABaseProduct child, dependes on the process and machine.
 void ABaseMachine::SpawnProducedProduct()
 {
-	ABaseProduct* spawnProduct = GetWorld()->SpawnActor<ABaseProduct>(productClass, spawnArrow->GetComponentLocation(), spawnArrow->GetComponentRotation());
+	ABaseProduct* spawnProduct = GetWorld()->SpawnActor<ABaseProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
 	if(productMesh.Num() > 0 && productSize.Num() > 0 && qualityMaterial.Num() > 0)
 	{
 		UE_LOG(LogTemp, Display, TEXT("SET Properties spawn properties in machine."));

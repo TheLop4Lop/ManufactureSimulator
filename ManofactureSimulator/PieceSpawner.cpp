@@ -2,7 +2,7 @@
 
 
 #include "PieceSpawner.h"
-#include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RawProduct.h"
 
@@ -12,8 +12,8 @@ APieceSpawner::APieceSpawner()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow Component"));
-	RootComponent = arrow;
+	spawnerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Spawner Box"));
+	RootComponent = spawnerBox;
 
 }
 
@@ -28,6 +28,21 @@ void APieceSpawner::BeginPlay()
 void APieceSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+// Checks if exit is clear for spawn product.
+bool APieceSpawner::CheckClearExit()
+{
+	TArray<AActor*> overlappingActors;
+	spawnerBox->GetOverlappingActors(overlappingActors);
+
+	if(overlappingActors.Num() != 0)
+	{
+		return false;
+	}
+
+	return true;
 
 }
 
@@ -99,7 +114,7 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 		}
 	}
 
-	ARawProduct* product = GetWorld()->SpawnActor<ARawProduct>(rawProductClass, arrow->GetRelativeLocation(), arrow->GetRelativeRotation());
+	ARawProduct* product = GetWorld()->SpawnActor<ARawProduct>(rawProductClass, spawnerBox->GetRelativeLocation(), spawnerBox->GetRelativeRotation());
 	if(product && selectedMesh && selectedMaterial)
 	{
 		product->SetProductCode(productCode);
