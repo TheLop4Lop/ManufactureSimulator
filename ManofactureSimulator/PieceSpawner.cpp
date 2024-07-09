@@ -114,11 +114,14 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 		}
 	}
 
-	ARawProduct* product = GetWorld()->SpawnActor<ARawProduct>(rawProductClass, spawnerBox->GetRelativeLocation(), spawnerBox->GetRelativeRotation());
-	if(product && selectedMesh && selectedMaterial)
+	if(rawProductClass)
 	{
-		product->SetProductCode(productCode);
-		product->SetsProductProperties(selectedMesh, selectedMaterial, selectesSize);
+		ARawProduct* product = GetWorld()->SpawnActor<ARawProduct>(rawProductClass, spawnerBox->GetRelativeLocation(), spawnerBox->GetRelativeRotation());
+		if(product && selectedMesh && selectedMaterial)
+		{
+			product->SetProductCode(productCode);
+			product->SetsProductProperties(selectedMesh, selectedMaterial, selectesSize);
+		}
 	}
 
 }

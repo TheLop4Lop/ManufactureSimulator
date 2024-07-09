@@ -57,7 +57,7 @@ void ABaseMachine::BeginPlay()
 
 	TArray<AActor*> initialActors;
 	boxEntrance->GetOverlappingActors(initialActors);
-	if(initialActors.IsValidIndex(0)) entranceConveyor = Cast<ABaseConveyorBelt>(initialActors[0]);	
+	if(initialActors.IsValidIndex(0)) entranceConveyor = Cast<ABaseConveyorBelt>(initialActors[0]);
 
 }
 
@@ -66,9 +66,15 @@ void ABaseMachine::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetInitialMachineStatus();
-	CheckEntranceForProduct();
-	CheckConditionsForSpawnProduct();
+	if(isPowered)
+	{
+		SetInitialMachineStatus();
+		CheckEntranceForProduct();	
+		CheckConditionsForSpawnProduct();
+	}else
+	{
+		ChangeProductionStatus(EMachineStatus::OFF);
+	}
 
 }
 
@@ -233,27 +239,38 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		break;
 
 	case EMachineStatus::ON_PRODUCTION:
+		UE_LOG(LogTemp, Warning, TEXT("Changing status to ON_PRODUCTION"));
 		machineStatusLight->SetLightColor(FColor::Green);
 		conveyorEvent.ExecuteIfBound(machineName, true);
 		break;
 
 	case EMachineStatus::ON_HOLD:
+		UE_LOG(LogTemp, Warning, TEXT("Changing status to ON_HOLD"));
 		machineStatusLight->SetLightColor(FColor::White);
 		conveyorEvent.ExecuteIfBound(machineName, true);
 		break;
 
 	case EMachineStatus::FULL_PRODUCTION:
+		UE_LOG(LogTemp, Warning, TEXT("Changing status to FULL_PRODUCTION"));
 		machineStatusLight->SetLightColor(FColor::Orange);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::PRODUCT_ERROR:
+		UE_LOG(LogTemp, Warning, TEXT("Changing status to PRODUCT_ERROR"));
 		machineStatusLight->SetLightColor(FColor::Red);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::CODE_ERROR:
+		UE_LOG(LogTemp, Warning, TEXT("Changing status to CODE_ERROR"));
 		machineStatusLight->SetLightColor(FColor::Yellow);
+		conveyorEvent.ExecuteIfBound(machineName, false);
+		break;
+
+	case EMachineStatus::OFF:
+		UE_LOG(LogTemp, Warning, TEXT("Machine OFF"));
+		machineStatusLight->SetIntensity(0.0f);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 	
@@ -288,12 +305,11 @@ bool ABaseMachine::CheckClearExit()
 // Checks all the conditions for spawn a product and spawn it.
 void ABaseMachine::CheckConditionsForSpawnProduct()
 {
-	if(isPowered && isReady && isOnHold && !isInMaintenance && productsToProcess == 0)
+	if(isReady && isOnHold && !isInMaintenance)
 	{
-		// CONFIGURE PRODCUTION STATE LIGHT ON HOLD.
-	}else if(isPowered && isReady && !isOnHold && !isInMaintenance && productsToProcess > 0 && !GetWorldTimerManager().IsTimerActive(spawnTimer))
+		ChangeProductionStatus(EMachineStatus::ON_HOLD);
+	}else if(isReady && !isOnHold && !isInMaintenance && !GetWorldTimerManager().IsTimerActive(spawnTimer))
 	{
-		// CONFIGURE PRODCUTION STATE LIGHT ON PRODUCTION.
 		GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::TryToSpawnProduct, totalProductionPerPiece, true);
 	}
 
@@ -302,7 +318,7 @@ void ABaseMachine::CheckConditionsForSpawnProduct()
 // Is a callback function by a timer, first check is exit is clear, then spawn product.
 void ABaseMachine::TryToSpawnProduct()
 {
-	if(CheckClearExit())
+	if(CheckClearExit() && (productsToProcess > 0))
 	{
 		SpawnProducedProduct();
 	}

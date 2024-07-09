@@ -10,45 +10,51 @@
 ///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 // Section for all the logic in process the product.
 
-// Checks the actors on the boxEntrance, this will change depending on the machine.
 void AMachineCutter::CheckEntranceForProduct()
 {
     if (boxEntrance)
-	{
-		TArray<AActor*> actorsOnEntrance;
-   		boxEntrance->GetOverlappingActors(actorsOnEntrance);
+    {
+        TArray<AActor*> actorsOnEntrance;
+        boxEntrance->GetOverlappingActors(actorsOnEntrance);
 
-    	for (AActor* singleActor : actorsOnEntrance)
-    	{
-        	if (singleActor && singleActor->IsA(classToTransform))
-        	{
-            	ARawProduct* productOnEntrance = Cast<ARawProduct>(singleActor);
-                if(productOnEntrance->GetRawProductCode().Equals(codeToProcess))
-                {
-                    if((productOnEntrance && productsToProcess < maxProductOrder)) // THIS CHANGE DEPENDING ON THE MACHINE
-				    {   
-                        ManageInitialProductProperties(productOnEntrance->GetRawProductCode());
-					    ChangeProductionStatus(EMachineStatus::ON_PRODUCTION);
+        EMachineStatus NewStatus = EMachineStatus::ON_PRODUCTION;
 
-					    productOnEntrance->DestroyProduct();
-				    }else
-				    {
-					    ChangeProductionStatus(EMachineStatus::FULL_PRODUCTION);
-				    }
-                }else
+        for (AActor* singleActor : actorsOnEntrance)
+        {
+            if (singleActor && singleActor->IsA(classToTransform))
+            {
+                ARawProduct* productOnEntrance = Cast<ARawProduct>(singleActor);
+                if (productOnEntrance->GetProductCode().Equals(codeToProcess))
                 {
-				    ChangeProductionStatus(EMachineStatus::CODE_ERROR);
-                    UE_LOG(LogTemp, Warning, TEXT("codeToProcess: %s, productCode: %s"), *codeToProcess, *productOnEntrance->GetRawProductCode());
+                    if (productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
+                    {
+                        ManageInitialProductProperties(productOnEntrance->GetProductCode());
+                        productOnEntrance->DestroyProduct();
+                    }
+                    else
+                    {
+                        NewStatus = EMachineStatus::FULL_PRODUCTION;
+                    }
                 }
-        	}else
-			{
-				ChangeProductionStatus(EMachineStatus::PRODUCT_ERROR);
-			}
-    	}
+                else
+                {
+                    NewStatus = EMachineStatus::CODE_ERROR;
+                }
+                break; // Exit the loop once we find a valid product
+            }
+            else
+            {
+                NewStatus = EMachineStatus::PRODUCT_ERROR;
+            }
+        }
 
-        if(actorsOnEntrance.Num() == 0) ChangeProductionStatus(EMachineStatus::ON_HOLD);
-	}
-
+        // Call ChangeProductionStatus only if the status has changed
+        if (NewStatus != PreviousStatus)
+        {
+            ChangeProductionStatus(NewStatus);
+            PreviousStatus = NewStatus;
+        }
+    }
 }
 
 // Gets the initialPieceAtributes and convert it to BaseMachine product code.
@@ -169,9 +175,12 @@ void AMachineCutter::SpawnProducedProduct()
         }
 	}
 
-    ACuttedProduct* cuttedProduct = GetWorld()->SpawnActor<ACuttedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
-    cuttedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
-    cuttedProduct->SetCuttedProductCode(productCode);
-    productsToProcess --;
+    if(productClass)
+    {
+        ACuttedProduct* cuttedProduct = GetWorld()->SpawnActor<ACuttedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
+        cuttedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
+        cuttedProduct->SetProductCode(productCode);
+        productsToProcess --;
+    }
 
 }

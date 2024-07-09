@@ -18,7 +18,8 @@ enum class EMachineStatus : uint8
 	ON_HOLD,
 	FULL_PRODUCTION,
 	PRODUCT_ERROR,
-	CODE_ERROR
+	CODE_ERROR,
+	OFF
 
 };
 
@@ -249,12 +250,17 @@ protected:
 
 	// Checks the actors on the boxEntrance, this will change depending on the machine.
 	virtual void CheckEntranceForProduct();
+	
+	void CallChangeProductionStatus(EMachineStatus newStatus);
 
 	// Changes the production status light and actions.
 	void ChangeProductionStatus(EMachineStatus newStatus);
 
 	// Checks if boxExit is clear for spawn product.
 	bool CheckClearExit();
+
+	// Controls MachineStatus flow
+	EMachineStatus PreviousStatus = EMachineStatus::ON_HOLD;
 
 	///////////////////////////////////// PRODUCTION TIMES ////////////////////////////////
 	// Production times to spawn produced piece and get machine ready.

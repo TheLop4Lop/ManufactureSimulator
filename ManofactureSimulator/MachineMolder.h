@@ -44,9 +44,7 @@ protected:
 	virtual void CheckEntranceForProduct() override;
 
 	// Gets the cuttedProduct properties and proces production product code.
-	void ManageCuttedProductProperties(FProductForm properties);
-
-	FProductForm& GetMolderedProductCode(FString& cuttedProductCode);
+	void ManageCuttedProductProperties(FString properties);
 
 	///////////////////////////////////// SPAWN PRODUCT ////////////////////////////////
 	// Section for spawn product and set properties.

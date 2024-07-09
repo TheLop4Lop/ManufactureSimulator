@@ -80,6 +80,20 @@ float ABaseProduct::GetProductQuality()
 
 }
 
+// Sets cutted piece product code.
+void ABaseProduct::SetProductCode(FString& code)
+{
+    productCode = code;
+
+}
+
+// Gets cutted piece product code.
+FString& ABaseProduct::GetProductCode()
+{
+    return productCode;
+
+}
+
 void ABaseProduct::DestroyProduct()
 {
 	Destroy();

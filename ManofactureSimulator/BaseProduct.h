@@ -37,6 +37,11 @@ public:
 	// Returns the quality of the piece.
 	float GetProductQuality();
 
+	// Sets cutted piece product code.
+	void SetProductCode(FString& code);
+	// Gets cutted piece product code.
+	FString& GetProductCode();
+
 	// Destroys the product.
 	void DestroyProduct();
 
@@ -63,5 +68,8 @@ protected:
 	// Holds the quality of the piece.
 	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
 	float qualityPercent;
+
+	// Stores product code to be readed by the next machine in the process.
+	FString productCode;
 
 };
