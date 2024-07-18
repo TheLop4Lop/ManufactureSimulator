@@ -3,72 +3,58 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseProductWidget.h"
-#include "ComputerMolderWidget.generated.h"
-
-DECLARE_DELEGATE_OneParam(FProcessOrder, FString);
+#include "ComputerMolderWidget.h"
+#include "ComputerPainterWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MANOFACTURESIMULATOR_API UComputerMolderWidget : public UBaseProductWidget
+class MANOFACTURESIMULATOR_API UComputerPainterWidget : public UComputerMolderWidget
 {
 	GENERATED_BODY()
 
 protected:
 	virtual void NativeConstruct() override;
 
-public:
-	// Delegate event for confirm production order for machine.
-	FProcessOrder confirmProductionCode;
-
 protected:
 ///////////////////////////////////// FORM PRODUCT BUTTON PROPERTIES ////////////////////////////////
 // Section for Form product characteristic buttons.
 	
-	// Form F1 button.
+	// Form C1 button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* F1;
+	class UButton* C1;
 
-	// Form F2 button.
+	// Form C2 button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* F2;
+	class UButton* C2;
 
-	// Form F3 button.
+	// Form C3 button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* F3;
+	class UButton* C3;
 
 	// Set implementation for Form buttons.
 	void SetFormsButtonsEvent();
 
-	// Set F1 button logic.
+	// Set C1 button logic.
 	UFUNCTION()
-	void SetF1ButtonLogic();
+	void SetC1ButtonLogic();
 
-	// Set F2 button logic.
+	// Set C2 button logic.
 	UFUNCTION()
-	void SetF2ButtonLogic();
+	void SetC2ButtonLogic();
 
-	// Set F3 button logic.
+	// Set C3 button logic.
 	UFUNCTION()
-	void SetF3ButtonLogic();
+	void SetC3ButtonLogic();
 
 	// Form string for implement product code.
-	FString formType;
+	FString colorType;
 
 	///////////////////////////////////// COMPUTER BUTTON PROPERTIES ////////////////////////////////
 	// Section for computer product characteristic orders.
 
-	// Confirm product order.
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* confirmButton;
-
-	// Sets implementation for confirmButton.
-	void SetConfirmButton();
-
 	// Sets confirmButton logic. Triggers an event for machine to recieve production order.
-	UFUNCTION()
-	virtual void SetConfirmButtonLogic();
+	virtual void SetConfirmButtonLogic() override;
 	
 };

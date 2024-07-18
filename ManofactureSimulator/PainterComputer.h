@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BaseComputer.h"
-#include "MolderComputer.generated.h"
+#include "PainterComputer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MANOFACTURESIMULATOR_API AMolderComputer : public ABaseComputer
+class MANOFACTURESIMULATOR_API APainterComputer : public ABaseComputer
 {
 	GENERATED_BODY()
 
@@ -26,10 +26,10 @@ protected:
 	// Sections for the actor properties.
 	
 	// Reference to widget Production Widget for manage production machine product.
-	class UComputerMolderWidget* computerWidget;
+	class UComputerPainterWidget* computerWidget;
 
 	// Reference to cutter machine in the world.
-	class AMachineMolder* cutterMachine;
+	class AMachinePainter* cutterMachine;
 
 	void PublicWidgetBindResetController();
 

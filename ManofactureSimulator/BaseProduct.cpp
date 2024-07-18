@@ -23,6 +23,7 @@ void ABaseProduct::BeginPlay()
 	Super::BeginPlay();
 
 	productMesh->SetSimulatePhysics(true);
+	productMesh->SetRenderCustomDepth(true);
 	
 }
 

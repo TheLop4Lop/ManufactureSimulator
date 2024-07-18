@@ -31,9 +31,6 @@ ABaseMachine::ABaseMachine()
 	machineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Machine Mesh"));
 	RootComponent = machineMesh;
 
-	computerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Computer Mesh"));
-	computerMesh->SetupAttachment(machineMesh);
-
 	boxEntrance = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Entrance"));
 	boxEntrance->SetupAttachment(machineMesh);
 

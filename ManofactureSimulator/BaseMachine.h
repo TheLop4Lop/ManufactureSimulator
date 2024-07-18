@@ -68,32 +68,6 @@ enum class EProductColor : uint8
 
 };
 
-USTRUCT(BlueprintType)
-struct FProductColor
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductMaterial Quality;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductSize Size;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductForm Form;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductColor Color;
-
-	FProductColor()
-		: Quality(EProductMaterial::M1),
-          Size(EProductSize::S1),
-          Form(EProductForm::F1),
-		  Color(EProductColor::C1)
-	{}
-
-};
-
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseMachine : public AActor
 {
@@ -164,10 +138,6 @@ protected:
 	// Machinery Mesh
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	UStaticMeshComponent* machineMesh;
-
-	// Machine Computer Mesh
-	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
-	UStaticMeshComponent* computerMesh;
 
 	// Box Entrance, manages the product and determines it properties and actions.
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
