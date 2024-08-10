@@ -6,6 +6,19 @@
 #include "MolderedProduct.h"
 #include "CuttedProduct.h"
 
+///////////////////////////////////// STATUS PROPERTIES ////////////////////////////////
+// Main varibles that controll the machine mechanic.
+
+void AMachineMolder::SetPositionOfServiceDoor()
+{
+	FRotator doorRotation;
+	(!isServiceDoorOpen)? doorRotation = FRotator(44.f, 303.0f, -108.0f) : doorRotation = FRotator(0.f, 0.f,0.f);
+	machineServiceDoorMesh->SetRelativeRotation(doorRotation);
+
+	isServiceDoorOpen = !isServiceDoorOpen;
+
+}
+
 //////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 // Section for all the logic in process the product.
 

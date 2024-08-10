@@ -36,6 +36,10 @@ class MANOFACTURESIMULATOR_API AMachineMolder : public ABaseMachine
 {
 	GENERATED_BODY()
 
+public:
+	// Sets the posititon for the Machine Service Door.
+	virtual void SetPositionOfServiceDoor() override;
+
 protected:
 //////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 	// Section for all the logic in process the product.

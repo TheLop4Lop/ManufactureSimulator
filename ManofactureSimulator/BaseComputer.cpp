@@ -50,3 +50,10 @@ void ABaseComputer::WidgetBindResetController()
 	characterController = nullptr;
 
 }
+
+// Calls to restart controller on player.
+void ABaseComputer::PublicWidgetBindResetController()
+{
+    WidgetBindResetController();
+
+}

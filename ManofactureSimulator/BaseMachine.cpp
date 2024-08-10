@@ -31,6 +31,15 @@ ABaseMachine::ABaseMachine()
 	machineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Machine Mesh"));
 	RootComponent = machineMesh;
 
+	productDoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Product Door Mesh"));
+	productDoorMesh->SetupAttachment(machineMesh);
+
+	machineServiceDoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Machine Door Mesh"));
+	machineServiceDoorMesh->SetupAttachment(machineMesh);
+
+	machineActionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Machine Action Mesh"));
+	machineActionMesh->SetupAttachment(machineMesh);
+
 	boxEntrance = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Entrance"));
 	boxEntrance->SetupAttachment(machineMesh);
 
@@ -188,6 +197,27 @@ void ABaseMachine::ResetReadyMachineStatus()
 {
 	isReady = false;
 	GetWorldTimerManager().ClearTimer(processTimer);
+}
+
+// Sets the position and status of product door.
+void ABaseMachine::SetPositionOfProductDoor()
+{
+	FRotator doorRotation;
+	(!isProductDoorOpen)? doorRotation = FRotator(0.f, 0.f, -90.f) : doorRotation = FRotator(0.f, 0.f,0.f);
+	productDoorMesh->SetRelativeRotation(doorRotation);
+
+	isProductDoorOpen = !isProductDoorOpen;
+
+}
+
+void ABaseMachine::SetPositionOfServiceDoor()
+{
+	FRotator doorRotation;
+	(!isServiceDoorOpen)? doorRotation = FRotator(0.f, 0.f, -100.f) : doorRotation = FRotator(0.f, 0.f,0.f);
+	machineServiceDoorMesh->SetRelativeRotation(doorRotation);
+
+	isServiceDoorOpen = !isServiceDoorOpen;
+
 }
 
 ///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////

@@ -3,23 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ComputerMolderWidget.h"
-#include "ComputerPainterWidget.generated.h"
+#include "ComputerWidgetMolder.h"
+#include "ComputerWidgetPainter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MANOFACTURESIMULATOR_API UComputerPainterWidget : public UComputerMolderWidget
+class MANOFACTURESIMULATOR_API UComputerWidgetPainter : public UComputerWidgetMolder
 {
 	GENERATED_BODY()
 
 protected:
 	virtual void NativeConstruct() override;
 
-protected:
-///////////////////////////////////// FORM PRODUCT BUTTON PROPERTIES ////////////////////////////////
-// Section for Form product characteristic buttons.
+///////////////////////////////////// COLOR PRODUCT BUTTON PROPERTIES ////////////////////////////////
+// Section for Color product characteristic buttons.
 	
 	// Form C1 button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -34,7 +33,7 @@ protected:
 	class UButton* C3;
 
 	// Set implementation for Form buttons.
-	void SetFormsButtonsEvent();
+	void SetColorsButtonsEvent();
 
 	// Set C1 button logic.
 	UFUNCTION()
@@ -51,10 +50,6 @@ protected:
 	// Form string for implement product code.
 	FString colorType;
 
-	///////////////////////////////////// COMPUTER BUTTON PROPERTIES ////////////////////////////////
-	// Section for computer product characteristic orders.
-
-	// Sets confirmButton logic. Triggers an event for machine to recieve production order.
-	virtual void SetConfirmButtonLogic() override;
+	virtual void ExecuteConfirmButton() override;
 	
 };

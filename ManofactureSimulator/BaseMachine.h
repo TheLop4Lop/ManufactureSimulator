@@ -88,6 +88,12 @@ public:
 	// Sets value of order code for the machinery to process.
 	void SetProductionMachineOrder(FString orderToProduce);
 
+	// Sets the position and status of product door.
+	void SetPositionOfProductDoor();
+
+	// Sets the posititon for the Machine Service Door.
+	virtual void SetPositionOfServiceDoor();
+
 	// Delegate event for active or desable a single conveyor belt.
 	FActiveConveyor conveyorEvent;
 
@@ -139,6 +145,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	UStaticMeshComponent* machineMesh;
 
+	// Machinery Mesh
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	UStaticMeshComponent* productDoorMesh;
+
+	// Machinery Mesh
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	UStaticMeshComponent* machineServiceDoorMesh;
+
+	// Machinery Mesh
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	UStaticMeshComponent* machineActionMesh;
+
 	// Box Entrance, manages the product and determines it properties and actions.
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UBoxComponent* boxEntrance;
@@ -172,6 +190,14 @@ protected:
 	// Sets maintenance status of the machine. Can't produce if this is on.
 	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
 	bool isInMaintenance;
+
+	// Sets ProductDoor status of the machine. Can't produce if this is on.
+	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
+	bool isProductDoorOpen;
+
+	// Sets maintenance service door status of the machine.
+	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
+	bool isServiceDoorOpen;
 
 	// Holds the actual status of the machine, this is then interpreted by a light color.
 	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))

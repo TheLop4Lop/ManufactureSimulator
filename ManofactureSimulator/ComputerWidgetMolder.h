@@ -3,27 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseProductWidget.h"
-#include "ComputerMolderWidget.generated.h"
-
-DECLARE_DELEGATE_OneParam(FProcessOrder, FString);
+#include "BaseMachineComputerWidget.h"
+#include "ComputerWidgetMolder.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MANOFACTURESIMULATOR_API UComputerMolderWidget : public UBaseProductWidget
+class MANOFACTURESIMULATOR_API UComputerWidgetMolder : public UBaseMachineComputerWidget
 {
 	GENERATED_BODY()
 
 protected:
 	virtual void NativeConstruct() override;
 
-public:
-	// Delegate event for confirm production order for machine.
-	FProcessOrder confirmProductionCode;
-
-protected:
 ///////////////////////////////////// FORM PRODUCT BUTTON PROPERTIES ////////////////////////////////
 // Section for Form product characteristic buttons.
 	
@@ -57,18 +50,6 @@ protected:
 	// Form string for implement product code.
 	FString formType;
 
-	///////////////////////////////////// COMPUTER BUTTON PROPERTIES ////////////////////////////////
-	// Section for computer product characteristic orders.
-
-	// Confirm product order.
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* confirmButton;
-
-	// Sets implementation for confirmButton.
-	void SetConfirmButton();
-
-	// Sets confirmButton logic. Triggers an event for machine to recieve production order.
-	UFUNCTION()
-	virtual void SetConfirmButtonLogic();
+	virtual void ExecuteConfirmButton() override;
 	
 };

@@ -215,7 +215,7 @@ void AMachinePainter::SpawnProducedProduct()
 
         switch (paintedProductCode.Color)
         {
-        case EProductColor::C1:
+        case EProductColor::C1: // BLUE COLOR
             switch (paintedProductCode.Quality)
             {
             case EProductMaterial::M1:
@@ -223,11 +223,11 @@ void AMachinePainter::SpawnProducedProduct()
                 break;
             
             case EProductMaterial::M2:
-                productMaterialToSpawn = color1Quality[1];
+                productMaterialToSpawn = color2Quality[0];
                 break;
 
             case EProductMaterial::M3:
-                productMaterialToSpawn = color1Quality[2];
+                productMaterialToSpawn = color3Quality[0];
                 break;
 
             default:
@@ -236,11 +236,11 @@ void AMachinePainter::SpawnProducedProduct()
             productCode += "C1";
             break;
         
-        case EProductColor::C2:
+        case EProductColor::C2:// RED COLOR
             switch (paintedProductCode.Quality)
             {
             case EProductMaterial::M1:
-                productMaterialToSpawn = color2Quality[0];
+                productMaterialToSpawn = color1Quality[1];
                 break;
             
             case EProductMaterial::M2:
@@ -248,7 +248,7 @@ void AMachinePainter::SpawnProducedProduct()
                 break;
 
             case EProductMaterial::M3:
-                productMaterialToSpawn = color2Quality[2];
+                productMaterialToSpawn = color3Quality[1];
                 break;
 
             default:
@@ -257,15 +257,15 @@ void AMachinePainter::SpawnProducedProduct()
             productCode += "C2";
             break;
 
-        case EProductColor::C3:
+        case EProductColor::C3: // GREEN COLOR
             switch (paintedProductCode.Quality)
             {
             case EProductMaterial::M1:
-                productMaterialToSpawn = color3Quality[0];
+                productMaterialToSpawn = color1Quality[2];
                 break;
             
             case EProductMaterial::M2:
-                productMaterialToSpawn = color3Quality[1];
+                productMaterialToSpawn = color2Quality[2];
                 break;
 
             case EProductMaterial::M3:

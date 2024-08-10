@@ -3,7 +3,7 @@
 
 #include "PainterComputer.h"
 #include "Kismet/GameplayStatics.h"
-#include "ComputerPainterWidget.h"
+#include "ComputerWidgetPainter.h"
 #include "CharacterController.h"
 #include "MachinePainter.h"
 
@@ -14,7 +14,7 @@ void APainterComputer::BeginPlay()
 
 	TArray<AActor*> actorsInWorld;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMachinePainter::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) cutterMachine = Cast<AMachinePainter>(actorsInWorld[0]);	
+	if(actorsInWorld.IsValidIndex(0)) painterMachine = Cast<AMachinePainter>(actorsInWorld[0]);	
 	
 }
 
@@ -22,13 +22,16 @@ void APainterComputer::BeginPlay()
 void APainterComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
 	characterController = CharacterController;
-	computerWidget = Cast<UComputerPainterWidget>(CreateWidget(characterController, computerClass));
+	computerWidget = Cast<UComputerWidgetPainter>(CreateWidget(characterController, computerClass));
 
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
 		computerWidget->confirmProductionCode.BindUObject(this, &APainterComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &APainterComputer::PublicWidgetBindResetController);
+
+		computerWidget->productDoorAction.BindUObject(this, &APainterComputer::CallProductDoorAction);
+		computerWidget->serviceDoorAction.BindUObject(this, &APainterComputer::CallsServiceDoorAction);
 	}
 
 }
@@ -36,9 +39,9 @@ void APainterComputer::AddWidgetFromComputer(ACharacterController* CharacterCont
 // Gett the product order for pass it on to Storage manager.
 void APainterComputer::WidgetBindProductOrder(FString productCode)
 {
-	if(cutterMachine)
+	if(painterMachine)
 	{
-		cutterMachine->SetProductionMachineOrder(productCode);
+		painterMachine->SetProductionMachineOrder(productCode);
 	}
 
 }
@@ -46,5 +49,25 @@ void APainterComputer::WidgetBindProductOrder(FString productCode)
 void APainterComputer::PublicWidgetBindResetController()
 {
     WidgetBindResetController();
+
+}
+
+// Calls machine for product door interaction.
+void APainterComputer::CallProductDoorAction()
+{
+	if(painterMachine)
+	{
+		painterMachine->SetPositionOfProductDoor();
+	}
+
+}
+
+// Calls machine service door for interaction.
+void APainterComputer::CallsServiceDoorAction()
+{
+	if(painterMachine)
+	{
+		painterMachine->SetPositionOfServiceDoor();
+	}
 
 }

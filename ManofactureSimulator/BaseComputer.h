@@ -29,6 +29,9 @@ public:
 	// Adds widget and assign the player controller to it.
 	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);
 
+	// Calls to restart controller on player.
+	void PublicWidgetBindResetController();
+
 protected:
 	///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
 	// Sections for the actor properties.

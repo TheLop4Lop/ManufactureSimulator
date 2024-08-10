@@ -3,7 +3,7 @@
 
 #include "MolderComputer.h"
 #include "Kismet/GameplayStatics.h"
-#include "ComputerMolderWidget.h"
+#include "ComputerWidgetMolder.h"
 #include "CharacterController.h"
 #include "MachineMolder.h"
 
@@ -14,7 +14,7 @@ void AMolderComputer::BeginPlay()
 
 	TArray<AActor*> actorsInWorld;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMachineMolder::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) cutterMachine = Cast<AMachineMolder>(actorsInWorld[0]);	
+	if(actorsInWorld.IsValidIndex(0)) molderMachine = Cast<AMachineMolder>(actorsInWorld[0]);	
 	
 }
 
@@ -22,13 +22,16 @@ void AMolderComputer::BeginPlay()
 void AMolderComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
 	characterController = CharacterController;
-	computerWidget = Cast<UComputerMolderWidget>(CreateWidget(characterController, computerClass));
+	computerWidget = Cast<UComputerWidgetMolder>(CreateWidget(characterController, computerClass));
 
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
 		computerWidget->confirmProductionCode.BindUObject(this, &AMolderComputer::WidgetBindProductOrder);
-		computerWidget->exitButtonEvent.BindUObject(this, &AMolderComputer::PublicWidgetBindResetController);
+		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::PublicWidgetBindResetController);
+
+		computerWidget->productDoorAction.BindUObject(this, &AMolderComputer::CallProductDoorAction);
+		computerWidget->serviceDoorAction.BindUObject(this, &AMolderComputer::CallsServiceDoorAction);
 	}
 
 }
@@ -36,15 +39,29 @@ void AMolderComputer::AddWidgetFromComputer(ACharacterController* CharacterContr
 // Gett the product order for pass it on to Storage manager.
 void AMolderComputer::WidgetBindProductOrder(FString productCode)
 {
-	if(cutterMachine)
+	if(molderMachine)
 	{
-		cutterMachine->SetProductionMachineOrder(productCode);
+		molderMachine->SetProductionMachineOrder(productCode);
 	}
 
 }
 
-void AMolderComputer::PublicWidgetBindResetController()
+// Calls machine for product door interaction.
+void AMolderComputer::CallProductDoorAction()
 {
-    WidgetBindResetController();
+	if(molderMachine)
+	{
+		molderMachine->SetPositionOfProductDoor();
+	}
+
+}
+
+// Calls machine service door for interaction.
+void AMolderComputer::CallsServiceDoorAction()
+{
+	if(molderMachine)
+	{
+		molderMachine->SetPositionOfServiceDoor();
+	}
 
 }

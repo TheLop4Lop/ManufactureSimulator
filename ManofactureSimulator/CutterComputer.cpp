@@ -3,7 +3,7 @@
 
 #include "CutterComputer.h"
 #include "Kismet/GameplayStatics.h"
-#include "ComputerCutterWidget.h"
+#include "ComputerWidgetCutter.h"
 #include "CharacterController.h"
 #include "MachineCutter.h"
 
@@ -22,13 +22,17 @@ void ACutterComputer::BeginPlay()
 void ACutterComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
 	characterController = CharacterController;
-	computerWidget = Cast<UComputerCutterWidget>(CreateWidget(characterController, computerClass));
+	computerWidget = Cast<UComputerWidgetCutter>(CreateWidget(characterController, computerClass));
 
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
+
 		computerWidget->confirmProductionCode.BindUObject(this, &ACutterComputer::WidgetBindProductOrder);
-		computerWidget->exitButtonEvent.BindUObject(this, &ACutterComputer::PublicWidgetBindResetController);
+		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::PublicWidgetBindResetController);
+
+		computerWidget->productDoorAction.BindUObject(this, &ACutterComputer::CallProductDoorAction);
+		computerWidget->serviceDoorAction.BindUObject(this, &ACutterComputer::CallsServiceDoorAction);
 	}
 
 }
@@ -43,8 +47,22 @@ void ACutterComputer::WidgetBindProductOrder(FString productCode)
 
 }
 
-void ACutterComputer::PublicWidgetBindResetController()
+// Calls machine for product door interaction.
+void ACutterComputer::CallProductDoorAction()
 {
-    WidgetBindResetController();
+	if(cutterMachine)
+	{
+		cutterMachine->SetPositionOfProductDoor();
+	}
+
+}
+
+// Calls machine service door for interaction.
+void ACutterComputer::CallsServiceDoorAction()
+{
+	if(cutterMachine)
+	{
+		cutterMachine->SetPositionOfServiceDoor();
+	}
 
 }

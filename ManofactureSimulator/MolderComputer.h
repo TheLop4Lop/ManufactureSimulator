@@ -26,14 +26,18 @@ protected:
 	// Sections for the actor properties.
 	
 	// Reference to widget Production Widget for manage production machine product.
-	class UComputerMolderWidget* computerWidget;
+	class UComputerWidgetMolder* computerWidget;
 
 	// Reference to cutter machine in the world.
-	class AMachineMolder* cutterMachine;
-
-	void PublicWidgetBindResetController();
+	class AMachineMolder* molderMachine;
 
 	// Gett the product order for pass it on to Storage manager.
 	void WidgetBindProductOrder(FString productCode);
+
+	// Calls machine for product door interaction.
+	void CallProductDoorAction();
+	
+	// Calls machine service door for interaction.
+	void CallsServiceDoorAction();
 	
 };
