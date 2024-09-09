@@ -41,7 +41,7 @@ class MANOFACTURESIMULATOR_API AMachinePainter : public ABaseMachine
 	GENERATED_BODY()
 
 protected:
-//////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
+	//////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 	// Section for all the logic in process the product.
 
 	// Checks the actors on the boxEntrance, this will change depending on the machine.
@@ -70,6 +70,5 @@ protected:
 
 	// Spawn product based on a specific ABaseProduct child, dependes on the process and machine.
 	virtual void SpawnProducedProduct() override;
-
 	
 };

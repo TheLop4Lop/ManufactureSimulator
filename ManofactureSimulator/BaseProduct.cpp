@@ -22,6 +22,8 @@ void ABaseProduct::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bProductFinished = false;
+
 	productMesh->SetSimulatePhysics(true);
 	productMesh->SetRenderCustomDepth(true);
 	
@@ -92,6 +94,13 @@ void ABaseProduct::SetProductCode(FString& code)
 FString& ABaseProduct::GetProductCode()
 {
     return productCode;
+
+}
+
+// Changes the finish product status
+void ABaseProduct::SetProductFinishProduction()
+{
+	bProductFinished = true;
 
 }
 

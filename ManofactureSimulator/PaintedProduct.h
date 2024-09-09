@@ -13,5 +13,9 @@ UCLASS()
 class MANOFACTURESIMULATOR_API APaintedProduct : public ABaseProduct
 {
 	GENERATED_BODY()
+
+public:
+	// Changes the status from not ready to store to ready
+	void ProductReadyForStorage();
 	
 };

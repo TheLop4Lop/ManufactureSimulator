@@ -3,3 +3,9 @@
 
 #include "PaintedProduct.h"
 
+// Changes the status from not ready to store to ready
+void APaintedProduct::ProductReadyForStorage()
+{
+    SetProductFinishProduction();
+
+}

@@ -69,7 +69,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
 	float qualityPercent;
 
+	// Holds the status for product ready for final storage.
+	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
+	bool bProductFinished;
+
 	// Stores product code to be readed by the next machine in the process.
 	FString productCode;
+	
+	// Changes the finish product status
+	void SetProductFinishProduction();
 
 };
