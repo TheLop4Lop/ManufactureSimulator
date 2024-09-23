@@ -51,6 +51,10 @@ private:
 	///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
 	// Interaction object section.
 
+	// Component responsable for holdin in place object
+	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
+	USceneComponent* holdComponent;
+
 	// Interaction widget.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> InteractionWidgetClass;

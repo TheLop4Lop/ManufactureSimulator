@@ -6,6 +6,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "RawProduct.h"
 
+#define minQuality 40
+#define midQuality 70
+#define maxQuality 100
+
 // Sets default values
 APieceSpawner::APieceSpawner()
 {
@@ -50,6 +54,7 @@ bool APieceSpawner::CheckClearExit()
 void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 {
 	productCode = "";
+	int pieceInitialQuality = 0;
 	UStaticMesh* selectedMesh = nullptr;
 	UMaterial* selectedMaterial = nullptr;
 	FVector selectesSize = FVector::ZeroVector;
@@ -59,14 +64,17 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 		switch (orderToSpawn.Quality)
 		{
 		case EMaterialQuality::QUALITY_LOW:
+			pieceInitialQuality = minQuality;
 			selectedMaterial = qualityMaterial[0];
 			productCode += "M1";
 			break;
 		case EMaterialQuality::QUALITY_MEDIUM:
+			pieceInitialQuality = midQuality;
 			selectedMaterial = qualityMaterial[1];
 			productCode += "M2";
 			break;
 		case EMaterialQuality::QUALITY_HIGH:
+			pieceInitialQuality = maxQuality;
 			selectedMaterial = qualityMaterial[3];
 			productCode += "M3";
 			break;
@@ -120,6 +128,7 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 		if(product && selectedMesh && selectedMaterial)
 		{
 			product->SetProductCode(productCode);
+			product->SetProductQuality(pieceInitialQuality);
 			product->SetsProductProperties(selectedMesh, selectedMaterial, selectesSize);
 		}
 	}

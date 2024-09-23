@@ -43,6 +43,9 @@ protected:
 	// Gets the initialPieceAtributes and convert it to BaseMachine product code.
 	void ManageInitialProductProperties(FString properties);
 
+	// Checks and store quality values from pieces into the productsQuality array.
+	virtual void InsertQualityToArray(int pieceQuality) override;
+
 	///////////////////////////////////// SPAWN PRODUCT ////////////////////////////////
 	// Section for spawn product and set properties.
 	

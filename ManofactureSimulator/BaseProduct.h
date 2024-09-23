@@ -33,9 +33,9 @@ public:
 	FVector GetProductSize();
 
 	// Set the quality of the piece, this depends on the type of proccess is being subimted to.
-	void SetProductQualityByProcess(float qualityByProcess);
+	void SetProductQuality(int qualityByProcess);
 	// Returns the quality of the piece.
-	float GetProductQuality();
+	int GetProductQuality();
 
 	// Sets cutted piece product code.
 	void SetProductCode(FString& code);
@@ -67,7 +67,7 @@ protected:
 
 	// Holds the quality of the piece.
 	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
-	float qualityPercent;
+	int qualityPercent;
 
 	// Holds the status for product ready for final storage.
 	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))

@@ -7,6 +7,8 @@
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
 #include "BaseComputer.h"
+#include "BaseCanister.h"
+#include "BaseProduct.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -19,6 +21,9 @@ ABaseCharacter::ABaseCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	holdComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Hold Position"));
+	holdComponent->SetupAttachment(RootComponent);
 
 }
 
@@ -43,14 +48,16 @@ void ABaseCharacter::Tick(float DeltaTime)
 		if(ActorInSight->IsA(ABaseComputer::StaticClass()))
 		{
 			Computer = Cast<ABaseComputer>(ActorInSight);
-		}// Restructure
-		
-		InteractionWidget = CreateWidget(CharacterController, InteractionWidgetClass);
-		if(InteractionWidget != nullptr)
-		{
-			InteractionWidget->AddToViewport();
+
+			InteractionWidget = CreateWidget(CharacterController, InteractionWidgetClass);
+			if(InteractionWidget != nullptr)
+			{
+				InteractionWidget->AddToViewport();
+			}
+			DoOnceWidget = false;
 		}
-		DoOnceWidget = false;
+		
+		
 	}else if(InSightLine() == nullptr && !DoOnceWidget)
 	{
 		InteractionWidget->RemoveFromParent();
@@ -132,14 +139,8 @@ void ABaseCharacter::Interaction()
 		{
 			Computer->AddWidgetFromComputer(CharacterController);
 			CharacterController->SetMovement(true);
-
-		}// Restructure
+		}
 	}
 
 }
 
-void ABaseCharacter::ResetMoveInput()
-{
-	UE_LOG(LogTemp, Display, TEXT("EXIT"));
-
-}

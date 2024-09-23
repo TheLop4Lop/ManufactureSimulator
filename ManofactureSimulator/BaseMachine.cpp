@@ -60,8 +60,9 @@ ABaseMachine::ABaseMachine()
 void ABaseMachine::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	TArray<AActor*> initialActors;
+	productsQuality.SetNum(maxProductOrder);
 	boxEntrance->GetOverlappingActors(initialActors);
 	if(initialActors.IsValidIndex(0)) entranceConveyor = Cast<ABaseConveyorBelt>(initialActors[0]);
 
@@ -241,6 +242,7 @@ void ABaseMachine::CheckEntranceForProduct()
 					ChangeProductionStatus(EMachineStatus::ON_PRODUCTION);
 					productsToProcess++;
 
+					InsertQualityToArray(productOnEntrance->GetProductQuality());
 					productOnEntrance->DestroyProduct();
 				}else
 				{
@@ -326,6 +328,92 @@ bool ABaseMachine::CheckClearExit()
 
 }
 
+///////////////////////////////////// PRODUCT QUALITY PROCESS ////////////////////////////////
+// Section for all the logic of quality product process.
+
+// Checks and store quality values from pieces into the productsQuality array.
+void ABaseMachine::InsertQualityToArray(int pieceQuality)
+{
+	if(insertIndex == productsQuality.Num() - 1 && productsQuality[insertIndex] == 0)
+	{
+		productsQuality[insertIndex] = pieceQuality;
+		insertIndex = 0;
+	}else if(productsQuality[insertIndex] == 0)
+	{
+		productsQuality[insertIndex] = pieceQuality;
+		insertIndex++;
+	}
+
+}
+
+// Reduces the oil in the machine, this affects production time.
+void ABaseMachine::ReduceOilLevel()
+{
+    if (oilLevel > 0)
+    {
+        oilLevel = (oilLevel < 40) ? FMath::Max(0, oilLevel - 2) : FMath::Max(0, oilLevel - 1);
+		UpdateOilPenalty();
+
+		UE_LOG(LogTemp, Warning, TEXT("MACHINE REPORT: %s, OIL LEVEL: %i, PENALTY: %f"), *GetActorLabel(), oilLevel, oilPenalty);
+    }
+}
+
+// Reduces the lubricant in the machine, this affects the quality of the product.
+void ABaseMachine::ReduceLubricantLevel()
+{
+    if (lubricantLevel > 0)
+    {
+        lubricantLevel = (lubricantLevel < 40) ? FMath::Max(0, lubricantLevel - 3) : FMath::Max(0, lubricantLevel - 1);
+		UpdateLubricantPenalty();
+
+		UE_LOG(LogTemp, Warning, TEXT("MACHINE REPORT: %s, LUBRICANT LEVEL: %i, PENALTY: %i"), *GetActorLabel(), lubricantLevel, lubricantPenalty);
+    }
+}
+
+// Updates the penalty based on oilLevel.
+void ABaseMachine::UpdateOilPenalty()
+{
+	if(oilLevel > 80)
+	{
+		oilPenalty = 0.0f;
+	}else if(oilLevel > 60)
+	{
+		oilPenalty = 1.0f;
+	}else if(oilLevel > 40)
+	{
+		oilPenalty = 2.0f;
+	}else if(oilLevel > 20)
+	{
+		oilPenalty = 3.0f;
+	}else
+	{
+		oilPenalty = 5.0f;
+	}
+
+}
+
+// Updates the lubricant penalty based on lubricantLevel.
+void ABaseMachine::UpdateLubricantPenalty()
+{
+	if(lubricantLevel > 80)
+	{
+		lubricantPenalty = 0;
+	}else if(lubricantLevel > 60)
+	{
+		lubricantPenalty = 5;
+	}else if(lubricantLevel > 40)
+	{
+		lubricantPenalty = 10;
+	}else if(lubricantLevel > 20)
+	{
+		lubricantPenalty = 30;
+	}else
+	{
+		lubricantPenalty = 60;
+	}
+
+}
+
 ///////////////////////////////////// SPAWN PRODUCT ////////////////////////////////
 // Section for spawn product and set properties.
 
@@ -337,7 +425,8 @@ void ABaseMachine::CheckConditionsForSpawnProduct()
 		ChangeProductionStatus(EMachineStatus::ON_HOLD);
 	}else if(isReady && !isOnHold && !isInMaintenance && !GetWorldTimerManager().IsTimerActive(spawnTimer))
 	{
-		GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::TryToSpawnProduct, totalProductionPerPiece, true);
+		GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::TryToSpawnProduct, 
+			totalProductionPerPiece + oilPenalty, true);
 	}
 
 }
@@ -348,6 +437,16 @@ void ABaseMachine::TryToSpawnProduct()
 	if(CheckClearExit() && (productsToProcess > 0))
 	{
 		SpawnProducedProduct();
+		productsProduced++;
+		if(productsProduced % oilReductionByPiece == 0)
+		{
+			ReduceOilLevel();
+		}
+
+		if(productsProduced % lubricantReductionByOil == 0)
+		{
+			ReduceLubricantLevel();
+		}
 	}
 
 }
@@ -361,6 +460,22 @@ void ABaseMachine::SpawnProducedProduct()
 		UE_LOG(LogTemp, Display, TEXT("SET Properties spawn properties in machine."));
 		// DESIGN SET PROPERTIES ON SPAWNED PRODUCT. DEPENDS ON TYPE OF THE MACHINE.
 	}
+
+	if(deleteIndex == productsQuality.Num() - 1 && productsQuality[deleteIndex] != 0)
+	{
+		spawnProduct->SetProductQuality(productsQuality[deleteIndex]);
+		productsQuality[deleteIndex] = 0;
+		deleteIndex = 0;
+	}else if(deleteIndex == productsQuality.Num() - 1)
+	{
+		deleteIndex = 0;
+		spawnProduct->SetProductQuality(productsQuality[deleteIndex]);
+	}else if(productsQuality[deleteIndex] != 0)
+	{
+		spawnProduct->SetProductQuality(productsQuality[deleteIndex]);
+		deleteIndex++;
+	}
+	
 	productsToProcess --;
 
 }

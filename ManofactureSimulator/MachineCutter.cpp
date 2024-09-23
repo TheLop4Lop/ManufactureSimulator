@@ -29,6 +29,7 @@ void AMachineCutter::CheckEntranceForProduct()
                     if (productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
                     {
                         ManageInitialProductProperties(productOnEntrance->GetProductCode());
+                        InsertQualityToArray(productOnEntrance->GetProductQuality());
                         productOnEntrance->DestroyProduct();
                     }
                     else
@@ -55,6 +56,13 @@ void AMachineCutter::CheckEntranceForProduct()
             PreviousStatus = NewStatus;
         }
     }
+}
+
+// Checks and store quality values from pieces into the productsQuality array.
+void AMachineCutter::InsertQualityToArray(int pieceQuality)
+{
+    productsQuality[insertIndex] = pieceQuality;
+
 }
 
 // Gets the initialPieceAtributes and convert it to BaseMachine product code.
@@ -180,6 +188,15 @@ void AMachineCutter::SpawnProducedProduct()
         ACuttedProduct* cuttedProduct = GetWorld()->SpawnActor<ACuttedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
         cuttedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
         cuttedProduct->SetProductCode(productCode);
+
+        if(productsToProcess != 0)
+        {
+            cuttedProduct->SetProductQuality(productsQuality[0] - lubricantPenalty);
+        }else
+        {
+            productsQuality[deleteIndex] = 0;
+        }
+
         productsToProcess --;
     }
 

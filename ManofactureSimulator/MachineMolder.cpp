@@ -41,8 +41,9 @@ void AMachineMolder::CheckEntranceForProduct()
                     if (productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
                     {
                         ManageCuttedProductProperties(productOnEntrance->GetProductCode());
+                        InsertQualityToArray(productOnEntrance->GetProductQuality());
+                        
                         productOnEntrance->DestroyProduct();
-
                         productsToProcess++;
                     }
                     else
@@ -217,6 +218,19 @@ void AMachineMolder::SpawnProducedProduct()
         AMolderedProduct* molderedProduct = GetWorld()->SpawnActor<AMolderedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
         molderedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
         molderedProduct->SetProductCode(productCode);
+
+        if(deleteIndex == productsQuality.Num() - 1 && productsQuality[deleteIndex] != 0)
+        {
+            molderedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            productsQuality[deleteIndex] = 0;
+            deleteIndex = 0;
+        }else if(productsQuality[deleteIndex] != 0)
+        {
+            molderedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            productsQuality[deleteIndex] = 0;
+            deleteIndex++;
+        }
+
         productsToProcess --;
     }
 

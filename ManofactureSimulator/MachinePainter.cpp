@@ -28,8 +28,9 @@ void AMachinePainter::CheckEntranceForProduct()
                     if (productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
                     {
                         ManageMolderedProductProperties(productOnEntrance->GetProductCode());
-                        productOnEntrance->DestroyProduct();
+                        InsertQualityToArray(productOnEntrance->GetProductQuality());
 
+                        productOnEntrance->DestroyProduct();
                         productsToProcess++;
                     }
                     else
@@ -285,9 +286,22 @@ void AMachinePainter::SpawnProducedProduct()
 
     if(productClass)
     {
-        APaintedProduct* molderedProduct = GetWorld()->SpawnActor<APaintedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
-        molderedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
-        molderedProduct->SetProductCode(productCode);
+        APaintedProduct* paintedProduct = GetWorld()->SpawnActor<APaintedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
+        paintedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
+        paintedProduct->SetProductCode(productCode);
+
+        if(deleteIndex == productsQuality.Num() - 1 && productsQuality[deleteIndex] != 0)
+        {
+            paintedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            productsQuality[deleteIndex] = 0;
+            deleteIndex = 0;
+        }else if(productsQuality[deleteIndex] != 0)
+        {
+            paintedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            productsQuality[deleteIndex] = 0;
+            deleteIndex++;
+        }
+
         productsToProcess --;
     }
 

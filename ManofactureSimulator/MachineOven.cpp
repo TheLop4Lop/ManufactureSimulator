@@ -27,8 +27,9 @@ void AMachineOven::CheckEntranceForProduct()
                     if (productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
                     {
                         ManageMolderedProductProperties(productOnEntrance->GetProductCode());
+                        InsertQualityToArray(productOnEntrance->GetProductQuality());
+                        
                         productOnEntrance->DestroyProduct();
-
                         productsToProcess++;
                     }
                     else

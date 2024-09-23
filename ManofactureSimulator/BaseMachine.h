@@ -258,6 +258,53 @@ protected:
 	// Controls MachineStatus flow
 	EMachineStatus PreviousStatus = EMachineStatus::ON_HOLD;
 
+	///////////////////////////////////// PRODUCT QUALITY PROCESS ////////////////////////////////
+	// Section for all the logic of quality product process.
+
+	// Holds the value of the quality pieces being produced. The size of the array is determined by maxProductOrder
+	TArray<int> productsQuality;
+	// Indext for checking and storing quality into the productsQuality array.
+	int insertIndex;
+	// Indext for checking and deleting quality from the productsQuality array.
+	int deleteIndex;
+
+	// Checks and store quality values from pieces into the productsQuality array.
+	virtual void InsertQualityToArray(int pieceQuality);
+
+	// Holds value to the quantity of oil in the machine, helps with production times.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int oilLevel = 80;
+
+	// Determines how many produced pieces reduce a single oil point.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int oilReductionByPiece = 2;
+
+	// Value of the additional time penalty of oil quantity.
+	float oilPenalty;
+
+	// Holds value to quantity of lubricant in the machine, helps with product quality.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int lubricantLevel = 80;
+
+	// Determines the reduction of a single point of lubricant based on X point level.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int lubricantReductionByOil = 3;
+
+	// Value of the quality penalty of lubricant quantity.
+	int lubricantPenalty;
+
+	// Reduces the oil in the machine, this affects production time.
+	void ReduceOilLevel();
+
+	// Updates the oil penalty based on oilLevel.
+	void UpdateOilPenalty();
+
+	// Reduces the lubricant in the machine, this affects the quality of the product. 
+	void ReduceLubricantLevel();
+
+	// Updates the lubricant penalty based on lubricantLevel.
+	void UpdateLubricantPenalty();
+
 	///////////////////////////////////// PRODUCTION TIMES ////////////////////////////////
 	// Production times to spawn produced piece and get machine ready.
 

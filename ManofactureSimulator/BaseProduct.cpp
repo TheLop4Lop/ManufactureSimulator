@@ -70,14 +70,14 @@ FVector ABaseProduct::GetProductSize()
 }
 
 // Set the quality of the piece, this depends on the type of proccess is being subimted to.
-void ABaseProduct::SetProductQualityByProcess(float qualityByProcess)
+void ABaseProduct::SetProductQuality(int initialQuality)
 {
-	qualityPercent = qualityByProcess;
+	qualityPercent = initialQuality;
 
 }
 
 // Returns the quality of the piece.
-float ABaseProduct::GetProductQuality()
+int ABaseProduct::GetProductQuality()
 {
 	return qualityPercent;
 
