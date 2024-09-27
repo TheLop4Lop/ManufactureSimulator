@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+DECLARE_DELEGATE(FHold);
+
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseCharacter : public ACharacter
 {
@@ -27,6 +29,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void ResetMoveInput();
+
+	FHold releaseHold;
 
 private:
 	///////////////////////////////////// BASE CHARACTER CONFIGURATION ////////////////////////////////
@@ -51,10 +55,6 @@ private:
 	///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
 	// Interaction object section.
 
-	// Component responsable for holdin in place object
-	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
-	USceneComponent* holdComponent;
-
 	// Interaction widget.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> InteractionWidgetClass;
@@ -72,5 +72,21 @@ private:
 	void Interaction();
 	
 	class ABaseComputer* Computer;
+
+	// Component responsable for holdin in place object
+	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
+	USceneComponent* holdComponent;
+
+	// Grabs object and attach it to holdComponent.
+	void GrabObject();
+
+	// Updates the location of object from tick.
+	void UpdateHoldedObjectLocation();
+
+	// Releases objecto from holdComponent.
+	void ReleaseObject();
+
+	// Holds reference to the object holded by character.
+	AActor* objectHolded;
 
 };

@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
+#include "Interactable.h"
 #include "BaseComputer.h"
 #include "BaseCanister.h"
 #include "BaseProduct.h"
@@ -55,14 +56,23 @@ void ABaseCharacter::Tick(float DeltaTime)
 				InteractionWidget->AddToViewport();
 			}
 			DoOnceWidget = false;
+		}else if(ActorInSight->IsA(ABaseProduct::StaticClass()) || ActorInSight->IsA(ABaseCanister::StaticClass()))
+		{
+			UE_LOG(LogTemp, Display, TEXT("GRAB OBJECT!"));
+			DoOnceWidget = false;
 		}
-		
-		
+
 	}else if(InSightLine() == nullptr && !DoOnceWidget)
 	{
-		InteractionWidget->RemoveFromParent();
+		if(InteractionWidget)
+		{
+			InteractionWidget->RemoveFromParent();
+			InteractionWidget = nullptr;
+		}
 		DoOnceWidget = true;
 	}
+
+	UpdateHoldedObjectLocation();
 
 }
 
@@ -78,6 +88,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis(TEXT("LookRight"), this, &APawn::AddControllerYawInput);
 
 	PlayerInputComponent->BindAction(TEXT("Interaction"), EInputEvent::IE_Released, this, &ABaseCharacter::Interaction);
+	PlayerInputComponent->BindAction(TEXT("Grab"), EInputEvent::IE_Pressed, this, &ABaseCharacter::GrabObject);
+	PlayerInputComponent->BindAction(TEXT("Release"), EInputEvent::IE_Released, this, &ABaseCharacter::ReleaseObject);
 
 }
 
@@ -144,3 +156,39 @@ void ABaseCharacter::Interaction()
 
 }
 
+// Grabs object and attach it to holdComponent.
+void ABaseCharacter::GrabObject()
+{
+	if(InSightLine() != nullptr && (InSightLine()->IsA(ABaseProduct::StaticClass()) || InSightLine()->IsA(ABaseCanister::StaticClass())))
+	objectHolded = InSightLine();
+	
+	if(objectHolded != nullptr && objectHolded->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	{
+		IInteractable::Execute_InteractionFunctionality(objectHolded);
+		//objectHolded->AttachToComponent(holdComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+
+}
+
+// Updates the location of object from tick.
+void ABaseCharacter::UpdateHoldedObjectLocation()
+{
+	if(objectHolded)
+	{
+		objectHolded->SetActorLocation(holdComponent->GetComponentLocation());
+		objectHolded->SetActorRotation(GetActorRotation());
+	}
+
+}
+
+// Releases objecto from holdComponent.
+void ABaseCharacter::ReleaseObject()
+{
+	if(objectHolded)
+	{
+		//objectHolded->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		releaseHold.ExecuteIfBound();
+	}
+	objectHolded = nullptr;
+
+}

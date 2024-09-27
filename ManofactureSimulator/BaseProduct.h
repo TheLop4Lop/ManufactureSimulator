@@ -7,7 +7,7 @@
 #include "BaseProduct.generated.h"
 
 UCLASS()
-class MANOFACTURESIMULATOR_API ABaseProduct : public AActor
+class MANOFACTURESIMULATOR_API ABaseProduct : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -42,16 +42,15 @@ public:
 	// Gets cutted piece product code.
 	FString& GetProductCode();
 
+	// Method implementation after character interaction, change canister properties for character hold.
+	virtual void InteractionFunctionality_Implementation() override;
+
 	// Destroys the product.
 	void DestroyProduct();
 
 protected:
 	///////////////////////////////////// BASE PRODUCT PROPERTIES ////////////////////////////////
 	// Section for the product properties, this interact with the respective machine class.
-
-	// Product root component.
-	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
-	USceneComponent* productRootComponent;
 
 	// Product Static Mesh
 	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
@@ -78,5 +77,15 @@ protected:
 	
 	// Changes the finish product status
 	void SetProductFinishProduction();
+
+	///////////////////////////////////// BASE PRODUCT INTERACTION ////////////////////////////////
+	// Section for Base Product interaction with character.
+
+	// Restets the behaviour of the mesh to it's original state.
+	UFUNCTION()
+	void SetProductReleaseReset();
+
+	// Holds reference to character for canister event reset.
+	class ABaseCharacter* character;
 
 };
