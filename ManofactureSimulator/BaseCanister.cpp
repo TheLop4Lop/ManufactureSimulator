@@ -23,6 +23,7 @@ void ABaseCanister::BeginPlay()
 
 	canisterMesh->SetSimulatePhysics(true);
 	canisterMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
+	canisterMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
 }
 
@@ -33,6 +34,37 @@ void ABaseCanister::Tick(float DeltaTime)
 
 }
 
+///////////////////////////////////// BASE CANISTER PROPERTIES ////////////////////////////////
+// Section for canister properties.
+
+// Returns the the canister liquid MAX capacity.
+int ABaseCanister::GetCanisterMaxCapacity()
+{
+	return maxLiquidCapacity;
+
+}
+
+// Returns the canister liquida level.
+int ABaseCanister::GetCanisterCurrentLevel()
+{
+	return currentLiquid;
+
+}
+
+// Sets new values for the liquid level.
+void ABaseCanister::FillCanister()
+{
+	currentLiquid++;
+
+}
+
+// Removes liquid level from canister.
+void ABaseCanister::ReduceCanister()
+{
+	currentLiquid--;
+
+}
+
 ///////////////////////////////////// BASE CANISTER INTERACTION ////////////////////////////////
 // Section for canister interaction with character.
 
@@ -40,7 +72,6 @@ void ABaseCanister::Tick(float DeltaTime)
 void ABaseCanister::InteractionFunctionality_Implementation()
 {
 	canisterMesh->SetSimulatePhysics(false);
-	canisterMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	UE_LOG(LogTemp, Display, TEXT("LINE TRACE HIT CANISTER!"));
 	character = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
@@ -55,7 +86,6 @@ void ABaseCanister::InteractionFunctionality_Implementation()
 void ABaseCanister::SetCanisterReleaseReset()
 {
 	UE_LOG(LogTemp, Display, TEXT("CANISTER RELEASED!"));
-	canisterMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	canisterMesh->SetSimulatePhysics(true);
 
 	character = nullptr;

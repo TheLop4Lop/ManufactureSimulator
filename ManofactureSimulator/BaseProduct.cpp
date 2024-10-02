@@ -26,6 +26,7 @@ void ABaseProduct::BeginPlay()
 	productMesh->SetSimulatePhysics(true);
 	productMesh->SetRenderCustomDepth(true);
 	productMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
+	productMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 
 }
 
@@ -117,7 +118,6 @@ void ABaseProduct::DestroyProduct()
 void ABaseProduct::InteractionFunctionality_Implementation()
 {
 	productMesh->SetSimulatePhysics(false);
-	productMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	UE_LOG(LogTemp, Display, TEXT("LINE TRACE HIT BaseProduct!"));
 	character = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
@@ -132,7 +132,6 @@ void ABaseProduct::InteractionFunctionality_Implementation()
 void ABaseProduct::SetProductReleaseReset()
 {
 	UE_LOG(LogTemp, Display, TEXT("BaseProduct RELEASED!"));
-	productMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	productMesh->SetSimulatePhysics(true);
 
 	character = nullptr;

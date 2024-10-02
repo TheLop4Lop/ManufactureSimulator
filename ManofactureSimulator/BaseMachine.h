@@ -165,6 +165,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UBoxComponent* boxExit;
 
+	// Box Service for BaseCanisterClass detection. Fill Oil and Lubricant logic.
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	class UBoxComponent* boxService;
+
 	// Light Status for machine.
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UPointLightComponent* machineStatusLight;
@@ -275,6 +279,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
 	int oilLevel = 80;
 
+	// Holds the maximum value for oil tank in the machine.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int maxOilLevel = 100;
+
 	// Determines how many produced pieces reduce a single oil point.
 	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
 	int oilReductionByPiece = 2;
@@ -285,6 +293,10 @@ protected:
 	// Holds value to quantity of lubricant in the machine, helps with product quality.
 	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
 	int lubricantLevel = 80;
+
+	// Holds the maximum value for Lubricant tank in the machine.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int maxLubricantLevel = 100;
 
 	// Determines the reduction of a single point of lubricant based on X point level.
 	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
@@ -304,6 +316,61 @@ protected:
 
 	// Updates the lubricant penalty based on lubricantLevel.
 	void UpdateLubricantPenalty();
+
+	///////////////////////////////////// SERVICE PROCESS ////////////////////////////////
+	// Section for all the logic of MAINTENANCE PPROCESS.
+
+	// Holds value to the quantity of oil in the machine, helps with production times.
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	int prevOilLevel;
+
+	// Holds value to quantity of lubricant in the machine, helps with product quality.
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	int prevLubricantLevel;
+
+	// Time value delay for fill up tank
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	float fillUpTime = 1.5f;
+
+	// Method called by timer. Restores oil quantity by canister collision.
+	void FillUpOilTank();
+
+	// Method called by timer. Restores lubricant quantity by canister collision.
+	void FillUpLubricantTan();
+
+	// Reference to Oil Cansiter class
+	class AOilCanister* oilCanister;
+
+	// Reference to Lubricant Canister class
+	class ALubricantCanister* lubricantCanister;
+
+	// Timer handle for fill up tanks.
+	FTimerHandle FillUpTankTimer;
+
+	// Controls the flow of Tick status check for Canister Service logic.
+	bool DoOnceService = false;
+
+	// Logic for detect actors in box Service when Service Door is Open.
+	void CheckForActorsInServiceBox();
+
+	// Method to clear canister references and FillUpTankTimer.
+	void ClearCanisterTimers();
+
+	// Check actors in service box to know if any is a ABaseCanister class.
+	void CheckActorsForCanisterClass(const TArray<AActor*>& actorsBox, bool& canisterFound);
+
+	// Checks type of canister in the service box.
+	void CheckTypeOfCanister(const TArray<AActor*>& actorsBox);
+
+	// Time value for close service door delay.
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	float closeServiceDoorTime = 120.0f;
+
+	// Close up Service Door after certain amount of time.
+	FTimerHandle serviceDoorTimer;
+
+	// Checks if isServiceDoorOpen is true, if it is, calls SetPositionOfServiceDoor to close door. This to prevent continuos check in tick.
+	void CloseUpServiceDoorByTimer();
 
 	///////////////////////////////////// PRODUCTION TIMES ////////////////////////////////
 	// Production times to spawn produced piece and get machine ready.

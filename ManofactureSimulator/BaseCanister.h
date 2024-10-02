@@ -27,6 +27,18 @@ public:
 	// Method implementation after character interaction, change canister properties for character hold.
 	virtual void InteractionFunctionality_Implementation() override;
 
+	// Returns the the canister liquid MAX capacity.
+	int GetCanisterMaxCapacity();
+
+	// Returns the canister liquida level.
+	int GetCanisterCurrentLevel();
+
+	// Sets new values for the liquid level.
+	void FillCanister();
+
+	// Removes liquid level from canister.
+	void ReduceCanister();
+
 protected:
 	///////////////////////////////////// BASE CANISTER PROPERTIES ////////////////////////////////
 	// Section for canister properties.
@@ -34,6 +46,14 @@ protected:
 	// Product Static Mesh
 	UPROPERTY(EditAnywhere, Category = "Canister Properties", meta = (AllowPrivateAccess))
 	UStaticMeshComponent* canisterMesh;
+
+	// Holds the value of the canister MAX capacity.
+	UPROPERTY(EditAnywhere, Category = "Canister Properties", meta = (AllowPrivateAccess))
+	int maxLiquidCapacity = 50;
+
+	// Holds the value of the actual level of liquid in the canister.
+	UPROPERTY(EditAnywhere, Category = "Canister Properties", meta = (AllowPrivateAccess))
+	int currentLiquid;
 
 	///////////////////////////////////// BASE CANISTER INTERACTION ////////////////////////////////
 	// Section for canister interaction with character.

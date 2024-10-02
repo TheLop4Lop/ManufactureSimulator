@@ -4,7 +4,9 @@
 #include "BaseMachine.h"
 #include "Components/PointLightComponent.h"
 #include "Components/BoxComponent.h"
+#include "LubricantCanister.h"
 #include "BaseConveyorBelt.h"
+#include "OilCanister.h"
 #include "BaseProduct.h"
 
 // Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
@@ -46,6 +48,9 @@ ABaseMachine::ABaseMachine()
 	boxExit = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Exit"));
 	boxExit->SetupAttachment(machineMesh);
 
+	boxService = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Maintenance"));
+	boxService->SetupAttachment(machineMesh);
+
 	machineStatusLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Machine Status Light"));
 	machineStatusLight->SetupAttachment(machineMesh);
 
@@ -78,6 +83,7 @@ void ABaseMachine::Tick(float DeltaTime)
 		SetInitialMachineStatus();
 		CheckEntranceForProduct();	
 		CheckConditionsForSpawnProduct();
+		CheckForActorsInServiceBox();
 	}else
 	{
 		ChangeProductionStatus(EMachineStatus::OFF);
@@ -411,6 +417,137 @@ void ABaseMachine::UpdateLubricantPenalty()
 	{
 		lubricantPenalty = 60;
 	}
+
+}
+
+///////////////////////////////////// SERVICE PROCESS ////////////////////////////////
+// Section for all the logic of MAINTENANCE PPROCESS.
+
+// Method called by timer. Restores oil quantity by canister collision.
+void ABaseMachine::FillUpOilTank()
+{
+	if(oilCanister)
+	{
+		if(oilCanister->GetCanisterCurrentLevel() > 0)
+		{
+			UE_LOG(LogTemp, Display, TEXT("FILLING OIL IN THE MACHINE."));
+			int missingOilLevel = maxOilLevel - oilLevel;
+			if(prevOilLevel < missingOilLevel)
+			{
+				prevOilLevel++;
+				oilCanister->ReduceCanister();
+			}
+		}
+	}
+
+}
+
+// Method called by timer. Restores lubricant quantity by canister collision.
+void ABaseMachine::FillUpLubricantTan()
+{
+	if(lubricantCanister)
+	{
+		if(lubricantCanister->GetCanisterCurrentLevel() > 0)
+		{
+			UE_LOG(LogTemp, Display, TEXT("FILLING LUBRICANT IN THE MACHINE"));
+			int missingLubricantLevel = maxLubricantLevel - lubricantLevel;
+			if(prevLubricantLevel < missingLubricantLevel)
+			{
+				prevLubricantLevel++;
+				lubricantCanister->ReduceCanister();
+			}
+		}
+	}
+
+}
+
+// Logic for detect actors in box Service when Service Door is Open.
+void ABaseMachine::CheckForActorsInServiceBox()
+{
+	if(isServiceDoorOpen)
+	{
+		GetWorldTimerManager().SetTimer(serviceDoorTimer, this, &ABaseMachine::CloseUpServiceDoorByTimer, closeServiceDoorTime, false);
+
+		TArray<AActor*> actorsInServiceDoor;
+		boxService->GetOverlappingActors(actorsInServiceDoor);
+
+		if(actorsInServiceDoor.Num() == 0 && DoOnceService)
+		{
+			UE_LOG(LogTemp, Display, TEXT("EMMMMMMMMMMMMPTY"));
+			ClearCanisterTimers();
+		}
+
+		if(actorsInServiceDoor.Num() > 0)
+		{
+			bool canisterFound = false;
+			CheckActorsForCanisterClass(actorsInServiceDoor, canisterFound);
+			if(canisterFound)
+			{
+				CheckTypeOfCanister(actorsInServiceDoor);
+			}
+		}
+	}
+
+}
+
+// Method to clear canister references and FillUpTankTimer.
+void ABaseMachine::ClearCanisterTimers()
+{
+	GetWorldTimerManager().ClearTimer(FillUpTankTimer);
+	oilCanister = nullptr;
+	lubricantCanister = nullptr;
+
+	DoOnceService = false;
+
+}
+
+// Check actors in service box to know if any is a ABaseCanister class.
+void ABaseMachine::CheckActorsForCanisterClass(const TArray<AActor*>& actorsBox, bool& canisterFound)
+{
+	for(AActor* singleActor : actorsBox)
+	{
+		if(singleActor->IsA(ABaseCanister::StaticClass()))
+		{
+			canisterFound = true;
+			break;
+		}else
+		{
+			UE_LOG(LogTemp, Display, TEXT("NO CANISTER"));
+			canisterFound = false;
+		}
+	}
+
+}
+
+// Checks type of canister in the service box.
+void ABaseMachine::CheckTypeOfCanister(const TArray<AActor*>& actorsBox)
+{
+	for(AActor* singleActor : actorsBox)
+	{
+		if(singleActor->IsA(AOilCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(FillUpTankTimer))
+		{
+			oilCanister = Cast<AOilCanister>(singleActor);
+			GetWorldTimerManager().SetTimer(FillUpTankTimer, this, &ABaseMachine::FillUpOilTank, fillUpTime, true);
+			DoOnceService = true;
+		}else if(singleActor->IsA(ALubricantCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(FillUpTankTimer))
+		{
+			lubricantCanister = Cast<ALubricantCanister>(singleActor);
+			GetWorldTimerManager().SetTimer(FillUpTankTimer, this, &ABaseMachine::FillUpLubricantTan, fillUpTime, true);
+			DoOnceService = true;
+		}
+	}
+
+}
+
+// Checks if isServiceDoorOpen is true, if it is, calls SetPositionOfServiceDoor to close door. This to prevent continuos check in tick.
+void ABaseMachine::CloseUpServiceDoorByTimer()
+{
+	if(isServiceDoorOpen)
+	{
+		SetPositionOfServiceDoor();
+	}
+
+	GetWorldTimerManager().ClearTimer(serviceDoorTimer);
 
 }
 
