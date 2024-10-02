@@ -8,6 +8,8 @@
 #include <string>
 #include "BaseMachine.generated.h"
 
+DECLARE_DELEGATE_TwoParams(FActiveConveyor, FName, bool);
+
 UENUM(BlueprintType)
 enum class EMachineStatus : uint8
 {
@@ -15,7 +17,9 @@ enum class EMachineStatus : uint8
 	ON_PRODUCTION,
 	ON_HOLD,
 	FULL_PRODUCTION,
-	CODE_ERROR
+	PRODUCT_ERROR,
+	CODE_ERROR,
+	OFF
 
 };
 
@@ -38,6 +42,15 @@ enum class EProductSize : uint8
 };
 
 UENUM(BlueprintType)
+enum class EProductLength : uint8
+{
+	L1,
+	L2,
+	L3
+
+};
+
+UENUM(BlueprintType)
 enum class EProductForm : uint8
 {
 	F1,
@@ -52,32 +65,6 @@ enum class EProductColor : uint8
 	C1,
 	C2,
 	C3
-
-};
-
-USTRUCT(BlueprintType)
-struct FProductColor
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductMaterial Quality;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductSize Size;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductForm Form;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductColor Color;
-
-	FProductColor()
-		: Quality(EProductMaterial::M1),
-          Size(EProductSize::S1),
-          Form(EProductForm::F1),
-		  Color(EProductColor::C1)
-	{}
 
 };
 
@@ -98,6 +85,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Sets value of order code for the machinery to process.
+	void SetProductionMachineOrder(FString orderToProduce);
+
+	// Sets the position and status of product door.
+	void SetPositionOfProductDoor();
+
+	// Sets the posititon for the Machine Service Door.
+	virtual void SetPositionOfServiceDoor();
+
+	// Delegate event for active or desable a single conveyor belt.
+	FActiveConveyor conveyorEvent;
+
 private:
 	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
 	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
@@ -107,6 +106,9 @@ private:
 
 	// Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
 	static std::map<FString, EProductSize> StringToEnumSizeMap;
+
+	// Static LENGTH map for string to ENUM data, this is used for product interpretation in respective machine.
+	static std::map<FString, EProductLength> StringToEnumLengthMap;
 
 	// Static FORM map for string to ENUM data, this is used for product interpretation in respective machine.
 	static std::map<FString, EProductForm> StringToEnumFormMap;
@@ -127,6 +129,9 @@ protected:
 	// Gets the StringToEnumSizeMap
 	EProductSize GetStringToEnumSizeMap(const FString& sizeString) const;
 
+	// Gets the StringToEnumLengthMap
+	EProductLength GetStringToEnumLengthMap(const FString& lengthString) const;
+
 	// Gets the StringToEnumFormMap
 	EProductForm GetStringToEnumFormMap(const FString& formString) const;
 
@@ -140,21 +145,33 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	UStaticMeshComponent* machineMesh;
 
-	// Machine Computer Mesh
+	// Machinery Mesh
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
-	UStaticMeshComponent* computerMesh;
+	UStaticMeshComponent* productDoorMesh;
 
-	// Box Entrance that manages the product and determines it properties and actions.
+	// Machinery Mesh
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	UStaticMeshComponent* machineServiceDoorMesh;
+
+	// Machinery Mesh
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	UStaticMeshComponent* machineActionMesh;
+
+	// Box Entrance, manages the product and determines it properties and actions.
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UBoxComponent* boxEntrance;
+
+	// Box Exit, the spawn location and rotation of the product, also check first if the procuct can be spawned.
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	class UBoxComponent* boxExit;
+
+	// Box Service for BaseCanisterClass detection. Fill Oil and Lubricant logic.
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	class UBoxComponent* boxService;
 
 	// Light Status for machine.
 	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
 	class UPointLightComponent* machineStatusLight;
-
-	// Arrow for spawn location and rotation of the objects.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
-	class UArrowComponent* spawnArrow;
 
 	// Holds reference to conveyor belt that provides product for production.
 	class ABaseConveyorBelt* entranceConveyor;
@@ -178,6 +195,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
 	bool isInMaintenance;
 
+	// Sets ProductDoor status of the machine. Can't produce if this is on.
+	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
+	bool isProductDoorOpen;
+
+	// Sets maintenance service door status of the machine.
+	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
+	bool isServiceDoorOpen;
+
 	// Holds the actual status of the machine, this is then interpreted by a light color.
 	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
 	EMachineStatus productionStatus;
@@ -193,31 +218,159 @@ protected:
 	///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 	// Section for all the logic in process the product.
 
+	// Reference to type of WidgetClass, Depending on the machine widgets change, but mainly is for product code config.
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> widgetClass;
+
 	// Holds the max quantity of orders.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int maxProductOrder = 5;
 
 	// Quantity of Products entered to the machine.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int productsEntered;
 
 	// Quantity of products produced.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int productsProduced;
 
 	// Product class to transform. This will depend on the type of machine.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	TSubclassOf<class ABaseProduct> classToTransform;
 
 	// Holds the reference to the products that had enter the machine.
-	UPROPERTY(EditAnywhere, Category = "Machine Capacity", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
 	int productsToProcess;
+
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
+	FString codeToProcess;
+
+	UPROPERTY(EditAnywhere, Category = "Product Process", meta = (AllowPrivateAccess))
+	FName machineName;
 
 	// Checks the actors on the boxEntrance, this will change depending on the machine.
 	virtual void CheckEntranceForProduct();
+	
+	void CallChangeProductionStatus(EMachineStatus newStatus);
 
 	// Changes the production status light and actions.
 	void ChangeProductionStatus(EMachineStatus newStatus);
+
+	// Checks if boxExit is clear for spawn product.
+	bool CheckClearExit();
+
+	// Controls MachineStatus flow
+	EMachineStatus PreviousStatus = EMachineStatus::ON_HOLD;
+
+	///////////////////////////////////// PRODUCT QUALITY PROCESS ////////////////////////////////
+	// Section for all the logic of quality product process.
+
+	// Holds the value of the quality pieces being produced. The size of the array is determined by maxProductOrder
+	TArray<int> productsQuality;
+	// Indext for checking and storing quality into the productsQuality array.
+	int insertIndex;
+	// Indext for checking and deleting quality from the productsQuality array.
+	int deleteIndex;
+
+	// Checks and store quality values from pieces into the productsQuality array.
+	virtual void InsertQualityToArray(int pieceQuality);
+
+	// Holds value to the quantity of oil in the machine, helps with production times.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int oilLevel = 80;
+
+	// Holds the maximum value for oil tank in the machine.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int maxOilLevel = 100;
+
+	// Determines how many produced pieces reduce a single oil point.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int oilReductionByPiece = 2;
+
+	// Value of the additional time penalty of oil quantity.
+	float oilPenalty;
+
+	// Holds value to quantity of lubricant in the machine, helps with product quality.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int lubricantLevel = 80;
+
+	// Holds the maximum value for Lubricant tank in the machine.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int maxLubricantLevel = 100;
+
+	// Determines the reduction of a single point of lubricant based on X point level.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int lubricantReductionByOil = 3;
+
+	// Value of the quality penalty of lubricant quantity.
+	int lubricantPenalty;
+
+	// Reduces the oil in the machine, this affects production time.
+	void ReduceOilLevel();
+
+	// Updates the oil penalty based on oilLevel.
+	void UpdateOilPenalty();
+
+	// Reduces the lubricant in the machine, this affects the quality of the product. 
+	void ReduceLubricantLevel();
+
+	// Updates the lubricant penalty based on lubricantLevel.
+	void UpdateLubricantPenalty();
+
+	///////////////////////////////////// SERVICE PROCESS ////////////////////////////////
+	// Section for all the logic of MAINTENANCE PPROCESS.
+
+	// Holds value to the quantity of oil in the machine, helps with production times.
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	int prevOilLevel;
+
+	// Holds value to quantity of lubricant in the machine, helps with product quality.
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	int prevLubricantLevel;
+
+	// Time value delay for fill up tank
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	float fillUpTime = 1.5f;
+
+	// Method called by timer. Restores oil quantity by canister collision.
+	void FillUpOilTank();
+
+	// Method called by timer. Restores lubricant quantity by canister collision.
+	void FillUpLubricantTan();
+
+	// Reference to Oil Cansiter class
+	class AOilCanister* oilCanister;
+
+	// Reference to Lubricant Canister class
+	class ALubricantCanister* lubricantCanister;
+
+	// Timer handle for fill up tanks.
+	FTimerHandle FillUpTankTimer;
+
+	// Controls the flow of Tick status check for Canister Service logic.
+	bool DoOnceService = false;
+
+	// Logic for detect actors in box Service when Service Door is Open.
+	void CheckForActorsInServiceBox();
+
+	// Method to clear canister references and FillUpTankTimer.
+	void ClearCanisterTimers();
+
+	// Check actors in service box to know if any is a ABaseCanister class.
+	void CheckActorsForCanisterClass(const TArray<AActor*>& actorsBox, bool& canisterFound);
+
+	// Checks type of canister in the service box.
+	void CheckTypeOfCanister(const TArray<AActor*>& actorsBox);
+
+	// Time value for close service door delay.
+	UPROPERTY(EditAnywhere, Category = "Service Process", meta = (AllowPrivateAccess))
+	float closeServiceDoorTime = 120.0f;
+
+	// Close up Service Door after certain amount of time.
+	FTimerHandle serviceDoorTimer;
+
+	// Checks if isServiceDoorOpen is true, if it is, calls SetPositionOfServiceDoor to close door. This to prevent continuos check in tick.
+	void CloseUpServiceDoorByTimer();
 
 	///////////////////////////////////// PRODUCTION TIMES ////////////////////////////////
 	// Production times to spawn produced piece and get machine ready.
@@ -321,6 +474,9 @@ protected:
 
 	// Checks all the conditions for spawn a product and spawn it.
 	void CheckConditionsForSpawnProduct();
+
+	// Is a callback function by a timer, first check is exit is clear, then spawn product.
+	void TryToSpawnProduct();
 
 	// Spawn product based on a specific ABaseProduct child, dependes on the process and machine.
 	virtual void SpawnProducedProduct();

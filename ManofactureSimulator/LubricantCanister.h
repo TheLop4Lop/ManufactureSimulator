@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseProduct.h"
-#include "MolderedProduct.generated.h"
+#include "BaseCanister.h"
+#include "LubricantCanister.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MANOFACTURESIMULATOR_API AMolderedProduct : public ABaseProduct
+class MANOFACTURESIMULATOR_API ALubricantCanister : public ABaseCanister
 {
 	GENERATED_BODY()
-
+	
 };

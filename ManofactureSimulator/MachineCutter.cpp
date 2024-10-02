@@ -10,56 +10,75 @@
 ///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 // Section for all the logic in process the product.
 
-// Checks the actors on the boxEntrance, this will change depending on the machine.
 void AMachineCutter::CheckEntranceForProduct()
 {
     if (boxEntrance)
-	{
-		TArray<AActor*> actorsOnEntrance;
-   		boxEntrance->GetOverlappingActors(actorsOnEntrance);
+    {
+        TArray<AActor*> actorsOnEntrance;
+        boxEntrance->GetOverlappingActors(actorsOnEntrance);
 
-    	for (AActor* singleActor : actorsOnEntrance)
-    	{
-        	if (singleActor && singleActor->IsA(classToTransform))
-        	{
-				UE_LOG(LogTemp, Display, TEXT("YES"));
-            	ARawProduct* productOnEntrance = Cast<ARawProduct>(singleActor);
-				if((productOnEntrance && productsToProcess < maxProductOrder)) // THIS CHANGE DEPENDING ON THE MACHINE
-				{
-					UE_LOG(LogTemp, Display, TEXT("PADENTRO"));
-                    ManageInitialProductProperties(productOnEntrance->GetRawProductCode());
-					ChangeProductionStatus(EMachineStatus::ON_PRODUCTION);
+        EMachineStatus NewStatus = EMachineStatus::ON_PRODUCTION;
 
-					productOnEntrance->DestroyProduct();
-				}else
-				{
-					UE_LOG(LogTemp, Display, TEXT("OCUPADO"));
-					ChangeProductionStatus(EMachineStatus::FULL_PRODUCTION);
-				}
-        	}else
-			{
-				UE_LOG(LogTemp, Display, TEXT("WHAT'S THIS?"));
-				ChangeProductionStatus(EMachineStatus::CODE_ERROR);
-			}
-    	}
-	}
+        for (AActor* singleActor : actorsOnEntrance)
+        {
+            if (singleActor && singleActor->IsA(classToTransform))
+            {
+                ARawProduct* productOnEntrance = Cast<ARawProduct>(singleActor);
+                if (productOnEntrance->GetProductCode().Equals(codeToProcess))
+                {
+                    if (productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
+                    {
+                        ManageInitialProductProperties(productOnEntrance->GetProductCode());
+                        InsertQualityToArray(productOnEntrance->GetProductQuality());
+                        productOnEntrance->DestroyProduct();
+                    }
+                    else
+                    {
+                        NewStatus = EMachineStatus::FULL_PRODUCTION;
+                    }
+                }
+                else
+                {
+                    NewStatus = EMachineStatus::CODE_ERROR;
+                }
+                break; // Exit the loop once we find a valid product
+            }
+            else
+            {
+                NewStatus = EMachineStatus::PRODUCT_ERROR;
+            }
+        }
+
+        // Call ChangeProductionStatus only if the status has changed
+        if (NewStatus != PreviousStatus)
+        {
+            ChangeProductionStatus(NewStatus);
+            PreviousStatus = NewStatus;
+        }
+    }
+}
+
+// Checks and store quality values from pieces into the productsQuality array.
+void AMachineCutter::InsertQualityToArray(int pieceQuality)
+{
+    productsQuality[insertIndex] = pieceQuality;
 
 }
 
 // Gets the initialPieceAtributes and convert it to BaseMachine product code.
-void AMachineCutter::ManageInitialProductProperties(FInitialPieceAttribute properties)
+void AMachineCutter::ManageInitialProductProperties(FString properties)
 {
-    switch (properties.Quality)
+    switch (GetStringToEnumMaterialMap(properties.Left(2)))
     {
-    case EMaterialQuality::QUALITY_LOW:
+    case EProductMaterial::M1:
         cuttedProductCode.Quality = EProductMaterial::M1;
         timeByMaterial = timeByMaterialLow;
         break;
-	case EMaterialQuality::QUALITY_MEDIUM:
+	case EProductMaterial::M2:
         cuttedProductCode.Quality = EProductMaterial::M2;
         timeByMaterial = timeByMaterialMidd;
         break;
-	case EMaterialQuality::QUALITY_HIGH:
+	case EProductMaterial::M3:
         cuttedProductCode.Quality = EProductMaterial::M3;
         timeByMaterial = timeByMaterialHigh;
         break;
@@ -68,17 +87,17 @@ void AMachineCutter::ManageInitialProductProperties(FInitialPieceAttribute prope
         break;
     }
 
-	switch (properties.Size)
+	switch (GetStringToEnumSizeMap(properties.Mid(2, 2)))
     {
-    case EMaterialSize::SIZE_SMALL:
+    case EProductSize::S1:
         cuttedProductCode.Size = EProductSize::S1;
         timeBySize = timeBySizeLow;
         break;
-	case EMaterialSize::SIZE_MEDIUM:
+	case EProductSize::S2:
         cuttedProductCode.Size = EProductSize::S2;
         timeBySize = timeBySizeMidd;
         break;
-	case EMaterialSize::SIZE_BIG:
+	case EProductSize::S3:
         cuttedProductCode.Size = EProductSize::S3;
         timeBySize = timeBySizeHigh;
         break;
@@ -87,15 +106,15 @@ void AMachineCutter::ManageInitialProductProperties(FInitialPieceAttribute prope
         break;
     }
 
-	switch (properties.Length)
+	switch (GetStringToEnumLengthMap(properties.Right(2)))
     {
-    case EMaterialLength::LENGTH_SHORT:
+    case EProductLength::L1:
         productsToProcess += 3;
         break;
-	case EMaterialLength::LENGTH_MEDIUM:
+	case EProductLength::L2:
         productsToProcess += 5;
         break;
-	case EMaterialLength::LENGTH_LARGE:
+	case EProductLength::L3:
         productsToProcess += 10;
         break;
 
@@ -164,9 +183,21 @@ void AMachineCutter::SpawnProducedProduct()
         }
 	}
 
-    ACuttedProduct* cuttedProduct = GetWorld()->SpawnActor<ACuttedProduct>(productClass, spawnArrow->GetComponentLocation(), spawnArrow->GetComponentRotation());
-    cuttedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
-    cuttedProduct->SetCuttedProductCode(productCode);
-    productsToProcess --;
+    if(productClass)
+    {
+        ACuttedProduct* cuttedProduct = GetWorld()->SpawnActor<ACuttedProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
+        cuttedProduct->SetsProductProperties(productMeshToSpawn, productMaterialToSpawn, productSizeToSpawn);
+        cuttedProduct->SetProductCode(productCode);
+
+        if(productsToProcess != 0)
+        {
+            cuttedProduct->SetProductQuality(productsQuality[0] - lubricantPenalty);
+        }else
+        {
+            productsQuality[deleteIndex] = 0;
+        }
+
+        productsToProcess --;
+    }
 
 }

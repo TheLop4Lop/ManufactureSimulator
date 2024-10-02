@@ -2,6 +2,8 @@
 
 
 #include "BaseProduct.h"
+#include "Kismet/GameplayStatics.h"
+#include "BaseCharacter.h"
 
 // Sets default values
 ABaseProduct::ABaseProduct()
@@ -9,11 +11,8 @@ ABaseProduct::ABaseProduct()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	productRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Raw Product Root"));
-	RootComponent = productRootComponent;
-
 	productMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Raw Product Mesh"));
-	productMesh->SetupAttachment(productRootComponent);
+	productMesh->SetupAttachment(RootComponent);
 
 }
 
@@ -22,8 +21,13 @@ void ABaseProduct::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bProductFinished = false;
+
 	productMesh->SetSimulatePhysics(true);
-	
+	productMesh->SetRenderCustomDepth(true);
+	productMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
+	productMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
 }
 
 // Called every frame
@@ -67,16 +71,37 @@ FVector ABaseProduct::GetProductSize()
 }
 
 // Set the quality of the piece, this depends on the type of proccess is being subimted to.
-void ABaseProduct::SetProductQualityByProcess(float qualityByProcess)
+void ABaseProduct::SetProductQuality(int initialQuality)
 {
-	qualityPercent = qualityByProcess;
+	qualityPercent = initialQuality;
 
 }
 
 // Returns the quality of the piece.
-float ABaseProduct::GetProductQuality()
+int ABaseProduct::GetProductQuality()
 {
 	return qualityPercent;
+
+}
+
+// Sets cutted piece product code.
+void ABaseProduct::SetProductCode(FString& code)
+{
+    productCode = code;
+
+}
+
+// Gets cutted piece product code.
+FString& ABaseProduct::GetProductCode()
+{
+    return productCode;
+
+}
+
+// Changes the finish product status
+void ABaseProduct::SetProductFinishProduction()
+{
+	bProductFinished = true;
 
 }
 
@@ -84,4 +109,31 @@ void ABaseProduct::DestroyProduct()
 {
 	Destroy();
 
+}
+
+///////////////////////////////////// BASE PRODUCT INTERACTION ////////////////////////////////
+// Section for Base Product interaction with character.
+
+// IInteractable interface method for character interaction.
+void ABaseProduct::InteractionFunctionality_Implementation()
+{
+	productMesh->SetSimulatePhysics(false);
+
+	UE_LOG(LogTemp, Display, TEXT("LINE TRACE HIT BaseProduct!"));
+	character = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
+	if(character)
+	{
+		character->releaseHold.BindUObject(this, &ABaseProduct::SetProductReleaseReset);
+	}
+
+}
+
+void ABaseProduct::SetProductReleaseReset()
+{
+	UE_LOG(LogTemp, Display, TEXT("BaseProduct RELEASED!"));
+	productMesh->SetSimulatePhysics(true);
+
+	character = nullptr;
+	
 }

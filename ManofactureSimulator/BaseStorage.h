@@ -65,17 +65,6 @@ struct FInitialPieceAttribute
 
 };
 
-UENUM(BlueprintType)
-enum LengthSizes
-{
-	L1,
-	L2,
-	L3,
-
-	NoLength
-
-};
-
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseStorage : public AActor
 {

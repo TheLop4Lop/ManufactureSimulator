@@ -7,7 +7,7 @@
 #include "BaseProduct.generated.h"
 
 UCLASS()
-class MANOFACTURESIMULATOR_API ABaseProduct : public AActor
+class MANOFACTURESIMULATOR_API ABaseProduct : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 	
@@ -33,9 +33,17 @@ public:
 	FVector GetProductSize();
 
 	// Set the quality of the piece, this depends on the type of proccess is being subimted to.
-	void SetProductQualityByProcess(float qualityByProcess);
+	void SetProductQuality(int qualityByProcess);
 	// Returns the quality of the piece.
-	float GetProductQuality();
+	int GetProductQuality();
+
+	// Sets cutted piece product code.
+	void SetProductCode(FString& code);
+	// Gets cutted piece product code.
+	FString& GetProductCode();
+
+	// Method implementation after character interaction, change canister properties for character hold.
+	virtual void InteractionFunctionality_Implementation() override;
 
 	// Destroys the product.
 	void DestroyProduct();
@@ -43,10 +51,6 @@ public:
 protected:
 	///////////////////////////////////// BASE PRODUCT PROPERTIES ////////////////////////////////
 	// Section for the product properties, this interact with the respective machine class.
-
-	// Product root component.
-	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
-	USceneComponent* productRootComponent;
 
 	// Product Static Mesh
 	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
@@ -62,6 +66,26 @@ protected:
 
 	// Holds the quality of the piece.
 	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
-	float qualityPercent;
+	int qualityPercent;
+
+	// Holds the status for product ready for final storage.
+	UPROPERTY(EditAnywhere, Category = "Product Properties", meta = (AllowPrivateAccess))
+	bool bProductFinished;
+
+	// Stores product code to be readed by the next machine in the process.
+	FString productCode;
+	
+	// Changes the finish product status
+	void SetProductFinishProduction();
+
+	///////////////////////////////////// BASE PRODUCT INTERACTION ////////////////////////////////
+	// Section for Base Product interaction with character.
+
+	// Restets the behaviour of the mesh to it's original state.
+	UFUNCTION()
+	void SetProductReleaseReset();
+
+	// Holds reference to character for canister event reset.
+	class ABaseCharacter* character;
 
 };

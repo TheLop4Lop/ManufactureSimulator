@@ -24,6 +24,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Checks if exit is clear for spawn product.
+	bool CheckClearExit();
+
 	// Pawns the Initial Piece product into the world.
 	void SpawnInitialPiece(struct FInitialPieceAttribute orderToSpawn);
 
@@ -32,13 +35,14 @@ protected:
 	// Spawner actor properties.
 
 	// Determines the location and rotation when actor spawns.
-	class UArrowComponent* arrow;
+	UPROPERTY(EditAnywhere, Category = "Spawner Properties", meta = (AlloPrivateAccess))
+	class UBoxComponent* spawnerBox;
 
 	///////////////////////////////////// RAW PRODUCT SPAWN ////////////////////////////////
 	// Reference to spawn class.
 
 	// Holds the product code for the spawning product.
-	FInitialPieceAttribute productCode;
+	FString productCode;
 
 	// Holds a reference to RawProduct template for spawning.
 	UPROPERTY(EditAnywhere, Category = "Spawn Product", meta = (AllowPrivateMessage))

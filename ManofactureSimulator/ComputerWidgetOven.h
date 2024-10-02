@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseProduct.h"
-#include "MolderedProduct.generated.h"
+#include "ComputerWidgetPainter.h"
+#include "ComputerWidgetOven.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MANOFACTURESIMULATOR_API AMolderedProduct : public ABaseProduct
+class MANOFACTURESIMULATOR_API UComputerWidgetOven : public UComputerWidgetPainter
 {
 	GENERATED_BODY()
-
+	
 };

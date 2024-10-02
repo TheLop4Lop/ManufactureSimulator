@@ -36,6 +36,10 @@ class MANOFACTURESIMULATOR_API AMachineMolder : public ABaseMachine
 {
 	GENERATED_BODY()
 
+public:
+	// Sets the posititon for the Machine Service Door.
+	virtual void SetPositionOfServiceDoor() override;
+
 protected:
 //////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 	// Section for all the logic in process the product.
@@ -44,9 +48,7 @@ protected:
 	virtual void CheckEntranceForProduct() override;
 
 	// Gets the cuttedProduct properties and proces production product code.
-	void ManageCuttedProductProperties(FProductForm properties);
-
-	FProductForm& GetMolderedProductCode(FString& cuttedProductCode);
+	void ManageCuttedProductProperties(FString properties);
 
 	///////////////////////////////////// SPAWN PRODUCT ////////////////////////////////
 	// Section for spawn product and set properties.

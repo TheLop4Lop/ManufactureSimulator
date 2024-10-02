@@ -14,18 +14,5 @@ UCLASS()
 class MANOFACTURESIMULATOR_API ARawProduct : public ABaseProduct
 {
 	GENERATED_BODY()
-
-public:
-	// Sets product code based on initial BaseStorage struct.
-	void SetProductCode(FInitialPieceAttribute productCode);
-	// Gets the Product code, this will be readed by the respective machines.
-	FInitialPieceAttribute GetRawProductCode();
-
-protected:
-	///////////////////////////////////// RAW PRODUCT SETTINGS ////////////////////////////////
-	// Section for Raw product properties.
-
-	// Struct for piece identification and properties settings.
-	FInitialPieceAttribute rawProductCode;
 	
 };
