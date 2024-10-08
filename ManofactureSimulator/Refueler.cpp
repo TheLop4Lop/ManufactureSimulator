@@ -43,6 +43,13 @@ void ARefueler::Tick(float DeltaTime)
 ///////////////////////////////////// REFUELER PROCESS ////////////////////////////////
 // Section for Refueler fill canisters process.
 
+// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
+void ARefueler::SetMachinePower()
+{
+	bIsPowered = !bIsPowered;
+
+}
+
 // Called from Refueler Computer after widget Security DOOR interaction; Open or Close Security Door.
 void ARefueler::SecurityDoorChangePosition()
 {
@@ -51,6 +58,8 @@ void ARefueler::SecurityDoorChangePosition()
 	refuelerDoor->SetRelativeRotation(doorRotation);
 
 	bIsDoorOpen = !bIsDoorOpen;
+	if(GetWorldTimerManager().IsTimerActive(oilDepositTimer)) GetWorldTimerManager().ClearTimer(oilDepositTimer);
+	if(GetWorldTimerManager().IsTimerActive(lubricantDepositTimer)) GetWorldTimerManager().ClearTimer(oilDepositTimer);
 
 }
 
@@ -85,19 +94,35 @@ bool ARefueler::LubricantActionButton()
 
 }
 
+// Called from Manager Computer to fill Oil Deposit.
+void ARefueler::FillOilDepositAction()
+{
+	if(bIsPowered) SetMachinePower();
+	GetWorldTimerManager().ClearTimer(oilDepositTimer);
+	GetWorldTimerManager().SetTimer(oilDepositTimer, this, &ARefueler::FillUpOilDeposit, oilDepositFillUpTime, (oilLevel < maxOilCapacity));
+
+}
+
+// Called from Manager Computer to fill Lubricant Deposit.
+void ARefueler::FillLubricantDepositAction()
+{
+	if(bIsPowered) SetMachinePower();
+	GetWorldTimerManager().ClearTimer(lubricantDepositTimer);
+	GetWorldTimerManager().SetTimer(lubricantDepositTimer, this, &ARefueler::FillUpLubricantDeposit, lubricantDepositFillUpTime, (oilLevel < maxOilCapacity));
+
+}
+
 // Search for actors in lubricantCanisterBox and manages the filling main logic.
 void ARefueler::CheckOilBoxForActorsAction()
 {
 	TArray<AActor*> actorsInOilBox;
 	oilCanisterBox->GetOverlappingActors(actorsInOilBox);
 
-	if(actorsInOilBox.Num() == 0 && DoOnceOil)
+	if(actorsInOilBox.Num() == 0)
 	{
-		UE_LOG(LogTemp, Display, TEXT("CLEAR OIL REFERENCE"));
 		GetWorldTimerManager().ClearTimer(oilDepositTimer);
+		isOilCanisterFull = false;
 		oilCanister = nullptr;
-
-		DoOnceOil = false;
 	}
 
 	if(actorsInOilBox.Num() > 0)
@@ -106,10 +131,8 @@ void ARefueler::CheckOilBoxForActorsAction()
 		{
 			if(singleActor->IsA(AOilCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(oilDepositTimer))
 			{
-				UE_LOG(LogTemp, Display, TEXT("PREPARING TO FILL OIL CANISTER"));
 				oilCanister = Cast<AOilCanister>(singleActor);
 				GetWorldTimerManager().SetTimer(oilDepositTimer, this, &ARefueler::FillUpOilCanister, oilCanisterFillUpTime, true);
-				DoOnceOil = true;
 			}
 		}
 	}
@@ -122,13 +145,11 @@ void ARefueler::CheckLubricantBoxForActorsAction()
 	TArray<AActor*> actorsInLubricantBox;
 	lubricantCanisterBox->GetOverlappingActors(actorsInLubricantBox);
 
-	if(actorsInLubricantBox.Num() == 0 && DoOnceLubricant)
+	if(actorsInLubricantBox.Num() == 0)
 	{
-		UE_LOG(LogTemp, Display, TEXT("CLEAR LUBRICANT REFERENCE"));
 		GetWorldTimerManager().ClearTimer(lubricantDepositTimer);
+		isLubricantCanisterFull = false;
 		lubricantCanister = nullptr;
-
-		DoOnceLubricant = false;
 	}
 
 	if(actorsInLubricantBox.Num() > 0)
@@ -137,10 +158,8 @@ void ARefueler::CheckLubricantBoxForActorsAction()
 		{
 			if(singleActor->IsA(ALubricantCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(lubricantDepositTimer))
 			{
-				UE_LOG(LogTemp, Display, TEXT("PREPARING TO FILL LUBRICANT CANISTER"));
 				lubricantCanister = Cast<ALubricantCanister>(singleActor);
 				GetWorldTimerManager().SetTimer(lubricantDepositTimer, this, &ARefueler::FillUpLubricantCanister, lubricantCanisterFillUpTime, true);
-				DoOnceLubricant = true;
 			}
 		}
 	}
@@ -149,17 +168,14 @@ void ARefueler::CheckLubricantBoxForActorsAction()
 
 void ARefueler::FillUpOilCanister()
 {
-	if(oilCanister)
+	if(oilCanister && !isOilCanisterFull)
 	{
 		if(oilLevel > 0)
 		{
-			UE_LOG(LogTemp, Display, TEXT("FILLIN UP OIL CANISTER!"));
 			if(oilCanister->GetCanisterCurrentLevel() < oilCanister->GetCanisterMaxCapacity())
 			{
 				oilCanister->FillCanister();
 				oilLevel--;
-
-				UE_LOG(LogTemp, Display, TEXT("OIL LEVEL: %i"), oilLevel);
 			}else
 			{
 				isOilCanisterFull = true;
@@ -171,22 +187,61 @@ void ARefueler::FillUpOilCanister()
 
 void ARefueler::FillUpLubricantCanister()
 {
-	if(lubricantCanister)
+	if(lubricantCanister && !isLubricantCanisterFull)
 	{
 		if(lubricantLevel > 0)
 		{
-			UE_LOG(LogTemp, Display, TEXT("FILLIN UP LUBRICANT CANISTER!"));
 			if(lubricantCanister->GetCanisterCurrentLevel() < lubricantCanister->GetCanisterMaxCapacity())
 			{
 				lubricantCanister->FillCanister();
 				lubricantLevel--;
-
-				UE_LOG(LogTemp, Display, TEXT("LUBRICANT LEVEL: %i"), lubricantLevel);
 			}else
 			{
 				isLubricantCanisterFull = true;
 			}
 		}
 	}
+
+}
+
+// Method called to stop (if is used) oil Timer to refil Refueler Oil deposit.
+void ARefueler::FillUpOilDeposit()
+{
+	oilLevel++;
+
+}
+
+// Method called to stop (if is used) Lubricant Timer to refil Refueler Lubricant deposit.
+void ARefueler::FillUpLubricantDeposit()
+{
+	lubricantLevel++;
+
+}
+
+// Gets Oil Deposit Level.
+int ARefueler::GetOilDepositLevel()
+{
+	return oilLevel;
+
+}
+
+// Get Lubricant Deposit Level.
+int ARefueler::GetLubricantDepositLeve()
+{
+	return lubricantLevel;
+
+}
+
+// Gets MAX Oil Deposit Level.
+int ARefueler::GetMaxOilDepositLevel()
+{
+	return maxOilCapacity;
+
+}
+
+// Get MAX Lubricant Deposit Level.
+int ARefueler::GetMaxLubricantDepositLeve()
+{
+	return maxlubricantCapacity;
 
 }

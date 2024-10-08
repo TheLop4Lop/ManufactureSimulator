@@ -2,6 +2,7 @@
 
 
 #include "ComputerRefuelerWidget.h"
+#include "Components/ProgressBar.h"
 #include "Components/Button.h"
 
 void UComputerRefuelerWidget::NativeConstruct()
@@ -33,6 +34,20 @@ void UComputerRefuelerWidget::SetButtonsLogicEvents()
     {
         fillLubricantCanister->OnClicked.AddDynamic(this, &UComputerRefuelerWidget::SetlubricantCanisterButtonLogic);
     }
+
+}
+
+// Sets value of Oil Bar.
+void UComputerRefuelerWidget::SetOilBarLevel(float oilevel)
+{
+    oilBar->SetPercent(oilevel);
+
+}
+
+// Sets value of Lubricant Bar.
+void UComputerRefuelerWidget::SetLubricantBarLevel(float lubricantLevel)
+{
+    lubricantBar->SetPercent(lubricantLevel);
 
 }
 

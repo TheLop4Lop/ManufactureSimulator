@@ -23,6 +23,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
+	void SetMachinePower();
+
 	// Called from Refueler Computer after widget Security DOOR interaction; Open or Close Security Door.
 	void SecurityDoorChangePosition();
 
@@ -31,6 +34,24 @@ public:
 
 	// Called from Refueler Computer after widget LUBRICANT interaction, if Service door is closed return true, otherwise false.
 	bool LubricantActionButton();
+
+	// Called from Manager Computer to fill Oil Deposit.
+	void FillOilDepositAction();
+
+	// Called from Manager Computer to fill Lubricant Deposit.
+	void FillLubricantDepositAction();
+
+	// Gets Oil Deposit Level.
+	int GetOilDepositLevel();
+
+	// Get Lubricant Deposit Level.
+	int GetLubricantDepositLeve();
+
+	// Gets MAX Oil Deposit Level.
+	int GetMaxOilDepositLevel();
+
+	// Get MAX Lubricant Deposit Level.
+	int GetMaxLubricantDepositLeve();
 
 protected:
 	///////////////////////////////////// REFUELER PROPERTIES ////////////////////////////////
@@ -106,11 +127,11 @@ protected:
 
 	// Hods the value of the time to fill one unity of oil into the Refueler Deposit.
 	UPROPERTY(EditAnywhere, Category = "Refueler Process", meta = (AllowPrivateAccess))
-	float oilDepositFillUpTime = 1.0f;
+	float oilDepositFillUpTime = 0.5f;
 
 	// Hods the value of the time to fill one unity of lubricant into the Refueler Deposit.
 	UPROPERTY(EditAnywhere, Category = "Refueler Process", meta = (AllowPrivateAccess))
-	float lubricantDepositFillUpTime = 0.5f;
+	float lubricantDepositFillUpTime = 0.2f;
 
 	// Hods the value of the time to fill one unity of oil into the canister.
 	UPROPERTY(EditAnywhere, Category = "Refueler Process", meta = (AllowPrivateAccess))
@@ -132,11 +153,21 @@ protected:
 	// Search for actors in lubricantCanisterBox and manages the filling main logic.
 	void CheckLubricantBoxForActorsAction();
 
+	// Method called from a timer, manages Oil Canister fill up.
 	UFUNCTION()
 	void FillUpOilCanister();
 
+	// Method called from a timer, manages Lubricant Canister fill up.
 	UFUNCTION()
 	void FillUpLubricantCanister();
+
+	// Method called to stop (if is used) oil Timer to refil Refueler Oil deposit.
+	UFUNCTION()
+	void FillUpOilDeposit();
+
+	// Method called to stop (if is used) Lubricant Timer to refil Refueler Lubricant deposit.
+	UFUNCTION()
+	void FillUpLubricantDeposit();
 
 	// Controls flow on clear oil timer Process.
 	bool DoOnceOil;

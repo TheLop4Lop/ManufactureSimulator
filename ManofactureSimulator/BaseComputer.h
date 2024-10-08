@@ -45,7 +45,7 @@ protected:
 	TSubclassOf<class UUserWidget> computerClass;
 
 	// Resets the character controller to move the character around.
-	void WidgetBindResetController();
+	virtual void WidgetBindResetController();
 
 	// Hold reference to character controller.
 	class ACharacterController* characterController;

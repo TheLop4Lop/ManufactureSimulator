@@ -7,6 +7,12 @@
 #include "CharacterController.h"
 #include "Refueler.h"
 
+ARefuelerComputer::ARefuelerComputer()
+{
+    PrimaryActorTick.bCanEverTick = true;
+
+}
+
 void ARefuelerComputer::BeginPlay()
 {
     Super::BeginPlay();
@@ -14,6 +20,22 @@ void ARefuelerComputer::BeginPlay()
     TArray<AActor*> actorsInWorld;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(),ARefueler::StaticClass(), actorsInWorld);
     if(actorsInWorld.IsValidIndex(0)) refuelerMachine = Cast<ARefueler>(actorsInWorld[0]);
+
+}
+
+// Called every frame
+void ARefuelerComputer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+    if(refuelerMachine && computerWidget)
+    {
+        float oilLevel = ((float)refuelerMachine->GetOilDepositLevel()/(float)refuelerMachine->GetMaxOilDepositLevel());
+        computerWidget->SetOilBarLevel(oilLevel);
+
+        float lubricantLevel = ((float)refuelerMachine->GetLubricantDepositLeve()/(float)refuelerMachine->GetMaxLubricantDepositLeve());
+        computerWidget->SetLubricantBarLevel(lubricantLevel);
+    }
 
 }
 
@@ -34,6 +56,22 @@ void ARefuelerComputer::AddWidgetFromComputer(ACharacterController* CharacterCon
 	}
 
 }
+
+///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
+
+// Resets the character controller to move the character around.
+void ARefuelerComputer::WidgetBindResetController()
+{
+    characterController->SetMovement(false);
+	characterController = nullptr;
+    
+    computerWidget = nullptr;
+
+}
+
+///////////////////////////////////// MACHINE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
 
 // Calls machine security door for interaction.
 void ARefuelerComputer::CallsSecurityDoorAction()

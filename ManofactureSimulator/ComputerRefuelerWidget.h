@@ -35,6 +35,12 @@ public:
 	// Delegate event to fill lubricant canister event.
 	FStartLubricantRefuel lubricantRefuelAction;
 
+	// Sets value of Oil Bar.
+	void SetOilBarLevel(float oilevel);
+
+	// Sets value of Lubricant Bar.
+	void SetLubricantBarLevel(float lubricantLevel);
+
 protected:
 ///////////////////////////////////// COMPUTER REFUELER PROPERTIES ////////////////////////////////
 // Section for Computer Refueler buttons.
@@ -54,6 +60,14 @@ protected:
 	// Start filling Lubricant Canister button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* fillLubricantCanister;
+
+	// Refueler Oil Deposit Indicator .
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UProgressBar* oilBar;
+
+	// Refueler Lubricant Deposit Indicator .
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UProgressBar* lubricantBar;
 
 	// Called in Native construct, method calls all other Button Logic Implementations.
 	void SetButtonsLogicEvents();
