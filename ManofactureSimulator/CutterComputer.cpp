@@ -18,6 +18,22 @@ void ACutterComputer::BeginPlay()
 	
 }
 
+// Called every frame
+void ACutterComputer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if(cutterMachine && computerWidget)
+	{
+		float oilLevel = ((float)cutterMachine->GetOilLevel()/(float)cutterMachine->GetMaxOilLevel());
+		computerWidget->SetOilLevel(oilLevel);
+
+		float lubricantLevel = ((float)cutterMachine->GetLubricantLevel()/(float)cutterMachine->GetMaxLubricantLevel());
+		computerWidget->SetLubricantLevel(lubricantLevel);
+	}
+
+}
+
 // Adds widget and assign the player controller to it.
 void ACutterComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
@@ -27,12 +43,50 @@ void ACutterComputer::AddWidgetFromComputer(ACharacterController* CharacterContr
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
-
 		computerWidget->confirmProductionCode.BindUObject(this, &ACutterComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::PublicWidgetBindResetController);
 
+		computerWidget->powerAction.BindUObject(this, &ACutterComputer::CallPowerAction);
+		computerWidget->serviceAction.BindUObject(this, &ACutterComputer::CallServiceAction);
+
 		computerWidget->productDoorAction.BindUObject(this, &ACutterComputer::CallProductDoorAction);
 		computerWidget->serviceDoorAction.BindUObject(this, &ACutterComputer::CallsServiceDoorAction);
+	}
+
+}
+
+///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
+
+// Resets the character controller to move the character around.
+void ACutterComputer::WidgetBindResetController()
+{
+    characterController->SetMovement(false);
+	characterController = nullptr;
+    
+    computerWidget = nullptr;
+
+}
+
+///////////////////////////////////// MACHINE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
+
+// Calls machine method to change Power Status.
+void ACutterComputer::CallPowerAction()
+{
+	if(cutterMachine)
+	{
+		cutterMachine->SetMachinePower();
+	}
+
+}
+
+// Calls machine method to enter service mode.
+void ACutterComputer::CallServiceAction()
+{
+	if(cutterMachine)
+	{
+		cutterMachine->StartMachineService();
 	}
 
 }

@@ -7,12 +7,6 @@
 #include "CharacterController.h"
 #include "Refueler.h"
 
-ARefuelerComputer::ARefuelerComputer()
-{
-    PrimaryActorTick.bCanEverTick = true;
-
-}
-
 void ARefuelerComputer::BeginPlay()
 {
     Super::BeginPlay();
@@ -50,6 +44,7 @@ void ARefuelerComputer::AddWidgetFromComputer(ACharacterController* CharacterCon
 		computerWidget->AddToViewport();
 		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::PublicWidgetBindResetController);
 
+        computerWidget->powerAction.BindUObject(this, &ARefuelerComputer::SetPowerStatus);
         computerWidget->doorAction.BindUObject(this, &ARefuelerComputer::CallsSecurityDoorAction);
 		computerWidget->oilRefuelAction.BindUObject(this, &ARefuelerComputer::CallsOilRefuel);
 		computerWidget->lubricantRefuelAction.BindUObject(this, &ARefuelerComputer::CallsLubricantRefuel);
@@ -72,6 +67,16 @@ void ARefuelerComputer::WidgetBindResetController()
 
 ///////////////////////////////////// MACHINE COMPUTER PROPERTIES ////////////////////////////////
 // Sections for the actor properties.
+
+// Changes Machine Power Status.
+void ARefuelerComputer::SetPowerStatus()
+{
+    if(refuelerMachine)
+    {
+        refuelerMachine->SetMachinePower();
+    }
+
+}
 
 // Calls machine security door for interaction.
 void ARefuelerComputer::CallsSecurityDoorAction()

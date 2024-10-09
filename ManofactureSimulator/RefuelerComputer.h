@@ -14,9 +14,6 @@ class MANOFACTURESIMULATOR_API ARefuelerComputer : public ABaseComputer
 {
 	GENERATED_BODY()
 
-public:
-	ARefuelerComputer();
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -42,6 +39,9 @@ protected:
 
 	// Reference to Refueler machine in the world.
 	class ARefueler* refuelerMachine;
+
+	// Changes Machine Power Status.
+	void SetPowerStatus();
 	
 	// Calls machine security door for interaction.
 	void CallsSecurityDoorAction();

@@ -85,6 +85,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
+	void SetMachinePower();
+
 	// Sets value of order code for the machinery to process.
 	void SetProductionMachineOrder(FString orderToProduce);
 
@@ -93,6 +96,21 @@ public:
 
 	// Sets the posititon for the Machine Service Door.
 	virtual void SetPositionOfServiceDoor();
+
+	// Called from computer after Widget Service Interaction; starts maintenance.
+	void StartMachineService();
+
+	// Gets current Oil Level.
+	int GetOilLevel();
+
+	// Gets MAX Oil Level.
+	int GetMaxOilLevel();
+
+	// Gets current Lubricnt Level.
+	int GetLubricantLevel();
+
+	// Gets MAX Lubricant Level.
+	int GetMaxLubricantLevel();
 
 	// Delegate event for active or desable a single conveyor belt.
 	FActiveConveyor conveyorEvent;
@@ -369,6 +387,10 @@ protected:
 	// Close up Service Door after certain amount of time.
 	FTimerHandle serviceDoorTimer;
 
+	// Method called by Timer, set Service configuration for machine maintinance.
+	UFUNCTION()
+	void RunMaintenance();
+
 	// Checks if isServiceDoorOpen is true, if it is, calls SetPositionOfServiceDoor to close door. This to prevent continuos check in tick.
 	void CloseUpServiceDoorByTimer();
 
@@ -385,7 +407,7 @@ protected:
 	
 	// Sets the Maintenance time for the machine to be ready to produce again, this depends on the machine type.
 	UPROPERTY(EditAnywhere, Category = "Production Time", meta = (AllowPrivateAccess))
-	float maintenanceTime;
+	float maintenanceTime = 30.0f;
 
 	// Holds the value of time consumed working on material type.
 	UPROPERTY(EditAnywhere, Category = "Production Time", meta = (AllowPrivateAccess))

@@ -227,6 +227,46 @@ void ABaseMachine::SetPositionOfServiceDoor()
 
 }
 
+// Called from Refueler computer after Widget Service Interaction; starts maintenance.
+void ABaseMachine::StartMachineService()
+{
+	UE_LOG(LogTemp, Display, TEXT("RUNNING MAINTENANCE..."));
+	isInMaintenance = true;
+	ChangeProductionStatus(EMachineStatus::ON_MAINTENANCE);
+
+	GetWorldTimerManager().ClearTimer(processTimer);
+	GetWorldTimerManager().SetTimer(processTimer, this, &ABaseMachine::RunMaintenance, maintenanceTime, false);
+
+}
+
+// Gets current Oil Level.
+int ABaseMachine::GetOilLevel()
+{
+	return oilLevel;
+
+}
+
+// Gets MAX Oil Level.
+int ABaseMachine::GetMaxOilLevel()
+{
+	return maxOilLevel;
+
+}
+
+// Gets current Lubricnt Level.
+int ABaseMachine::GetLubricantLevel()
+{
+	return lubricantLevel;
+
+}
+
+// Gets MAX Lubricant Level.
+int ABaseMachine::GetMaxLubricantLevel()
+{
+	return maxLubricantLevel;
+
+}
+
 ///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 // Section for all the logic in process the product.
 
@@ -315,6 +355,13 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 
 }
 
+// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
+void ABaseMachine::SetMachinePower()
+{
+	isPowered = !isPowered;
+
+}
+
 void ABaseMachine::SetProductionMachineOrder(FString orderToProduce)
 {
 	codeToProcess = orderToProduce;
@@ -359,8 +406,6 @@ void ABaseMachine::ReduceOilLevel()
     {
         oilLevel = (oilLevel < 40) ? FMath::Max(0, oilLevel - 2) : FMath::Max(0, oilLevel - 1);
 		UpdateOilPenalty();
-
-		UE_LOG(LogTemp, Warning, TEXT("MACHINE REPORT: %s, OIL LEVEL: %i, PENALTY: %f"), *GetActorLabel(), oilLevel, oilPenalty);
     }
 }
 
@@ -371,8 +416,6 @@ void ABaseMachine::ReduceLubricantLevel()
     {
         lubricantLevel = (lubricantLevel < 40) ? FMath::Max(0, lubricantLevel - 3) : FMath::Max(0, lubricantLevel - 1);
 		UpdateLubricantPenalty();
-
-		UE_LOG(LogTemp, Warning, TEXT("MACHINE REPORT: %s, LUBRICANT LEVEL: %i, PENALTY: %i"), *GetActorLabel(), lubricantLevel, lubricantPenalty);
     }
 }
 
@@ -524,12 +567,12 @@ void ABaseMachine::CheckTypeOfCanister(const TArray<AActor*>& actorsBox)
 {
 	for(AActor* singleActor : actorsBox)
 	{
-		if(singleActor->IsA(AOilCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(FillUpTankTimer))
+		if(singleActor->IsA(AOilCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(FillUpTankTimer) && !isInMaintenance)
 		{
 			oilCanister = Cast<AOilCanister>(singleActor);
 			GetWorldTimerManager().SetTimer(FillUpTankTimer, this, &ABaseMachine::FillUpOilTank, fillUpTime, true);
 			DoOnceService = true;
-		}else if(singleActor->IsA(ALubricantCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(FillUpTankTimer))
+		}else if(singleActor->IsA(ALubricantCanister::StaticClass()) && !GetWorldTimerManager().IsTimerActive(FillUpTankTimer) && !isInMaintenance)
 		{
 			lubricantCanister = Cast<ALubricantCanister>(singleActor);
 			GetWorldTimerManager().SetTimer(FillUpTankTimer, this, &ABaseMachine::FillUpLubricantTan, fillUpTime, true);
@@ -537,6 +580,26 @@ void ABaseMachine::CheckTypeOfCanister(const TArray<AActor*>& actorsBox)
 		}
 	}
 
+}
+
+// Method called by Timer, set Service configuration for machine maintinance.
+void ABaseMachine::RunMaintenance()
+{
+	if(!prevOilLevel == 0)
+	{
+		oilLevel = prevOilLevel;
+		prevOilLevel = 0;
+	}
+
+	if(!prevLubricantLevel == 0)
+	{
+		lubricantLevel = prevLubricantLevel;
+		prevLubricantLevel = 0;
+	}
+
+	isInMaintenance = false;
+	ChangeProductionStatus(EMachineStatus::ON_HOLD);
+	UE_LOG(LogTemp, Display, TEXT("MAINTENANCE DONE!"));
 }
 
 // Checks if isServiceDoorOpen is true, if it is, calls SetPositionOfServiceDoor to close door. This to prevent continuos check in tick.
@@ -594,7 +657,6 @@ void ABaseMachine::SpawnProducedProduct()
 	ABaseProduct* spawnProduct = GetWorld()->SpawnActor<ABaseProduct>(productClass, boxExit->GetComponentLocation(), boxExit->GetComponentRotation());
 	if(productMesh.Num() > 0 && productSize.Num() > 0 && qualityMaterial.Num() > 0)
 	{
-		UE_LOG(LogTemp, Display, TEXT("SET Properties spawn properties in machine."));
 		// DESIGN SET PROPERTIES ON SPAWNED PRODUCT. DEPENDS ON TYPE OF THE MACHINE.
 	}
 

@@ -18,6 +18,22 @@ void AOvenComputer::BeginPlay()
 
 }
 
+// Called every frame
+void AOvenComputer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if(ovenMachine && computerWidget)
+	{
+		float oilLevel = ((float)ovenMachine->GetOilLevel()/(float)ovenMachine->GetMaxOilLevel());
+		computerWidget->SetOilLevel(oilLevel);
+
+		float lubricantLevel = ((float)ovenMachine->GetLubricantLevel()/(float)ovenMachine->GetMaxLubricantLevel());
+		computerWidget->SetLubricantLevel(lubricantLevel);
+	}
+
+}
+
 // Adds widget and assign the player controller to it.
 void AOvenComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
@@ -30,8 +46,47 @@ void AOvenComputer::AddWidgetFromComputer(ACharacterController* CharacterControl
 		computerWidget->confirmProductionCode.BindUObject(this, &AOvenComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &AOvenComputer::PublicWidgetBindResetController);
 
+		computerWidget->powerAction.BindUObject(this, &AOvenComputer::CallPowerAction);
+		computerWidget->serviceAction.BindUObject(this, &AOvenComputer::CallServiceAction);
+
 		computerWidget->productDoorAction.BindUObject(this, &AOvenComputer::CallProductDoorAction);
 		computerWidget->serviceDoorAction.BindUObject(this, &AOvenComputer::CallsServiceDoorAction);
+	}
+
+}
+
+///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
+
+// Resets the character controller to move the character around.
+void AOvenComputer::WidgetBindResetController()
+{
+    characterController->SetMovement(false);
+	characterController = nullptr;
+    
+    computerWidget = nullptr;
+
+}
+
+///////////////////////////////////// MACHINE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
+
+// Calls machine method to change Power Status.
+void AOvenComputer::CallPowerAction()
+{
+	if(ovenMachine)
+	{
+		ovenMachine->SetMachinePower();
+	}
+
+}
+
+// Calls machine method to enter service mode.
+void AOvenComputer::CallServiceAction()
+{
+	if(ovenMachine)
+	{
+		ovenMachine->StartMachineService();
 	}
 
 }
@@ -41,7 +96,6 @@ void AOvenComputer::WidgetBindProductOrder(FString productCode)
 {
 	if(ovenMachine)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Computer to Machine code: %s"), *productCode);
 		ovenMachine->SetProductionMachineOrder(productCode);
 	}
 
