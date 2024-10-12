@@ -6,6 +6,17 @@
 #include "GameFramework/Actor.h"
 #include "MachineQuality.generated.h"
 
+UENUM(BlueprintType)
+enum class EMachineQualityStatus : uint8
+{
+	POWER_OFF,
+	BOX_EMPTY,
+	NO_MATCH,
+	MULTIPLE,
+	SCANNED
+
+};
+
 UCLASS()
 class MANOFACTURESIMULATOR_API AMachineQuality : public AActor
 {
@@ -22,5 +33,38 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Change Power machine Status.
+	void SetMachinePower();
+
+	// Scan Produc inside de boxDetector.
+	EMachineQualityStatus ScanForProduct();
+
+	// Returns Proudct code from scannedProduct.
+	FString GetProductCode();
+
+	// Returns Product Quality status.
+	float GetProductQuality();
+
+protected:
+	///////////////////////////////////// MACHINE PROPERTIES ////////////////////////////////
+	// Section for the Machine Properties.
+
+	// Machine Quality Static Mesh.
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	UStaticMeshComponent* machineMesh;
+
+	// Machine Product detector Box.
+	UPROPERTY(EditAnywhere, Category = "Machine Properties", meta = (AllowPrivateAccess))
+	class UBoxComponent* boxDetector;
+
+	///////////////////////////////////// MACHINE PROCESS ////////////////////////////////
+	// Section for the Machine Process.
+
+	// Determines Machine Power Status.
+	UPROPERTY(EditAnywhere, Category = "Machine Process", meta = (AllowPrivateAccess))
+	bool isPowered;
+
+	class ABaseProduct* scannedProduct;
 
 };
