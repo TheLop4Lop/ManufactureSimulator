@@ -3,6 +3,7 @@
 #include "BaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/BoxComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
@@ -42,27 +43,29 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//Checks if the controller isn't nullptr and if there's a actor in Character sight
-	if(InSightLine() != nullptr && DoOnceWidget)
-	{
-		AActor* ActorInSight = InSightLine();
-		if(ActorInSight->IsA(ABaseComputer::StaticClass()))
-		{
-			Computer = Cast<ABaseComputer>(ActorInSight);
+	AActor* actorInSight = InSightLine().GetActor();
+	UPrimitiveComponent* HitComponent = InSightLine().GetComponent();
 
-			InteractionWidget = CreateWidget(CharacterController, InteractionWidgetClass);
-			if(InteractionWidget != nullptr)
-			{
-				InteractionWidget->AddToViewport();
-			}
-			DoOnceWidget = false;
-		}else if(ActorInSight->IsA(ABaseProduct::StaticClass()) || ActorInSight->IsA(ABaseCanister::StaticClass()))
+	//Checks if the controller isn't nullptr and if there's a actor in Character sight
+	if(actorInSight != nullptr && DoOnceWidget)
+	{
+		if(actorInSight->IsA(ABaseComputer::StaticClass()))
 		{
-			UE_LOG(LogTemp, Display, TEXT("GRAB OBJECT!"));
+			Computer = Cast<ABaseComputer>(actorInSight);
+
+			SetInteractionWidget(computerInteractionWidgetClass);
+			DoOnceWidget = false;
+		}else if(actorInSight->IsA(ABaseProduct::StaticClass()) || actorInSight->IsA(ABaseCanister::StaticClass()))
+		{
+			SetInteractionWidget(grabInteractionWidgetClass);
+			DoOnceWidget = false;
+		}else if(HitComponent && HitComponent->IsA(UBoxComponent::StaticClass()) && objectHolded)
+		{
+			SetInteractionWidget(releaseInteractionWidgetClass);
 			DoOnceWidget = false;
 		}
 
-	}else if(InSightLine() == nullptr && !DoOnceWidget)
+	}else if(actorInSight == nullptr && !DoOnceWidget)
 	{
 		if(InteractionWidget)
 		{
@@ -113,8 +116,22 @@ void ABaseCharacter::MoveRight(float AxisValue)
 ///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
 // Interaction object section.
 
+// Set Interaction widget to a specific WidgetClass.
+void ABaseCharacter::SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass)
+{
+	if(widgetClass)
+	{
+		InteractionWidget = CreateWidget(CharacterController, widgetClass);
+		if(InteractionWidget != nullptr)
+		{
+			InteractionWidget->AddToViewport();
+		}
+	}
+	
+}
+
 // Checks if there's an actor in front of the character.
-AActor* ABaseCharacter::InSightLine()
+FHitResult ABaseCharacter::InSightLine()
 {
 	FVector SightLocation;
 	FRotator SightRotation;
@@ -132,13 +149,9 @@ AActor* ABaseCharacter::InSightLine()
 
 	FCollisionShape Sphere = FCollisionShape::MakeSphere(5.f);
 
-	if(GetWorld()->SweepSingleByChannel(Hit, SightLocation, SightEndVector, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel1, Sphere, Params))
-	{
-		return Hit.GetActor();
-
-	}
-
-	return nullptr;
+	GetWorld()->SweepSingleByChannel(Hit, SightLocation, SightEndVector, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel1, Sphere, Params);
+	
+	return Hit;
 
 }
 
@@ -159,13 +172,14 @@ void ABaseCharacter::Interaction()
 // Grabs object and attach it to holdComponent.
 void ABaseCharacter::GrabObject()
 {
-	if(InSightLine() != nullptr && (InSightLine()->IsA(ABaseProduct::StaticClass()) || InSightLine()->IsA(ABaseCanister::StaticClass())))
-	objectHolded = InSightLine();
+	AActor* hitActor = InSightLine().GetActor();
+	if(hitActor != nullptr && (hitActor->IsA(ABaseProduct::StaticClass()) || hitActor->IsA(ABaseCanister::StaticClass())))
+	objectHolded = hitActor;
 	
 	if(objectHolded != nullptr && objectHolded->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
 		IInteractable::Execute_InteractionFunctionality(objectHolded);
-		//objectHolded->AttachToComponent(holdComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		objectHolded->AttachToComponent(holdComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale); /////////
 	}
 
 }
@@ -186,7 +200,7 @@ void ABaseCharacter::ReleaseObject()
 {
 	if(objectHolded)
 	{
-		//objectHolded->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		objectHolded->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform); ////////////
 		releaseHold.ExecuteIfBound();
 	}
 	objectHolded = nullptr;

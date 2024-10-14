@@ -57,15 +57,28 @@ private:
 
 	// Interaction widget.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
-	TSubclassOf<class UUserWidget> InteractionWidgetClass;
+	TSubclassOf<class UUserWidget> computerInteractionWidgetClass;
+
+	// Interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> grabInteractionWidgetClass;
+
+	// Interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> releaseInteractionWidgetClass;
+
+	// Holds the Widget Class to an specific interaction.
 	UUserWidget* InteractionWidget;
+
+	// Set Interaction widget to a specific WidgetClass.
+	void SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass);
 
 	// Range for object interaction.
 	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
 	float ObjectRangeSight = 100;
 	
 	// Checks if there's an actor in front of the character.
-	AActor* InSightLine();
+	FHitResult InSightLine();
 	bool DoOnceWidget = true;
 
 	// Method that interacts directly with the object displaying widget.
