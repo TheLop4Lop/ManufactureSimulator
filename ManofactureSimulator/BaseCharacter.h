@@ -7,6 +7,7 @@
 #include "BaseCharacter.generated.h"
 
 DECLARE_DELEGATE(FHold);
+DECLARE_DELEGATE_OneParam(FPlaceRelease, UPrimitiveComponent*);
 
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseCharacter : public ACharacter
@@ -30,7 +31,11 @@ public:
 
 	void ResetMoveInput();
 
+	// Simple release grab action.
 	FHold releaseHold;
+
+	// Complex release grab actions, with excecution also sends location.
+	FPlaceRelease releaseComplexHold;
 
 private:
 	///////////////////////////////////// BASE CHARACTER CONFIGURATION ////////////////////////////////
@@ -101,5 +106,9 @@ private:
 
 	// Holds reference to the object holded by character.
 	AActor* objectHolded;
+	// Holds value if an object can be placed on a boxComponent.
+	bool canPlaceObject;
+	// Holds the location of the boxComponent to place the holded object.
+	UPrimitiveComponent* HitComponent;
 
 };

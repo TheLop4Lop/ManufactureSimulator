@@ -12,8 +12,11 @@ ARefueler::ARefueler()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	refuelerRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Refueler Root"));
+	RootComponent = refuelerRoot;
+
 	refuelerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Refueler Mesh"));
-	RootComponent = refuelerMesh;
+	refuelerMesh->SetupAttachment(refuelerRoot);
 
 	refuelerDoor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Security Door"));
 	refuelerDoor->SetupAttachment(refuelerMesh);

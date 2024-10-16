@@ -44,7 +44,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AActor* actorInSight = InSightLine().GetActor();
-	UPrimitiveComponent* HitComponent = InSightLine().GetComponent();
+	UPrimitiveComponent* sightHitComponent = InSightLine().GetComponent();
 
 	//Checks if the controller isn't nullptr and if there's a actor in Character sight
 	if(actorInSight != nullptr && DoOnceWidget)
@@ -54,14 +54,19 @@ void ABaseCharacter::Tick(float DeltaTime)
 			Computer = Cast<ABaseComputer>(actorInSight);
 
 			SetInteractionWidget(computerInteractionWidgetClass);
+			canPlaceObject = false;
 			DoOnceWidget = false;
 		}else if(actorInSight->IsA(ABaseProduct::StaticClass()) || actorInSight->IsA(ABaseCanister::StaticClass()))
 		{
 			SetInteractionWidget(grabInteractionWidgetClass);
+			canPlaceObject = false;
 			DoOnceWidget = false;
-		}else if(HitComponent && HitComponent->IsA(UBoxComponent::StaticClass()) && objectHolded)
+		}else if(sightHitComponent && sightHitComponent->IsA(UBoxComponent::StaticClass()) && objectHolded)
 		{
 			SetInteractionWidget(releaseInteractionWidgetClass);
+			HitComponent = sightHitComponent;
+
+			canPlaceObject = true;
 			DoOnceWidget = false;
 		}
 
@@ -72,6 +77,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 			InteractionWidget->RemoveFromParent();
 			InteractionWidget = nullptr;
 		}
+		canPlaceObject = false;
 		DoOnceWidget = true;
 	}
 
@@ -198,10 +204,16 @@ void ABaseCharacter::UpdateHoldedObjectLocation()
 // Releases objecto from holdComponent.
 void ABaseCharacter::ReleaseObject()
 {
-	if(objectHolded)
+	if(objectHolded && !canPlaceObject)
 	{
 		objectHolded->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform); ////////////
 		releaseHold.ExecuteIfBound();
+	}else if(objectHolded && canPlaceObject)
+	{
+		objectHolded->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		
+		UE_LOG(LogTemp, Display, TEXT("HitComponent name: %s."), *HitComponent->GetName());
+		releaseComplexHold.ExecuteIfBound(HitComponent);
 	}
 	objectHolded = nullptr;
 

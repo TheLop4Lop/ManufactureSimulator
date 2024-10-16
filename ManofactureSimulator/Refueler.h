@@ -59,6 +59,10 @@ protected:
 
 	// Refueler mesh reference.
 	UPROPERTY(EditAnywhere, Category = "Refueler Properties", meta = (AllowPrivateAccess))
+	USceneComponent* refuelerRoot;
+
+	// Refueler mesh reference.
+	UPROPERTY(EditAnywhere, Category = "Refueler Properties", meta = (AllowPrivateAccess))
 	UStaticMeshComponent* refuelerMesh;
 
 	// Refueler segurity Door.
