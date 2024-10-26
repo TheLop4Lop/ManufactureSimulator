@@ -6,6 +6,9 @@
 #include "BaseProductWidget.h"
 #include "BaseMachineComputerWidget.generated.h"
 
+DECLARE_DELEGATE(FPowerMachine);
+DECLARE_DELEGATE(FServiceMachine);
+
 DECLARE_DELEGATE(FProductDoor);
 DECLARE_DELEGATE(FServideDoor);
 DECLARE_DELEGATE_OneParam(FProcessOrder, FString);
@@ -22,6 +25,12 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+	// Delegate evento to change Power status on machine.
+	FPowerMachine powerAction;
+
+	// Delegate event to set Machine on Service status.
+	FServiceMachine serviceAction;
+
 	// Delegate event for confirm production order for machine.
 	FProcessOrder confirmProductionCode;
 
@@ -31,9 +40,34 @@ public:
 	// Delehate event for service machine door to open or close.
 	FServideDoor serviceDoorAction;
 
+	// Set Oil Bar percent level.
+	void SetOilLevel(float oilLevel);
+
+	// Set Lubricant Bar percent level.
+	void SetLubricantLevel(float lubricantLevel);
+
 protected:
 	///////////////////////////////////// COMPUTER BUTTON PROPERTIES ////////////////////////////////
 	// Section for computer product characteristic orders.
+
+	// Machine Power Button.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UButton* powerButton;
+
+	// Machine service button.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UButton* serviceButton;
+
+	// Sets implementation for machine power and service.
+	void SetMachineBaseButtons();
+
+	// Implements logic event for Power Button.
+	UFUNCTION()
+	void SetPowerButtonLogic();
+
+	// Implements logic event for Service Button.
+	UFUNCTION()
+	void SetServiceButtonLogic();
 
 	// Confirm product order.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -66,5 +100,13 @@ protected:
 
 	// Set Machine door buttons.
 	void SetMachineDoorsButtons();
+
+	// Oil Machine Level progress Bar.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UProgressBar* oilLevelBar;
+
+	// Lubricant Machine Level progress Bar.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UProgressBar* lubricantLevelBar;
 	
 };

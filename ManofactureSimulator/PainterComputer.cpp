@@ -18,6 +18,22 @@ void APainterComputer::BeginPlay()
 	
 }
 
+// Called every frame
+void APainterComputer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if(painterMachine && computerWidget)
+	{
+		float oilLevel = ((float)painterMachine->GetOilLevel()/(float)painterMachine->GetMaxOilLevel());
+		computerWidget->SetOilLevel(oilLevel);
+
+		float lubricantLevel = ((float)painterMachine->GetLubricantLevel()/(float)painterMachine->GetMaxLubricantLevel());
+		computerWidget->SetLubricantLevel(lubricantLevel);
+	}
+
+}
+
 // Adds widget and assign the player controller to it.
 void APainterComputer::AddWidgetFromComputer(ACharacterController* CharacterController)
 {
@@ -30,8 +46,47 @@ void APainterComputer::AddWidgetFromComputer(ACharacterController* CharacterCont
 		computerWidget->confirmProductionCode.BindUObject(this, &APainterComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &APainterComputer::PublicWidgetBindResetController);
 
+		computerWidget->powerAction.BindUObject(this, &APainterComputer::CallPowerAction);
+		computerWidget->serviceAction.BindUObject(this, &APainterComputer::CallServiceAction);
+
 		computerWidget->productDoorAction.BindUObject(this, &APainterComputer::CallProductDoorAction);
 		computerWidget->serviceDoorAction.BindUObject(this, &APainterComputer::CallsServiceDoorAction);
+	}
+
+}
+
+///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
+
+// Resets the character controller to move the character around.
+void APainterComputer::WidgetBindResetController()
+{
+    characterController->SetMovement(false);
+	characterController = nullptr;
+    
+    computerWidget = nullptr;
+
+}
+
+///////////////////////////////////// MACHINE COMPUTER PROPERTIES ////////////////////////////////
+// Sections for the actor properties.
+
+// Calls machine method to change Power Status.
+void APainterComputer::CallPowerAction()
+{
+	if(painterMachine)
+	{
+		painterMachine->SetMachinePower();
+	}
+
+}
+
+// Calls machine method to enter service mode.
+void APainterComputer::CallServiceAction()
+{
+	if(painterMachine)
+	{
+		painterMachine->StartMachineService();
 	}
 
 }

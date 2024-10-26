@@ -12,7 +12,7 @@ ABaseProduct::ABaseProduct()
 	PrimaryActorTick.bCanEverTick = false;
 
 	productMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Raw Product Mesh"));
-	productMesh->SetupAttachment(RootComponent);
+	RootComponent = productMesh;
 
 }
 
@@ -118,22 +118,39 @@ void ABaseProduct::DestroyProduct()
 void ABaseProduct::InteractionFunctionality_Implementation()
 {
 	productMesh->SetSimulatePhysics(false);
-
-	UE_LOG(LogTemp, Display, TEXT("LINE TRACE HIT BaseProduct!"));
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	character = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	if(character)
 	{
 		character->releaseHold.BindUObject(this, &ABaseProduct::SetProductReleaseReset);
+		character->releaseComplexHold.BindUObject(this, &ABaseProduct::SetProductComplexReleaseReset);
 	}
 
 }
 
 void ABaseProduct::SetProductReleaseReset()
 {
-	UE_LOG(LogTemp, Display, TEXT("BaseProduct RELEASED!"));
+	UE_LOG(LogTemp, Display, TEXT("SIMPLE RELEASE"));
 	productMesh->SetSimulatePhysics(true);
 
 	character = nullptr;
 	
+}
+
+// Restets the behaviour of the mesh to it's original state and set location to a specific location.
+void ABaseProduct::SetProductComplexReleaseReset(UPrimitiveComponent* hitComponent)
+{
+	if(hitComponent)
+	{
+		FVector boxLocation = hitComponent->GetComponentLocation();
+		UE_LOG(LogTemp, Display, TEXT("COMPLEX RELEASE X: %f, Y: %f, Z: %f"), boxLocation.X, boxLocation.Y, boxLocation.Z);
+
+		AttachToComponent(hitComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		SetActorLocation(boxLocation);
+		productMesh->SetSimulatePhysics(true);
+
+		character = nullptr;
+	}
+
 }

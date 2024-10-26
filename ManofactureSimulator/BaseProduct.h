@@ -85,6 +85,10 @@ protected:
 	UFUNCTION()
 	void SetProductReleaseReset();
 
+	// Restets the behaviour of the mesh to it's original state and set location to a specific location.
+	UFUNCTION()
+	void SetProductComplexReleaseReset(UPrimitiveComponent* hitComponent);
+
 	// Holds reference to character for canister event reset.
 	class ABaseCharacter* character;
 

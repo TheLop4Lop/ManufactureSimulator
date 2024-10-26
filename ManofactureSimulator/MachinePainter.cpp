@@ -137,7 +137,7 @@ void AMachinePainter::ManageMolderedProductProperties(FString properties)
         break;
     }
     
-    totalProductionPerPiece = timeByMaterial + timeBySize + timeByForm + timeByColor;
+    totalProductionPerPiece = timeByMaterial + timeBySize + timeByForm + timeByColor + oilPenalty;
 
 }
 
@@ -292,12 +292,12 @@ void AMachinePainter::SpawnProducedProduct()
 
         if(deleteIndex == productsQuality.Num() - 1 && productsQuality[deleteIndex] != 0)
         {
-            paintedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            paintedProduct->SetProductQuality(FMath::Max(0, productsQuality[deleteIndex] - lubricantPenalty));
             productsQuality[deleteIndex] = 0;
             deleteIndex = 0;
         }else if(productsQuality[deleteIndex] != 0)
         {
-            paintedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            paintedProduct->SetProductQuality(FMath::Max(0, productsQuality[deleteIndex] - lubricantPenalty));
             productsQuality[deleteIndex] = 0;
             deleteIndex++;
         }

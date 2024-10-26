@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BaseComputer.h"
-#include "MolderComputer.generated.h"
+#include "RefuelerComputer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MANOFACTURESIMULATOR_API AMolderComputer : public ABaseComputer
+class MANOFACTURESIMULATOR_API ARefuelerComputer : public ABaseComputer
 {
 	GENERATED_BODY()
 
@@ -35,24 +35,21 @@ protected:
 	// Sections for the actor properties.
 	
 	// Reference to widget Production Widget for manage production machine product.
-	class UComputerWidgetMolder* computerWidget;
+	class UComputerRefuelerWidget* computerWidget;
 
-	// Reference to cutter machine in the world.
-	class AMachineMolder* molderMachine;
+	// Reference to Refueler machine in the world.
+	class ARefueler* refuelerMachine;
 
-	// Calls machine method to change Power Status.
-	void CallPowerAction();
-
-	// Calls machine method to enter service mode.
-	void CallServiceAction();
-
-	// Gett the product order for pass it on to Storage manager.
-	void WidgetBindProductOrder(FString productCode);
-
-	// Calls machine for product door interaction.
-	void CallProductDoorAction();
+	// Changes Machine Power Status.
+	void SetPowerStatus();
 	
-	// Calls machine service door for interaction.
-	void CallsServiceDoorAction();
+	// Calls machine security door for interaction.
+	void CallsSecurityDoorAction();
+
+	// Calls interaction for oil supply
+	void CallsOilRefuel();
+
+	// Calls interaction for lubricant supply
+	void CallsLubricantRefuel();
 	
 };

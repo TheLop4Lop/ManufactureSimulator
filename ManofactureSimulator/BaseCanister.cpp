@@ -72,22 +72,37 @@ void ABaseCanister::ReduceCanister()
 void ABaseCanister::InteractionFunctionality_Implementation()
 {
 	canisterMesh->SetSimulatePhysics(false);
-
-	UE_LOG(LogTemp, Display, TEXT("LINE TRACE HIT CANISTER!"));
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	character = Cast<ABaseCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	if(character)
 	{
 		character->releaseHold.BindUObject(this, &ABaseCanister::SetCanisterReleaseReset);
+		character->releaseComplexHold.BindUObject(this, &ABaseCanister::SetCanisterComplexReleaseReset);
 	}
 
 }
 
 void ABaseCanister::SetCanisterReleaseReset()
 {
-	UE_LOG(LogTemp, Display, TEXT("CANISTER RELEASED!"));
 	canisterMesh->SetSimulatePhysics(true);
 
 	character = nullptr;
 	
+}
+
+// Restets the behaviour of the mesh to it's original state and set location to a specific location.
+void ABaseCanister::SetCanisterComplexReleaseReset(UPrimitiveComponent* hitComponent)
+{
+	if(hitComponent)
+	{
+		FVector boxLocation = hitComponent->GetComponentLocation();
+
+		AttachToComponent(hitComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		SetActorLocation(boxLocation);
+		canisterMesh->SetSimulatePhysics(true);
+
+		character = nullptr;
+	}
+
 }
