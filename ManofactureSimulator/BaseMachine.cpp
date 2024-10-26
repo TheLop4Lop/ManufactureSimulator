@@ -234,6 +234,7 @@ void ABaseMachine::StartMachineService()
 	isInMaintenance = true;
 	ChangeProductionStatus(EMachineStatus::ON_MAINTENANCE);
 
+	GetWorldTimerManager().ClearTimer(spawnTimer);
 	GetWorldTimerManager().ClearTimer(processTimer);
 	GetWorldTimerManager().SetTimer(processTimer, this, &ABaseMachine::RunMaintenance, maintenanceTime, false);
 
@@ -314,37 +315,37 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		break;
 
 	case EMachineStatus::ON_PRODUCTION:
-		UE_LOG(LogTemp, Warning, TEXT("Changing status to ON_PRODUCTION"));
+		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to ON_PRODUCTION"), *GetActorLabel());
 		machineStatusLight->SetLightColor(FColor::Green);
 		conveyorEvent.ExecuteIfBound(machineName, true);
 		break;
 
 	case EMachineStatus::ON_HOLD:
-		UE_LOG(LogTemp, Warning, TEXT("Changing status to ON_HOLD"));
+		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to ON_HOLD"), *GetActorLabel());
 		machineStatusLight->SetLightColor(FColor::White);
 		conveyorEvent.ExecuteIfBound(machineName, true);
 		break;
 
 	case EMachineStatus::FULL_PRODUCTION:
-		UE_LOG(LogTemp, Warning, TEXT("Changing status to FULL_PRODUCTION"));
+		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to FULL_PRODUCTION"), *GetActorLabel());
 		machineStatusLight->SetLightColor(FColor::Orange);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::PRODUCT_ERROR:
-		UE_LOG(LogTemp, Warning, TEXT("Changing status to PRODUCT_ERROR"));
+		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to PRODUCT_ERROR"), *GetActorLabel());
 		machineStatusLight->SetLightColor(FColor::Red);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::CODE_ERROR:
-		UE_LOG(LogTemp, Warning, TEXT("Changing status to CODE_ERROR"));
+		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to CODE_ERROR"), *GetActorLabel());
 		machineStatusLight->SetLightColor(FColor::Yellow);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::OFF:
-		UE_LOG(LogTemp, Warning, TEXT("Machine OFF"));
+		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Machine OFF"), *GetActorLabel());
 		machineStatusLight->SetIntensity(0.0f);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
@@ -414,7 +415,7 @@ void ABaseMachine::ReduceLubricantLevel()
 {
     if (lubricantLevel > 0)
     {
-        lubricantLevel = (lubricantLevel < 40) ? FMath::Max(0, lubricantLevel - 3) : FMath::Max(0, lubricantLevel - 1);
+        lubricantLevel = (lubricantLevel < 40) ? FMath::Max(0, lubricantLevel - 2) : FMath::Max(0, lubricantLevel - 1);
 		UpdateLubricantPenalty();
     }
 }
@@ -433,10 +434,10 @@ void ABaseMachine::UpdateOilPenalty()
 		oilPenalty = 2.0f;
 	}else if(oilLevel > 20)
 	{
-		oilPenalty = 3.0f;
+		oilPenalty = 5.0f;
 	}else
 	{
-		oilPenalty = 5.0f;
+		oilPenalty = 9.0f;
 	}
 
 }
@@ -516,7 +517,7 @@ void ABaseMachine::CheckForActorsInServiceBox()
 
 		if(actorsInServiceDoor.Num() == 0 && DoOnceService)
 		{
-			UE_LOG(LogTemp, Display, TEXT("EMMMMMMMMMMMMPTY"));
+			UE_LOG(LogTemp, Display, TEXT("EMPTY"));
 			ClearCanisterTimers();
 		}
 
@@ -587,18 +588,19 @@ void ABaseMachine::RunMaintenance()
 {
 	if(!prevOilLevel == 0)
 	{
-		oilLevel = prevOilLevel;
+		oilLevel += prevOilLevel;
 		prevOilLevel = 0;
 	}
 
 	if(!prevLubricantLevel == 0)
 	{
-		lubricantLevel = prevLubricantLevel;
+		lubricantLevel += prevLubricantLevel;
 		prevLubricantLevel = 0;
 	}
 
 	isInMaintenance = false;
 	ChangeProductionStatus(EMachineStatus::ON_HOLD);
+	GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::TryToSpawnProduct, totalProductionPerPiece, true);
 	UE_LOG(LogTemp, Display, TEXT("MAINTENANCE DONE!"));
 }
 
@@ -623,12 +625,19 @@ void ABaseMachine::CheckConditionsForSpawnProduct()
 	if(isReady && isOnHold && !isInMaintenance)
 	{
 		ChangeProductionStatus(EMachineStatus::ON_HOLD);
-	}else if(isReady && !isOnHold && !isInMaintenance && !GetWorldTimerManager().IsTimerActive(spawnTimer))
-	{
-		GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::TryToSpawnProduct, 
-			totalProductionPerPiece + oilPenalty, true);
 	}
+	else if(isReady && !isOnHold && !isInMaintenance)
+	{
+		if (lastProductionTime != totalProductionPerPiece)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Machine: %s, Reset to Time: %f"), *GetActorLabel(), totalProductionPerPiece);
+			GetWorldTimerManager().ClearTimer(spawnTimer);
+			GetWorldTimerManager().SetTimer(spawnTimer, this, &ABaseMachine::TryToSpawnProduct,
+				totalProductionPerPiece, true);
 
+			lastProductionTime = totalProductionPerPiece;
+		}
+	}
 }
 
 // Is a callback function by a timer, first check is exit is clear, then spawn product.
@@ -660,7 +669,7 @@ void ABaseMachine::SpawnProducedProduct()
 		// DESIGN SET PROPERTIES ON SPAWNED PRODUCT. DEPENDS ON TYPE OF THE MACHINE.
 	}
 
-	if(deleteIndex == productsQuality.Num() - 1 && productsQuality[deleteIndex] != 0)
+	if(deleteIndex == productsQuality.Num() - 1 && productsQuality[deleteIndex] != 0) // Quality based on Lubrican level implemented on Child Classes.
 	{
 		spawnProduct->SetProductQuality(productsQuality[deleteIndex]);
 		productsQuality[deleteIndex] = 0;

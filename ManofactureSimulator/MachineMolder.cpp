@@ -132,7 +132,7 @@ void AMachineMolder::ManageCuttedProductProperties(FString properties)
         break;
     }
     
-    totalProductionPerPiece = timeByMaterial + timeBySize + timeByForm;
+    totalProductionPerPiece = timeByMaterial + timeBySize + timeByForm + oilPenalty;
 
 }
 
@@ -221,12 +221,12 @@ void AMachineMolder::SpawnProducedProduct()
 
         if(deleteIndex == productsQuality.Num() - 1 && productsQuality[deleteIndex] != 0)
         {
-            molderedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            molderedProduct->SetProductQuality(FMath::Max(0, productsQuality[deleteIndex] - lubricantPenalty));
             productsQuality[deleteIndex] = 0;
             deleteIndex = 0;
         }else if(productsQuality[deleteIndex] != 0)
         {
-            molderedProduct->SetProductQuality(productsQuality[deleteIndex] - lubricantPenalty);
+            molderedProduct->SetProductQuality(FMath::Max(0, productsQuality[deleteIndex] - lubricantPenalty));
             productsQuality[deleteIndex] = 0;
             deleteIndex++;
         }

@@ -85,7 +85,6 @@ void ABaseCanister::InteractionFunctionality_Implementation()
 
 void ABaseCanister::SetCanisterReleaseReset()
 {
-	UE_LOG(LogTemp, Display, TEXT("SIMPLE RELEASE"));
 	canisterMesh->SetSimulatePhysics(true);
 
 	character = nullptr;
@@ -98,7 +97,6 @@ void ABaseCanister::SetCanisterComplexReleaseReset(UPrimitiveComponent* hitCompo
 	if(hitComponent)
 	{
 		FVector boxLocation = hitComponent->GetComponentLocation();
-		UE_LOG(LogTemp, Display, TEXT("COMPLEX RELEASE X: %f, Y: %f, Z: %f"), boxLocation.X, boxLocation.Y, boxLocation.Z);
 
 		AttachToComponent(hitComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		SetActorLocation(boxLocation);

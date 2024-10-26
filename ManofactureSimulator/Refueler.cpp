@@ -57,7 +57,7 @@ void ARefueler::SetMachinePower()
 void ARefueler::SecurityDoorChangePosition()
 {
 	FRotator doorRotation;
-	(!bIsDoorOpen)? doorRotation = FRotator(0.f, 0.f, -100.f) : doorRotation = FRotator(0.f, 0.f,0.f);
+	(!bIsDoorOpen)? doorRotation = FRotator(0.f, 100.f, 0.f) : doorRotation = FRotator(0.f, 0.f,0.f);
 	refuelerDoor->SetRelativeRotation(doorRotation);
 
 	bIsDoorOpen = !bIsDoorOpen;
@@ -88,6 +88,7 @@ bool ARefueler::LubricantActionButton()
 	{
 		if(!bIsDoorOpen)
 		{
+			UE_LOG(LogTemp, Display, TEXT("CALLING TO FILL CANISTER"));
 			CheckLubricantBoxForActorsAction();
 			return true;
 		}

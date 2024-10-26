@@ -122,7 +122,7 @@ void AMachineCutter::ManageInitialProductProperties(FString properties)
         break;
     }
     
-    totalProductionPerPiece = timeByMaterial + timeBySize;
+    totalProductionPerPiece = timeByMaterial + timeBySize + oilPenalty;
 
 }
 
@@ -191,7 +191,7 @@ void AMachineCutter::SpawnProducedProduct()
 
         if(productsToProcess != 0)
         {
-            cuttedProduct->SetProductQuality(productsQuality[0] - lubricantPenalty);
+            cuttedProduct->SetProductQuality(FMath::Max(0, productsQuality[0] - lubricantPenalty));
         }else
         {
             productsQuality[deleteIndex] = 0;

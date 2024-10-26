@@ -305,6 +305,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
 	int oilReductionByPiece = 2;
 
+	// Determines how many produced pieces reduce a single oil point.
+	UPROPERTY(EditAnywhere, Category = "Product Quality", meta = (AllowPrivateAccess))
+	int oilPenaltyTime = 1;
+
 	// Value of the additional time penalty of oil quantity.
 	float oilPenalty;
 
@@ -469,6 +473,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Production Time", meta = (AllowPrivateAccess))
 	float totalProductionPerPiece;
 	
+	// Control ProductionTime variable.
+	float lastProductionTime = 0.0f;
+
 	// Timer for handle initial ready up timer for machine.
 	FTimerHandle processTimer;
 

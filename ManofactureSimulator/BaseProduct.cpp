@@ -12,7 +12,7 @@ ABaseProduct::ABaseProduct()
 	PrimaryActorTick.bCanEverTick = false;
 
 	productMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Raw Product Mesh"));
-	productMesh->SetupAttachment(RootComponent);
+	RootComponent = productMesh;
 
 }
 
