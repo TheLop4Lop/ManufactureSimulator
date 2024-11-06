@@ -13,6 +13,7 @@ DECLARE_DELEGATE_TwoParams(FActiveConveyor, FName, bool);
 UENUM(BlueprintType)
 enum class EMachineStatus : uint8
 {
+	ON_WARMING,
 	ON_MAINTENANCE,
 	ON_PRODUCTION,
 	ON_HOLD,
@@ -225,13 +226,22 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
 	EMachineStatus productionStatus;
 
-	// Checks the conditions of power machine and changes status for production.
+	// Checks the conditions of machine at being gameplay.
 	void SetInitialMachineStatus();
+
+	// Checks the conditions of power machine and changes status for production.
+	void SetPowerUpMachineStatus();
+
+	// Checks the conditions of to turn off machine.
+	void SetPowerDownMachineStatus();
 
 	// Sets ready status to true and clears timer.
 	void SetReadyMachineStatus();
 	// Sets ready status to false and clears timer.
 	void ResetReadyMachineStatus();
+
+	// Timer handle for ready machine status.
+	FTimerHandle readySetUpTimer;
 
 	///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 	// Section for all the logic in process the product.

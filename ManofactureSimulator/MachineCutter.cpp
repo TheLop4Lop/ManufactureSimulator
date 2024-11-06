@@ -17,7 +17,8 @@ void AMachineCutter::CheckEntranceForProduct()
         TArray<AActor*> actorsOnEntrance;
         boxEntrance->GetOverlappingActors(actorsOnEntrance);
 
-        EMachineStatus NewStatus = EMachineStatus::ON_PRODUCTION;
+        EMachineStatus NewStatus;
+        (productsToProcess > 0)? NewStatus = EMachineStatus::ON_PRODUCTION : NewStatus = EMachineStatus::ON_HOLD;
 
         for (AActor* singleActor : actorsOnEntrance)
         {
