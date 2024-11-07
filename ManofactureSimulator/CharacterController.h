@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "CharacterController.generated.h"
 
+DECLARE_DELEGATE(FControllerReset);
+
 /**
  * 
  */
@@ -17,5 +19,8 @@ class MANOFACTURESIMULATOR_API ACharacterController : public APlayerController
 public:
 	// Change the controller and interaction on the character, used when widgets are enable or disabled.
 	void SetMovement(bool bSet);
+
+	// Delegate to reset movement on character.
+	FControllerReset resetMovement;
 	
 };

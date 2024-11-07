@@ -35,6 +35,7 @@ void ABaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	CharacterController = Cast<ACharacterController>(GetController());
+	CharacterController->resetMovement.BindUObject(this, &ABaseCharacter::ResetMoveInput);
 	
 }
 
@@ -96,7 +97,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis(TEXT("LookRight"), this, &APawn::AddControllerYawInput);
 
-	PlayerInputComponent->BindAction(TEXT("Interaction"), EInputEvent::IE_Released, this, &ABaseCharacter::Interaction);
+	PlayerInputComponent->BindAction(TEXT("Interaction"), EInputEvent::IE_Released, this, &ABaseCharacter::ComputerInteraction);
 	PlayerInputComponent->BindAction(TEXT("Grab"), EInputEvent::IE_Pressed, this, &ABaseCharacter::GrabObject);
 	PlayerInputComponent->BindAction(TEXT("Release"), EInputEvent::IE_Released, this, &ABaseCharacter::ReleaseObject);
 
@@ -116,6 +117,13 @@ void ABaseCharacter::MoveForward(float AxisValue)
 void ABaseCharacter::MoveRight(float AxisValue)
 {
 	AddMovementInput(GetActorRightVector() * AxisValue);
+
+}
+
+//Resets movement on character.
+void ABaseCharacter::ResetMoveInput()
+{
+	this->GetMovementComponent()->Activate();
 
 }
 
@@ -162,14 +170,21 @@ FHitResult ABaseCharacter::InSightLine()
 }
 
 // Method that interacts directly with the object displaying widget.
-void ABaseCharacter::Interaction()
+void ABaseCharacter::ComputerInteraction()
 {
 	if(!DoOnceWidget)
 	{
 		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr)
 		{
 			Computer->AddWidgetFromComputer(CharacterController);
+			this->GetMovementComponent()->Deactivate();
 			CharacterController->SetMovement(true);
+
+			if(InteractionWidget != nullptr)
+			{
+				InteractionWidget->RemoveFromParent();
+				InteractionWidget = nullptr;
+			}
 		}
 	}
 
@@ -186,6 +201,12 @@ void ABaseCharacter::GrabObject()
 	{
 		IInteractable::Execute_InteractionFunctionality(objectHolded);
 		objectHolded->AttachToComponent(holdComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale); /////////
+
+		if(InteractionWidget != nullptr)
+		{
+			InteractionWidget->RemoveFromParent();
+			InteractionWidget = nullptr;
+		}
 	}
 
 }

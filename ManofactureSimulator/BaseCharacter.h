@@ -29,6 +29,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//Resets movement on character.
 	void ResetMoveInput();
 
 	// Simple release grab action.
@@ -87,7 +88,7 @@ private:
 	bool DoOnceWidget = true;
 
 	// Method that interacts directly with the object displaying widget.
-	void Interaction();
+	void ComputerInteraction();
 	
 	class ABaseComputer* Computer;
 
