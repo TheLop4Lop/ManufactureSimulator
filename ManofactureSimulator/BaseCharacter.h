@@ -65,16 +65,23 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> computerInteractionWidgetClass;
 
-	// Interaction widget.
+	// Grab Interaction widget.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> grabInteractionWidgetClass;
 
-	// Interaction widget.
+	// Release Interaction widget.
 	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
 	TSubclassOf<class UUserWidget> releaseInteractionWidgetClass;
 
+	// Canister indicator widget.
+	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> canisterLevelIndicatorClass;
+
 	// Holds the Widget Class to an specific interaction.
 	UUserWidget* InteractionWidget;
+
+	// Holds the Widget Class to an specific interaction.
+	class UCanisterWidget* canisterWidget;
 
 	// Set Interaction widget to a specific WidgetClass.
 	void SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass);
@@ -111,5 +118,8 @@ private:
 	bool canPlaceObject;
 	// Holds the location of the boxComponent to place the holded object.
 	UPrimitiveComponent* HitComponent;
+
+	// Use to get values of cannister to update value on widget.
+	ABaseCanister* holdedCanister;
 
 };

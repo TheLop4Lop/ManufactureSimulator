@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
+#include "CanisterWidget.h"
 #include "Interactable.h"
 #include "BaseComputer.h"
 #include "BaseCanister.h"
@@ -83,6 +84,11 @@ void ABaseCharacter::Tick(float DeltaTime)
 	}
 
 	UpdateHoldedObjectLocation();
+
+	if(holdedCanister && canisterWidget)
+	{
+		canisterWidget->SetIndicatorCanisterLevel((float)holdedCanister->GetCanisterCurrentLevel()/(float)holdedCanister->GetCanisterMaxCapacity());
+	}
 
 }
 
@@ -207,6 +213,17 @@ void ABaseCharacter::GrabObject()
 			InteractionWidget->RemoveFromParent();
 			InteractionWidget = nullptr;
 		}
+
+		if(objectHolded->IsA(ABaseCanister::StaticClass()))
+		{
+			holdedCanister = Cast<ABaseCanister>(objectHolded);
+
+			canisterWidget = Cast<UCanisterWidget>(CreateWidget(CharacterController, canisterLevelIndicatorClass));
+			if(canisterWidget && holdedCanister)
+			{
+				canisterWidget->AddToViewport();
+			}
+		}
 	}
 
 }
@@ -236,6 +253,14 @@ void ABaseCharacter::ReleaseObject()
 		UE_LOG(LogTemp, Display, TEXT("HitComponent name: %s."), *HitComponent->GetName());
 		releaseComplexHold.ExecuteIfBound(HitComponent);
 	}
+
+	if(canisterWidget)
+	{
+		canisterWidget->RemoveFromParent();
+		canisterWidget = nullptr;
+		holdedCanister = nullptr;
+	}
+
 	objectHolded = nullptr;
 
 }
