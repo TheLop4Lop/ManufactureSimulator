@@ -130,25 +130,12 @@ void ABaseCharacter::MoveRight(float AxisValue)
 void ABaseCharacter::ResetMoveInput()
 {
 	this->GetMovementComponent()->Activate();
+	bIsWidgetDisplayed = false;
 
 }
 
-///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
-// Interaction object section.
-
-// Set Interaction widget to a specific WidgetClass.
-void ABaseCharacter::SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass)
-{
-	if(widgetClass)
-	{
-		InteractionWidget = CreateWidget(CharacterController, widgetClass);
-		if(InteractionWidget != nullptr)
-		{
-			InteractionWidget->AddToViewport();
-		}
-	}
-	
-}
+///////////////////////////////////// GENERAL INTERACTION ////////////////////////////////
+// Interaction for base interaction section.
 
 // Checks if there's an actor in front of the character.
 FHitResult ABaseCharacter::InSightLine()
@@ -175,26 +162,42 @@ FHitResult ABaseCharacter::InSightLine()
 
 }
 
+// Set Interaction widget to a specific WidgetClass.
+void ABaseCharacter::SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass)
+{
+	if(widgetClass)
+	{
+		InteractionWidget = CreateWidget(CharacterController, widgetClass);
+		if(InteractionWidget != nullptr)
+		{
+			InteractionWidget->AddToViewport();
+		}
+	}
+	
+}
+
+///////////////////////////////////// COMPUTER INTERACTION ////////////////////////////////
+// Interaction computer section.
+
 // Method that interacts directly with the object displaying widget.
 void ABaseCharacter::ComputerInteraction()
 {
 	if(!DoOnceWidget)
 	{
-		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr)
+		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
 		{
 			Computer->AddWidgetFromComputer(CharacterController);
 			this->GetMovementComponent()->Deactivate();
 			CharacterController->SetMovement(true);
 
-			if(InteractionWidget != nullptr)
-			{
-				InteractionWidget->RemoveFromParent();
-				InteractionWidget = nullptr;
-			}
+			bIsWidgetDisplayed = true;
 		}
 	}
 
 }
+
+///////////////////////////////////// GRAB INTERACTION ////////////////////////////////
+// Interaction with grabbing objects section.
 
 // Grabs object and attach it to holdComponent.
 void ABaseCharacter::GrabObject()
