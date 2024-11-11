@@ -37,6 +37,9 @@ public:
 	// Change Power machine Status.
 	void SetMachinePower();
 
+	// Get the actual stage of the scanner machine.
+	bool GetMachinePower();
+
 	// Scan Produc inside de boxDetector.
 	EMachineQualityStatus ScanForProduct();
 

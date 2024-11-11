@@ -38,7 +38,11 @@ void UComputerQualityWidget::SetPowerLogic()
 // Sets logic for Scan button.
 void UComputerQualityWidget::SetScanLogic()
 {
-    scanAction.ExecuteIfBound();
+    if(bMachineOn)
+    {
+        scanAction.ExecuteIfBound();
+        OnScannerEvent();
+    }
     
 }
 

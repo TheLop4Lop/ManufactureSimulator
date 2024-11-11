@@ -106,6 +106,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UProgressBar* expectedQualityBar;
 
+	// Custom event to be implemented on Widget; Animation for scann.
+    UFUNCTION(BlueprintImplementableEvent, Category = "CustomEvent")
+    void OnScannerEvent();
+
 	// Material quality to be assing and read on Widget.
 	UPROPERTY(BlueprintReadWrite, Category = "Product Code", meta = (AllowPrivateAccess))
 	float productActualQuality;

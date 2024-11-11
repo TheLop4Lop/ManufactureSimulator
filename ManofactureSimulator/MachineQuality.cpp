@@ -40,6 +40,13 @@ void AMachineQuality::SetMachinePower()
 
 }
 
+// Get the actual stage of the scanner machine.
+bool AMachineQuality::GetMachinePower()
+{
+	return isPowered;
+
+}
+
 // Scan Produc inside de boxDetector.
 EMachineQualityStatus AMachineQuality::ScanForProduct()
 {

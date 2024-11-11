@@ -45,7 +45,7 @@ void AQualityComputer::Tick(float DeltaTime)
 
     if(qualityMachine && computerWidget)
     {
-		computerWidget->SetMachinePowerStatus(machineQualityPowered);
+		computerWidget->SetMachinePowerStatus(qualityMachine->GetMachinePower());
 
         computerWidget->SetProductMaterial(materialQuality);
 		computerWidget->SetProductSize(materialSize);
@@ -177,26 +177,21 @@ void AQualityComputer::ScanProductAction()
 		switch (qualityMachine->ScanForProduct())
 		{
 		case EMachineQualityStatus::POWER_OFF:
-			machineQualityPowered = false;
 			break;
 
 		case EMachineQualityStatus::BOX_EMPTY:
-			machineQualityPowered = true;
 			if(computerWidget) UE_LOG(LogTemp, Display, TEXT("PLACE A PRODUCTION PRODUCT ON THE SCANNER."));
 			break;
 
 		case EMachineQualityStatus::NO_MATCH:
-			machineQualityPowered = true;
 			if(computerWidget) UE_LOG(LogTemp, Display, TEXT("OBJECT IN THE SCANNER NOT MATCH A PRODUCTION PRODUCT."));
 			break;
 
 		case EMachineQualityStatus::MULTIPLE:
-			machineQualityPowered = true;
 			if(computerWidget) UE_LOG(LogTemp, Display, TEXT("REMOVE ITEMS, ONLY ONE PRODUCTIO PRODUCT ON THE SCANNER."));
 			break;
 		
 		case EMachineQualityStatus::SCANNED:
-			machineQualityPowered = true;
 			ReadProductProperties(qualityMachine->GetProductCode());
 			ReadProductQuality(qualityMachine->GetProductQuality());
 			break;
