@@ -3,7 +3,9 @@
 
 #include "BaseMachine.h"
 #include "Components/PointLightComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "LubricantCanister.h"
 #include "BaseConveyorBelt.h"
 #include "OilCanister.h"
@@ -175,6 +177,20 @@ EProductColor ABaseMachine::GetStringToEnumColorMap(const FString& colorString) 
 
 }
 
+///////////////////////////////////// MACHINE SOUND PROPERTIES ////////////////////////////////
+// Section for all the machine sound properties.
+
+// Manages production of Sound on machine mange status.
+void ABaseMachine::ReproduceMachineSound(USoundBase* soundToReproduce)
+{
+	if(audioHandle && soundToReproduce)
+	{
+		audioHandle->Stop();
+		audioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), soundToReproduce, GetActorLocation());
+	}
+
+}
+
 ///////////////////////////////////// STATUS PROPERTIES ////////////////////////////////
 // Main varibles that controll the machine mechanic.
 
@@ -194,7 +210,10 @@ void ABaseMachine::SetPowerUpMachineStatus()
 	{
 		ChangeProductionStatus(EMachineStatus::ON_WARMING);
 		GetWorldTimerManager().SetTimer(readySetUpTimer, this, &ABaseMachine::SetReadyMachineStatus, machineWarmUp, false);
-		// PLAY READY SOUND.
+		if(machineWarmUpSound)
+		{
+			audioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), machineWarmUpSound, GetActorLocation());
+		}
 	}
 
 }
@@ -338,18 +357,27 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 	switch (newStatus)
 	{
 	case EMachineStatus::ON_WARMING:
+		// Sound being initiated on SetPowerUpMachineStatus().
+		bProductionOnPlaying = false;
+
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::White);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 	
 	case EMachineStatus::ON_MAINTENANCE:
+		ReproduceMachineSound(serviceSound);
+		bProductionOnPlaying = false;
+
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Blue);
 		conveyorEvent.ExecuteIfBound(machineName, false);
 		break;
 
 	case EMachineStatus::ON_PRODUCTION:
+		if(!bProductionOnPlaying) ReproduceMachineSound(machineProductionSound);
+		bProductionOnPlaying = true;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to ON_PRODUCTION"), *GetActorLabel());
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Green);
@@ -357,6 +385,9 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		break;
 
 	case EMachineStatus::ON_HOLD:
+		ReproduceMachineSound(machineOnSound);
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to ON_HOLD"), *GetActorLabel());
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Yellow);
@@ -371,6 +402,10 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		break;
 
 	case EMachineStatus::PRODUCT_ERROR:
+		if(pieceErrorSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), pieceErrorSound, GetActorLocation());
+		ReproduceMachineSound(machineOnSound);
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to PRODUCT_ERROR"), *GetActorLabel());
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Red);
@@ -378,6 +413,10 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		break;
 
 	case EMachineStatus::CODE_ERROR:
+		if(codeErrorSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), codeErrorSound, GetActorLocation());
+		ReproduceMachineSound(machineOnSound);
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to CODE_ERROR"), *GetActorLabel());
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Orange);
@@ -385,6 +424,9 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		break;
 
 	case EMachineStatus::OFF:
+		ReproduceMachineSound(machineTurnDownSound);
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Machine OFF"), *GetActorLabel());
 		machineStatusLight->SetIntensity(0.0f);
 		conveyorEvent.ExecuteIfBound(machineName, false);

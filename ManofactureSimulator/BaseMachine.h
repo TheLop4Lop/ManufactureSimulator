@@ -195,6 +195,46 @@ protected:
 	// Holds reference to conveyor belt that provides product for production.
 	class ABaseConveyorBelt* entranceConveyor;
 
+	///////////////////////////////////// MACHINE SOUND PROPERTIES ////////////////////////////////
+	// Section for all the machine sound properties.
+
+	// Sound class for machine WarmUp state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineWarmUpSound;
+
+	// Sound class machine turned down state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineTurnDownSound;
+
+	// Sound class for service state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* serviceSound;
+
+	// Sound class for service state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineOnSound;
+
+	// Sound class for service state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineProductionSound;
+	
+	// Sound class for piece error state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* pieceErrorSound;
+
+	// Sound class for code error state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* codeErrorSound;
+
+	// Handles audio Spawned in the world.
+	class UAudioComponent* audioHandle;
+
+	// Manages production of Sound on machine mange status.
+	void ReproduceMachineSound(USoundBase* soundToReproduce);
+
+	// Controls audio flow for machineProductionSound.
+	bool bProductionOnPlaying;
+
 	///////////////////////////////////// STATUS PROPERTIES ////////////////////////////////
 	// Main varibles that controll the machine mechanic.
 
