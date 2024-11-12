@@ -4,6 +4,7 @@
 #include "ComputerQualityWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 
 void UComputerQualityWidget::NativeConstruct()
 {
@@ -32,6 +33,19 @@ void UComputerQualityWidget::SetQualityButtons()
 void UComputerQualityWidget::SetPowerLogic()
 {
     powerAction.ExecuteIfBound();
+
+}
+
+// Sets the color of the Power Button Light.
+void UComputerQualityWidget::SetPowerLight(bool bMachinePower)
+{
+    if(powerLight)
+    {
+        FLinearColor powerColor;
+        (bMachinePower) ? powerColor = FLinearColor::Green : powerColor = FLinearColor::Red;
+
+        powerLight->SetColorAndOpacity(powerColor);
+    }
 
 }
 

@@ -25,6 +25,8 @@ void ACutterComputer::Tick(float DeltaTime)
 
 	if(cutterMachine && computerWidget)
 	{
+		computerWidget->SetPowerLight(cutterMachine->GetMachinePower());
+
 		float oilLevel = ((float)cutterMachine->GetOilLevel()/(float)cutterMachine->GetMaxOilLevel());
 		computerWidget->SetOilLevel(oilLevel);
 

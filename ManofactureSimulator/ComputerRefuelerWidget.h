@@ -35,6 +35,9 @@ public:
 	// Delegate event to fill lubricant canister event.
 	FStartLubricantRefuel lubricantRefuelAction;
 
+	// Sets the color of the Power Button Light.
+	void SetPowerLight(bool bMachinePower);
+
 	// Sets value of Oil Bar.
 	void SetOilBarLevel(float oilevel);
 
@@ -48,6 +51,10 @@ protected:
 	// Power machine button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* bPower;
+
+	// Machine Power Button Light indicator.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* powerLight;
 
 	// Open/Close ServiceDoor button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))

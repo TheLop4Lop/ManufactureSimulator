@@ -46,6 +46,7 @@ void AQualityComputer::Tick(float DeltaTime)
     if(qualityMachine && computerWidget)
     {
 		computerWidget->SetMachinePowerStatus(qualityMachine->GetMachinePower());
+		computerWidget->SetPowerLight(qualityMachine->GetMachinePower());
 
         computerWidget->SetProductMaterial(materialQuality);
 		computerWidget->SetProductSize(materialSize);

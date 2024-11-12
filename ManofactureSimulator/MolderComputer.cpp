@@ -25,6 +25,8 @@ void AMolderComputer::Tick(float DeltaTime)
 
 	if(molderMachine && computerWidget)
 	{
+		computerWidget->SetPowerLight(molderMachine->GetMachinePower());
+		
 		float oilLevel = ((float)molderMachine->GetOilLevel()/(float)molderMachine->GetMaxOilLevel());
 		computerWidget->SetOilLevel(oilLevel);
 
@@ -43,6 +45,7 @@ void AMolderComputer::AddWidgetFromComputer(ACharacterController* CharacterContr
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
+
 		computerWidget->confirmProductionCode.BindUObject(this, &AMolderComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::PublicWidgetBindResetController);
 

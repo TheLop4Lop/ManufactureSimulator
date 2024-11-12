@@ -449,6 +449,13 @@ void ABaseMachine::SetMachinePower()
 
 }
 
+// Returns Computer Status for Widget interaction light.
+bool ABaseMachine::GetMachinePower()
+{
+	return isPowered;
+
+}
+
 void ABaseMachine::SetProductionMachineOrder(FString orderToProduce)
 {
 	codeToProcess = orderToProduce;

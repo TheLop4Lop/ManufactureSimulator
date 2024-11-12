@@ -86,8 +86,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
+	// Called Computer after widget Power interactio; change status between ON and OFF.
 	void SetMachinePower();
+
+	// Returns Computer Status for Widget interaction light.
+	bool GetMachinePower();
 
 	// Sets value of order code for the machinery to process.
 	void SetProductionMachineOrder(FString orderToProduce);

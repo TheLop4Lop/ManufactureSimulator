@@ -25,6 +25,8 @@ void APainterComputer::Tick(float DeltaTime)
 
 	if(painterMachine && computerWidget)
 	{
+		computerWidget->SetPowerLight(painterMachine->GetMachinePower());
+		
 		float oilLevel = ((float)painterMachine->GetOilLevel()/(float)painterMachine->GetMaxOilLevel());
 		computerWidget->SetOilLevel(oilLevel);
 
@@ -43,6 +45,7 @@ void APainterComputer::AddWidgetFromComputer(ACharacterController* CharacterCont
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
+
 		computerWidget->confirmProductionCode.BindUObject(this, &APainterComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &APainterComputer::PublicWidgetBindResetController);
 

@@ -4,6 +4,7 @@
 #include "ComputerRefuelerWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 
 void UComputerRefuelerWidget::NativeConstruct()
 {
@@ -55,6 +56,19 @@ void UComputerRefuelerWidget::SetLubricantBarLevel(float lubricantLevel)
 void UComputerRefuelerWidget::SetPowerButtonLogic()
 {
     powerAction.ExecuteIfBound();
+
+}
+
+// Sets the color of the Power Button Light.
+void UComputerRefuelerWidget::SetPowerLight(bool bMachinePower)
+{
+    if(powerLight)
+    {
+        FLinearColor powerColor;
+        (bMachinePower) ? powerColor = FLinearColor::Green : powerColor = FLinearColor::Red;
+
+        powerLight->SetColorAndOpacity(powerColor);
+    }
 
 }
 

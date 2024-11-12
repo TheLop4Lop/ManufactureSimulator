@@ -30,6 +30,9 @@ public:
 	// Sets status for MachinePower.
 	void SetMachinePowerStatus(bool bPowerStatus);
 
+	// Sets the color of the Power Button Light.
+	void SetPowerLight(bool bMachinePower);
+
 	// Sets Product Material.
 	void SetProductMaterial(FString materialCode);
 
@@ -58,6 +61,10 @@ protected:
 	// Power machine button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* bPower;
+
+	// Machine Power Button Light indicator.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* powerLight;
 
 	// Scan machine button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))

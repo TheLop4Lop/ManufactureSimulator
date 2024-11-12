@@ -25,6 +25,8 @@ void AOvenComputer::Tick(float DeltaTime)
 
 	if(ovenMachine && computerWidget)
 	{
+		computerWidget->SetPowerLight(ovenMachine->GetMachinePower());
+
 		float oilLevel = ((float)ovenMachine->GetOilLevel()/(float)ovenMachine->GetMaxOilLevel());
 		computerWidget->SetOilLevel(oilLevel);
 
@@ -43,6 +45,7 @@ void AOvenComputer::AddWidgetFromComputer(ACharacterController* CharacterControl
 	if(computerWidget)
 	{
 		computerWidget->AddToViewport();
+
 		computerWidget->confirmProductionCode.BindUObject(this, &AOvenComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &AOvenComputer::PublicWidgetBindResetController);
 

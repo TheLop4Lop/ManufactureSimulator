@@ -53,6 +53,13 @@ void ARefueler::SetMachinePower()
 
 }
 
+// Gets power status for widget interaction.
+bool ARefueler::GetMachinePower()
+{
+	return bIsPowered;
+
+}
+
 // Called from Refueler Computer after widget Security DOOR interaction; Open or Close Security Door.
 void ARefueler::SecurityDoorChangePosition()
 {

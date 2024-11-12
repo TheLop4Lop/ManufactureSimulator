@@ -26,6 +26,9 @@ public:
 	// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
 	void SetMachinePower();
 
+	// Gets power status for widget interaction.
+	bool GetMachinePower();
+
 	// Called from Refueler Computer after widget Security DOOR interaction; Open or Close Security Door.
 	void SecurityDoorChangePosition();
 
