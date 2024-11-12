@@ -137,4 +137,18 @@ private:
 	// Holds value if an object can be placed on a boxComponent.
 	bool canPlaceObject;
 
+	///////////////////////////////////// GRAB INTERACTION SOUND ////////////////////////////////
+	// Interaction with grabbing objects sound section.
+
+	// Canister grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* canisterGrabSound;
+
+	// Canister grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* pieceGrabSound;
+
+	// Plays sound of grabbed object by the player.
+	void PlayGrabbedObjectSound(USoundBase* grabbedObjectSound);
+
 };

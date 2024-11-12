@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/BoxComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
 #include "CanisterWidget.h"
@@ -219,6 +220,7 @@ void ABaseCharacter::GrabObject()
 
 		if(objectHolded->IsA(ABaseCanister::StaticClass()))
 		{
+			PlayGrabbedObjectSound(canisterGrabSound);
 			holdedCanister = Cast<ABaseCanister>(objectHolded);
 
 			canisterWidget = Cast<UCanisterWidget>(CreateWidget(CharacterController, canisterLevelIndicatorClass));
@@ -226,6 +228,9 @@ void ABaseCharacter::GrabObject()
 			{
 				canisterWidget->AddToViewport();
 			}
+		}else
+		{
+			PlayGrabbedObjectSound(pieceGrabSound);
 		}
 	}
 
@@ -265,5 +270,18 @@ void ABaseCharacter::ReleaseObject()
 	}
 
 	objectHolded = nullptr;
+
+}
+
+///////////////////////////////////// GRAB INTERACTION SOUND ////////////////////////////////
+// Interaction with grabbing objects sound section.
+
+// Plays sound of grabbed object by the player.
+void ABaseCharacter::PlayGrabbedObjectSound(USoundBase* grabbedObjectSound)
+{
+	if(grabbedObjectSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), grabbedObjectSound, holdComponent->GetComponentLocation());
+	}
 
 }
