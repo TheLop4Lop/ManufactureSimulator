@@ -226,7 +226,7 @@ void ABaseMachine::SetPowerDownMachineStatus()
 		UE_LOG(LogTemp, Display, TEXT("SHOULD SHUT DOWN, CLEARING TIMERS"));
 		GetWorldTimerManager().ClearTimer(processTimer); // Stops production timer.
 		GetWorldTimerManager().SetTimer(readySetUpTimer, this, &ABaseMachine::ResetReadyMachineStatus, machineWarmDown, false);
-		// PLAY SHUT DOWN SOUND.
+		ReproduceMachineSound(machineTurnDownSound);
 	}
 
 }
@@ -424,7 +424,6 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		break;
 
 	case EMachineStatus::OFF:
-		ReproduceMachineSound(machineTurnDownSound);
 		bProductionOnPlaying = false;
 
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Machine OFF"), *GetActorLabel());
