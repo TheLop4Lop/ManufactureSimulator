@@ -315,6 +315,12 @@ int ABaseMachine::GetMaxLubricantLevel()
 
 }
 
+FColor ABaseMachine::GetMachineStatusColor()
+{
+	return machineStatusColor;
+
+}
+
 ///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 // Section for all the logic in process the product.
 
@@ -363,6 +369,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::White);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::White;
 		break;
 	
 	case EMachineStatus::ON_MAINTENANCE:
@@ -372,6 +379,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Blue);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Blue;
 		break;
 
 	case EMachineStatus::ON_PRODUCTION:
@@ -382,6 +390,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Green);
 		conveyorEvent.ExecuteIfBound(machineName, true);
+		machineStatusColor = FColor::Green;
 		break;
 
 	case EMachineStatus::ON_HOLD:
@@ -392,6 +401,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Yellow);
 		conveyorEvent.ExecuteIfBound(machineName, true);
+		machineStatusColor = FColor::Yellow;
 		break;
 
 	case EMachineStatus::FULL_PRODUCTION:
@@ -399,6 +409,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Turquoise);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Turquoise;
 		break;
 
 	case EMachineStatus::PRODUCT_ERROR:
@@ -410,6 +421,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Red);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Red;
 		break;
 
 	case EMachineStatus::CODE_ERROR:
@@ -421,6 +433,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Orange);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Orange;
 		break;
 
 	case EMachineStatus::OFF:
@@ -429,6 +442,7 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Machine OFF"), *GetActorLabel());
 		machineStatusLight->SetIntensity(0.0f);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Black;
 		break;
 	
 	default:

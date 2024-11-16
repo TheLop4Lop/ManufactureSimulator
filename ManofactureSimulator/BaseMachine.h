@@ -116,6 +116,8 @@ public:
 	// Gets MAX Lubricant Level.
 	int GetMaxLubricantLevel();
 
+	FColor GetMachineStatusColor();
+
 	// Delegate event for active or desable a single conveyor belt.
 	FActiveConveyor conveyorEvent;
 
@@ -329,6 +331,9 @@ protected:
 
 	// Checks if boxExit is clear for spawn product.
 	bool CheckClearExit();
+
+	// Holds color status value of maachine.
+	FColor machineStatusColor;
 
 	// Controls MachineStatus flow
 	EMachineStatus PreviousStatus = EMachineStatus::ON_HOLD;
