@@ -2,7 +2,9 @@
 
 
 #include "MachineQuality.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "BaseProduct.h"
 
 // Sets default values
@@ -37,6 +39,13 @@ void AMachineQuality::Tick(float DeltaTime)
 void AMachineQuality::SetMachinePower()
 {
 	isPowered = !isPowered;
+	if(isPowered && scannerOnSound)
+	{
+		onAudioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), scannerOnSound, GetActorLocation());
+	}else
+	{
+		onAudioHandle->Stop();
+	}
 
 }
 
@@ -58,17 +67,21 @@ EMachineQualityStatus AMachineQuality::ScanForProduct()
 
 		if(actorsInBox.Num() == 0)
 		{
+			if(emptyScannerSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), emptyScannerSound, GetActorLocation());
 			return EMachineQualityStatus::BOX_EMPTY;
 		}else if(actorsInBox.Num() > 1)
 		{
+			if(multiplePiecesOnScannerSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), multiplePiecesOnScannerSound, GetActorLocation());
 			return EMachineQualityStatus::MULTIPLE;
 		}else
 		{
 			if(!actorsInBox[0]->IsA(ABaseProduct::StaticClass()))
 			{
+				if(noPieceOnScannerSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), noPieceOnScannerSound, GetActorLocation());
 				return EMachineQualityStatus::NO_MATCH;
 			}else
 			{
+				if(scannerActionSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), scannerActionSound, GetActorLocation());
 				scannedProduct = Cast<ABaseProduct>(actorsInBox[0]);
 				return EMachineQualityStatus::SCANNED;
 			}
