@@ -73,18 +73,6 @@ protected:
 	// Reference in the world of PieceSpawner, responsable of spawning product.
 	class APieceSpawner* productSpawner;
 
-	///////////////////////////////////// CONVERT TO ENUMS ////////////////////////////////
-	// Methods for convert FString to enum.
-
-	// Retrieves a string and convert it into a EMaterialQuality enum.
-	EMaterialQuality ConverStringToEnumQuality(FString quality);
-
-	// Retrieves a string and convert it into a EMaterialSize enum.
-	EMaterialSize ConverStringToEnumSize(FString quality);
-
-	// Retrieves a string and convert it into a EMaterialLength enum.
-	EMaterialLength ConverStringToEnumLength(FString quality);
-
 	///////////////////////////////////// PRODUCT QUANTITY MANAGER ////////////////////////////////
 	// Section manages the order quantity the player can make.
 

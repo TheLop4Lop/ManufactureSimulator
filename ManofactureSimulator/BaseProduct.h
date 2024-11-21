@@ -42,6 +42,9 @@ public:
 	// Gets cutted piece product code.
 	FString& GetProductCode();
 
+	// Returns the state of product finished.
+	bool IsProductFinished();
+
 	// Method implementation after character interaction, change canister properties for character hold.
 	virtual void InteractionFunctionality_Implementation() override;
 

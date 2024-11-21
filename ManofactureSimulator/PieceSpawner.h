@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "BaseStorage.h" // To access Enums and Struct
+#include "EProductProperties.h"
 #include "PieceSpawner.generated.h"
 
 UCLASS()

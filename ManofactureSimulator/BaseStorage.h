@@ -4,31 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "EProductProperties.h" // To get access to Product Properties ENUM.
 #include "BaseStorage.generated.h"
-
-UENUM(BlueprintType)
-enum class EMaterialQuality : uint8
-{
-	QUALITY_LOW,
-	QUALITY_MEDIUM,
-	QUALITY_HIGH
-};
-
-UENUM(BlueprintType)
-enum class EMaterialSize : uint8
-{
-	SIZE_SMALL,
-	SIZE_MEDIUM,
-	SIZE_BIG
-};
-
-UENUM(BlueprintType)
-enum class EMaterialLength : uint8
-{
-	LENGTH_SHORT,
-	LENGTH_MEDIUM,
-	LENGTH_LARGE
-};
 
 USTRUCT(BlueprintType)
 struct FInitialPieceAttribute
@@ -36,19 +13,19 @@ struct FInitialPieceAttribute
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EMaterialQuality Quality;
+	EPieceMaterial Quality;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EMaterialSize Size;
+	EPieceSize Size;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EMaterialLength Length;
+	EPieceLenght Length;
 
 	// Defult value constructor.
 	FInitialPieceAttribute()
-		: Quality(EMaterialQuality::QUALITY_LOW),
-		  Size(EMaterialSize::SIZE_SMALL),
-		  Length(EMaterialLength::LENGTH_SHORT)
+		: Quality(EPieceMaterial::QUALITY_LOW),
+		  Size(EPieceSize::SIZE_SMALL),
+		  Length(EPieceLenght::LENGTH_SHORT)
 	{}
 
 	// Operator overload, use for comparing if two keys are the same on the TMap.

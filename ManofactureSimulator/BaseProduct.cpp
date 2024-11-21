@@ -102,6 +102,13 @@ FString& ABaseProduct::GetProductCode()
 
 }
 
+// Returns the state of product finished.
+bool ABaseProduct::IsProductFinished()
+{
+	return bProductFinished;
+
+}
+
 // Changes the finish product status
 void ABaseProduct::SetProductFinishProduction()
 {

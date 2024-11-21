@@ -1,46 +1,12 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #include "StorageManager.h"
 #include "Runtime/Core/Public/Misc/CString.h"
 #include "Kismet/GameplayStatics.h"
+#include "EProductProperties.h" // To get access to Product Properties ENUM.
 #include "PieceSpawner.h"
 #include "FinalStorage.h"
 #include "BaseStorage.h"
-
-#include <map>
-#include <string>
-
-// Singleton - Static method that returns a single QualityMap instance.
-static const std::map<std::string, EMaterialQuality>& GetQualityMap()
-{
-	static const std::map<std::string, EMaterialQuality> tableQuality = { 
-		{"M1", EMaterialQuality::QUALITY_LOW}, 
-		{"M2", EMaterialQuality::QUALITY_MEDIUM},  
-		{"M3", EMaterialQuality::QUALITY_HIGH}};
-
-	return tableQuality;
-
-}
-
-// Singleton - Static method that returns a single GetSizeMap instance.
-static const std::map<std::string, EMaterialSize>& GetSizeMap()
-{
-	static const std::map<std::string, EMaterialSize> tableSize = { 
-		{"S1",EMaterialSize::SIZE_SMALL},
-		{"S2",EMaterialSize::SIZE_MEDIUM},
-		{"S3",EMaterialSize::SIZE_BIG}};
-
-	return tableSize;
-}
-
-// Singleton - Static method that returns a single GetLengthMap instance.
-static const std::map<std::string, EMaterialLength>& GetLengthMap()
-{
-	static const std::map<std::string, EMaterialLength> tableLength = { 
-		{"L1",EMaterialLength::LENGTH_SHORT},
-		{"L2",EMaterialLength::LENGTH_MEDIUM},
-		{"L3",EMaterialLength::LENGTH_LARGE}};
-
-	return tableLength;
-}
 
 // Sets default values
 AStorageManager::AStorageManager()
@@ -87,9 +53,9 @@ EStorageProductionStatus AStorageManager::CanProduceProductOrder(FString Order, 
 {
 	FInitialPieceAttribute productToOrder;
 
-	productToOrder.Quality = ConverStringToEnumQuality(Order.Left(2));
-	productToOrder.Size = ConverStringToEnumSize(Order.Mid(2,2));
-	productToOrder.Length = ConverStringToEnumLength(Order.Right(2));
+	productToOrder.Quality = UEProductProperties::ConverStringToEnumQuality(Order.Left(2));
+	productToOrder.Size = UEProductProperties::ConverStringToEnumSize(Order.Mid(2,2));
+	productToOrder.Length = UEProductProperties::ConverStringToEnumLength(Order.Right(2));
 
 	if (baseStorage->OrderIsInInventory(productToOrder, quantity) && (ordersToSpawn.Num() < maxProductOrder))
 	{
@@ -108,39 +74,6 @@ EStorageProductionStatus AStorageManager::CanProduceProductOrder(FString Order, 
 
 	UE_LOG(LogTemp, Display, TEXT("NOT ENOUGH FOR PRODUCT!"));
 	return EStorageProductionStatus::CANNOT_PRODUCE;
-
-}
-
-// Retrieves a string and convert it into a EMaterialQuality enum.
-EMaterialQuality AStorageManager::ConverStringToEnumQuality(FString quality)
-{
-	std::string order = std::string(TCHAR_TO_UTF8(*quality));
-	auto& tableQuality = GetQualityMap();
-	auto iTable = tableQuality.find(order);
-	
-	return (iTable != tableQuality.end()) ? iTable->second : EMaterialQuality::QUALITY_LOW;
-
-}
-
-// Retrieves a string and convert it into a EMaterialSize enum.
-EMaterialSize AStorageManager::ConverStringToEnumSize(FString size)
-{
-	std::string order = std::string(TCHAR_TO_UTF8(*size));
-	auto& tableSize = GetSizeMap();
-	auto iTable = tableSize.find(order);
-	
-	return (iTable != tableSize.end()) ? iTable->second : EMaterialSize::SIZE_SMALL;
-
-}
-
-// Retrieves a string and convert it into a EMaterialLength enum.
-EMaterialLength AStorageManager::ConverStringToEnumLength(FString length)
-{
-	std::string order = std::string(TCHAR_TO_UTF8(*length));
-	auto& tableLength = GetLengthMap();
-	auto iTable = tableLength.find(order);
-	
-	return (iTable != tableLength.end()) ? iTable->second : EMaterialLength::LENGTH_SHORT;
 
 }
 

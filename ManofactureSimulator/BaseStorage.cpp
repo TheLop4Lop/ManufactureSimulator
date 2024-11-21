@@ -16,9 +16,9 @@ void ABaseStorage::BeginPlay()
 	Super::BeginPlay();
 	
 	FInitialPieceAttribute testProduct;
-	testProduct.Quality = EMaterialQuality::QUALITY_LOW;
-	testProduct.Size = EMaterialSize::SIZE_MEDIUM;
-	testProduct.Length = EMaterialLength::LENGTH_LARGE;
+	testProduct.Quality = EPieceMaterial::QUALITY_LOW;
+	testProduct.Size = EPieceSize::SIZE_MEDIUM;
+	testProduct.Length = EPieceLenght::LENGTH_LARGE;
 
 	AddInitialPieceToMap(testProduct, 10);
 
