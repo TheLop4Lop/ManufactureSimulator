@@ -69,4 +69,22 @@ protected:
 	// Holds reference to character for canister event reset.
 	class ABaseCharacter* character;
 
+	///////////////////////////////////// BASE CANISTER SOUNDS ////////////////////////////////
+	// Section for canister sound properties.
+
+	// Canister grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* canisterReleasedOnComponentSound;
+
+	// Canister grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* canisterReleasedFreeSound;
+
+	// Defines the maximum Sound amount.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	float MaxImpulse;
+
+	UFUNCTION()
+	void HitSound(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 };

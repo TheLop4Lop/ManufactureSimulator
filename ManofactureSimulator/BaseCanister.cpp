@@ -14,6 +14,8 @@ ABaseCanister::ABaseCanister()
 	canisterMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Canister Mesh"));
 	canisterMesh->SetupAttachment(RootComponent);
 
+	canisterMesh->OnComponentHit.AddDynamic(this, &ABaseCanister::HitSound);
+	
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +26,8 @@ void ABaseCanister::BeginPlay()
 	canisterMesh->SetSimulatePhysics(true);
 	canisterMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 	canisterMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	
+	canisterMesh->SetNotifyRigidBodyCollision(true);
 
 }
 
@@ -97,12 +101,24 @@ void ABaseCanister::SetCanisterComplexReleaseReset(UPrimitiveComponent* hitCompo
 	if(hitComponent)
 	{
 		FVector boxLocation = hitComponent->GetComponentLocation();
+		if(canisterReleasedOnComponentSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), canisterReleasedOnComponentSound, boxLocation);
 
 		AttachToComponent(hitComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		SetActorLocation(boxLocation);
 		canisterMesh->SetSimulatePhysics(true);
 
 		character = nullptr;
+	}
+
+}
+
+void ABaseCanister::HitSound(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	float volumeMultiplier = FMath::Clamp(NormalImpulse.Size() / MaxImpulse, 0.0f, 2.0f);
+	if(canisterReleasedFreeSound && volumeMultiplier > 0.06)
+	{
+		UE_LOG(LogTemp, Display, TEXT("SOUND! VOLUME: %f"), volumeMultiplier);
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), canisterReleasedFreeSound, GetActorLocation(), volumeMultiplier);
 	}
 
 }

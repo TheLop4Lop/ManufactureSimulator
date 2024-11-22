@@ -5,8 +5,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/BoxComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
+#include "CanisterWidget.h"
 #include "Interactable.h"
 #include "BaseComputer.h"
 #include "BaseCanister.h"
@@ -35,6 +37,7 @@ void ABaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	CharacterController = Cast<ACharacterController>(GetController());
+	CharacterController->resetMovement.BindUObject(this, &ABaseCharacter::ResetMoveInput);
 	
 }
 
@@ -83,6 +86,11 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 	UpdateHoldedObjectLocation();
 
+	if(holdedCanister && canisterWidget)
+	{
+		canisterWidget->SetIndicatorCanisterLevel((float)holdedCanister->GetCanisterCurrentLevel()/(float)holdedCanister->GetCanisterMaxCapacity());
+	}
+
 }
 
 // Called to bind functionality to input
@@ -96,7 +104,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis(TEXT("LookRight"), this, &APawn::AddControllerYawInput);
 
-	PlayerInputComponent->BindAction(TEXT("Interaction"), EInputEvent::IE_Released, this, &ABaseCharacter::Interaction);
+	PlayerInputComponent->BindAction(TEXT("Interaction"), EInputEvent::IE_Released, this, &ABaseCharacter::ComputerInteraction);
 	PlayerInputComponent->BindAction(TEXT("Grab"), EInputEvent::IE_Pressed, this, &ABaseCharacter::GrabObject);
 	PlayerInputComponent->BindAction(TEXT("Release"), EInputEvent::IE_Released, this, &ABaseCharacter::ReleaseObject);
 
@@ -119,22 +127,16 @@ void ABaseCharacter::MoveRight(float AxisValue)
 
 }
 
-///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
-// Interaction object section.
-
-// Set Interaction widget to a specific WidgetClass.
-void ABaseCharacter::SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass)
+//Resets movement on character.
+void ABaseCharacter::ResetMoveInput()
 {
-	if(widgetClass)
-	{
-		InteractionWidget = CreateWidget(CharacterController, widgetClass);
-		if(InteractionWidget != nullptr)
-		{
-			InteractionWidget->AddToViewport();
-		}
-	}
-	
+	this->GetMovementComponent()->Activate();
+	bIsWidgetDisplayed = false;
+
 }
+
+///////////////////////////////////// GENERAL INTERACTION ////////////////////////////////
+// Interaction for base interaction section.
 
 // Checks if there's an actor in front of the character.
 FHitResult ABaseCharacter::InSightLine()
@@ -161,19 +163,42 @@ FHitResult ABaseCharacter::InSightLine()
 
 }
 
+// Set Interaction widget to a specific WidgetClass.
+void ABaseCharacter::SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass)
+{
+	if(widgetClass)
+	{
+		InteractionWidget = CreateWidget(CharacterController, widgetClass);
+		if(InteractionWidget != nullptr)
+		{
+			InteractionWidget->AddToViewport();
+		}
+	}
+	
+}
+
+///////////////////////////////////// COMPUTER INTERACTION ////////////////////////////////
+// Interaction computer section.
+
 // Method that interacts directly with the object displaying widget.
-void ABaseCharacter::Interaction()
+void ABaseCharacter::ComputerInteraction()
 {
 	if(!DoOnceWidget)
 	{
-		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr)
+		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
 		{
 			Computer->AddWidgetFromComputer(CharacterController);
+			this->GetMovementComponent()->Deactivate();
 			CharacterController->SetMovement(true);
+
+			bIsWidgetDisplayed = true;
 		}
 	}
 
 }
+
+///////////////////////////////////// GRAB INTERACTION ////////////////////////////////
+// Interaction with grabbing objects section.
 
 // Grabs object and attach it to holdComponent.
 void ABaseCharacter::GrabObject()
@@ -186,6 +211,27 @@ void ABaseCharacter::GrabObject()
 	{
 		IInteractable::Execute_InteractionFunctionality(objectHolded);
 		objectHolded->AttachToComponent(holdComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale); /////////
+
+		if(InteractionWidget != nullptr)
+		{
+			InteractionWidget->RemoveFromParent();
+			InteractionWidget = nullptr;
+		}
+
+		if(objectHolded->IsA(ABaseCanister::StaticClass()))
+		{
+			PlayGrabbedObjectSound(canisterGrabSound);
+			holdedCanister = Cast<ABaseCanister>(objectHolded);
+
+			canisterWidget = Cast<UCanisterWidget>(CreateWidget(CharacterController, canisterLevelIndicatorClass));
+			if(canisterWidget && holdedCanister)
+			{
+				canisterWidget->AddToViewport();
+			}
+		}else
+		{
+			PlayGrabbedObjectSound(pieceGrabSound);
+		}
 	}
 
 }
@@ -215,6 +261,27 @@ void ABaseCharacter::ReleaseObject()
 		UE_LOG(LogTemp, Display, TEXT("HitComponent name: %s."), *HitComponent->GetName());
 		releaseComplexHold.ExecuteIfBound(HitComponent);
 	}
+
+	if(canisterWidget)
+	{
+		canisterWidget->RemoveFromParent();
+		canisterWidget = nullptr;
+		holdedCanister = nullptr;
+	}
+
 	objectHolded = nullptr;
+
+}
+
+///////////////////////////////////// GRAB INTERACTION SOUND ////////////////////////////////
+// Interaction with grabbing objects sound section.
+
+// Plays sound of grabbed object by the player.
+void ABaseCharacter::PlayGrabbedObjectSound(USoundBase* grabbedObjectSound)
+{
+	if(grabbedObjectSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), grabbedObjectSound, holdComponent->GetComponentLocation());
+	}
 
 }

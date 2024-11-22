@@ -13,6 +13,7 @@ void ACharacterController::SetMovement(bool bSet)
     }else
     {
 		EnableInput(this);
+        resetMovement.ExecuteIfBound();
         SetInputMode(FInputModeGameOnly());
     }
 

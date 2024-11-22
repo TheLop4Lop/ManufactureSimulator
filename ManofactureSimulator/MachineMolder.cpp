@@ -29,7 +29,8 @@ void AMachineMolder::CheckEntranceForProduct()
         TArray<AActor*> actorsOnEntrance;
         boxEntrance->GetOverlappingActors(actorsOnEntrance);
 
-        EMachineStatus NewStatus = EMachineStatus::ON_PRODUCTION; // Default status
+        EMachineStatus NewStatus;
+        (productsToProcess > 0)? NewStatus = EMachineStatus::ON_PRODUCTION : NewStatus = EMachineStatus::ON_HOLD;
 
         for (AActor* singleActor : actorsOnEntrance)
         {
@@ -75,18 +76,18 @@ void AMachineMolder::CheckEntranceForProduct()
 // Gets the cuttedProduct properties and proces production product code.
 void AMachineMolder::ManageCuttedProductProperties(FString properties)
 {
-    switch (GetStringToEnumMaterialMap(properties.Left(2)))
+    switch (UEProductProperties::ConverStringToEnumQuality(properties.Left(2)))
     {
-    case EProductMaterial::M1:
-        molderedProductCode.Quality = EProductMaterial::M1;
+    case EPieceMaterial::QUALITY_LOW:
+        molderedProductCode.Quality = EPieceMaterial::QUALITY_LOW;
         timeByMaterial = timeByMaterialLow;
         break;
-	case EProductMaterial::M2:
-        molderedProductCode.Quality = EProductMaterial::M2;
+	case EPieceMaterial::QUALITY_MEDIUM:
+        molderedProductCode.Quality = EPieceMaterial::QUALITY_MEDIUM;
         timeByMaterial = timeByMaterialMidd;
         break;
-	case EProductMaterial::M3:
-        molderedProductCode.Quality = EProductMaterial::M3;
+	case EPieceMaterial::QUALITY_HIGH:
+        molderedProductCode.Quality = EPieceMaterial::QUALITY_HIGH;
         timeByMaterial = timeByMaterialHigh;
         break;
     
@@ -94,18 +95,18 @@ void AMachineMolder::ManageCuttedProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumSizeMap(properties.Mid(2, 2)))
+	switch (UEProductProperties::ConverStringToEnumSize(properties.Mid(2, 2)))
     {
-    case EProductSize::S1:
-        molderedProductCode.Size = EProductSize::S1;
+    case EPieceSize::SIZE_SMALL:
+        molderedProductCode.Size = EPieceSize::SIZE_SMALL;
         timeBySize = timeBySizeLow;
         break;
-	case EProductSize::S2:
-        molderedProductCode.Size = EProductSize::S2;
+	case EPieceSize::SIZE_MEDIUM:
+        molderedProductCode.Size = EPieceSize::SIZE_MEDIUM;
         timeBySize = timeBySizeMidd;
         break;
-	case EProductSize::S3:
-        molderedProductCode.Size = EProductSize::S3;
+	case EPieceSize::SIZE_BIG:
+        molderedProductCode.Size = EPieceSize::SIZE_BIG;
         timeBySize = timeBySizeHigh;
         break;
     
@@ -113,18 +114,18 @@ void AMachineMolder::ManageCuttedProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumFormMap(codeToProcess.Right(2)))
+	switch (UEProductProperties::ConverStringToEnumForm(codeToProcess.Right(2)))
     {
-    case EProductForm::F1:
-        molderedProductCode.Form = EProductForm::F1;
+    case EPieceForm::FORM_CONE:
+        molderedProductCode.Form = EPieceForm::FORM_CONE;
         timeByForm = timeByFormF1;
         break;
-	case EProductForm::F2:
-        molderedProductCode.Form = EProductForm::F2;
+	case EPieceForm::FORM_CYLINDER:
+        molderedProductCode.Form = EPieceForm::FORM_CYLINDER;
         timeByForm = timeByFormF2;
         break;
-	case EProductForm::F3:
-        molderedProductCode.Form = EProductForm::F3;
+	case EPieceForm::FORM_TORUS:
+        molderedProductCode.Form = EPieceForm::FORM_TORUS;
         timeByForm = timeByFormF3;
         break;
 
@@ -151,17 +152,17 @@ void AMachineMolder::SpawnProducedProduct()
 	{
         switch (molderedProductCode.Quality)
         {
-        case EProductMaterial::M1:
+        case EPieceMaterial::QUALITY_LOW:
             productMaterialToSpawn = qualityMaterial[0];
             productCode += "M1";
             break;
         
-        case EProductMaterial::M2:
+        case EPieceMaterial::QUALITY_MEDIUM:
             productMaterialToSpawn = qualityMaterial[1];
             productCode += "M2";
             break;
 
-        case EProductMaterial::M3:
+        case EPieceMaterial::QUALITY_HIGH:
             productMaterialToSpawn = qualityMaterial[2];
             productCode += "M3";
             break;
@@ -172,17 +173,17 @@ void AMachineMolder::SpawnProducedProduct()
 
         switch (molderedProductCode.Size)
         {
-        case EProductSize::S1:
+        case EPieceSize::SIZE_SMALL:
             productSizeToSpawn = productSize[0];
             productCode += "S1";
             break;
         
-        case EProductSize::S2:
+        case EPieceSize::SIZE_MEDIUM:
             productSizeToSpawn = productSize[1];
             productCode += "S2";
             break;
 
-        case EProductSize::S3:
+        case EPieceSize::SIZE_BIG:
             productSizeToSpawn = productSize[2];
             productCode += "S3";
             break;
@@ -193,17 +194,17 @@ void AMachineMolder::SpawnProducedProduct()
 
         switch (molderedProductCode.Form)
         {
-        case EProductForm::F1:
+        case EPieceForm::FORM_CONE:
             productMeshToSpawn = productMesh[0];
             productCode += "F1";
             break;
         
-        case EProductForm::F2:
+        case EPieceForm::FORM_CYLINDER:
             productMeshToSpawn = productMesh[1];
             productCode += "F2";
             break;
 
-        case EProductForm::F3:
+        case EPieceForm::FORM_TORUS:
             productMeshToSpawn = productMesh[2];
             productCode += "F3";
             break;

@@ -2,7 +2,9 @@
 
 
 #include "Refueler.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "LubricantCanister.h"
 #include "OilCanister.h"
 
@@ -50,6 +52,20 @@ void ARefueler::Tick(float DeltaTime)
 void ARefueler::SetMachinePower()
 {
 	bIsPowered = !bIsPowered;
+	if(bIsPowered && refuelerOnSound)
+	{
+		onAudioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), refuelerOnSound, GetActorLocation());
+	}else
+	{
+		onAudioHandle->Stop();
+	}
+	
+}
+
+// Gets power status for widget interaction.
+bool ARefueler::GetMachinePower()
+{
+	return bIsPowered;
 
 }
 
@@ -60,9 +76,19 @@ void ARefueler::SecurityDoorChangePosition()
 	(!bIsDoorOpen)? doorRotation = FRotator(0.f, 100.f, 0.f) : doorRotation = FRotator(0.f, 0.f,0.f);
 	refuelerDoor->SetRelativeRotation(doorRotation);
 
+	if(actionDoorSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), actionDoorSound, GetActorLocation());
+
 	bIsDoorOpen = !bIsDoorOpen;
-	if(GetWorldTimerManager().IsTimerActive(oilDepositTimer)) GetWorldTimerManager().ClearTimer(oilDepositTimer);
-	if(GetWorldTimerManager().IsTimerActive(lubricantDepositTimer)) GetWorldTimerManager().ClearTimer(oilDepositTimer);
+	if(GetWorldTimerManager().IsTimerActive(oilDepositTimer))
+	{
+		GetWorldTimerManager().ClearTimer(oilDepositTimer);
+		oilAudioHandle->Stop();
+	}
+	if(GetWorldTimerManager().IsTimerActive(lubricantDepositTimer))
+	{
+		GetWorldTimerManager().ClearTimer(oilDepositTimer);
+		lubricantAudioHandle->Stop();
+	}
 
 }
 
@@ -75,6 +101,9 @@ bool ARefueler::OilActionButton()
 		{
 			CheckOilBoxForActorsAction();
 			return true;
+		}else
+		{
+			if(openDoorWarningSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), openDoorWarningSound, GetActorLocation());
 		}
 	}
 
@@ -88,9 +117,11 @@ bool ARefueler::LubricantActionButton()
 	{
 		if(!bIsDoorOpen)
 		{
-			UE_LOG(LogTemp, Display, TEXT("CALLING TO FILL CANISTER"));
 			CheckLubricantBoxForActorsAction();
 			return true;
+		}else
+		{
+			if(openDoorWarningSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), openDoorWarningSound, GetActorLocation());
 		}
 	}
 
@@ -124,6 +155,7 @@ void ARefueler::CheckOilBoxForActorsAction()
 
 	if(actorsInOilBox.Num() == 0)
 	{
+		if(missingCanisterSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), missingCanisterSound, GetActorLocation());
 		GetWorldTimerManager().ClearTimer(oilDepositTimer);
 		isOilCanisterFull = false;
 		oilCanister = nullptr;
@@ -137,6 +169,10 @@ void ARefueler::CheckOilBoxForActorsAction()
 			{
 				oilCanister = Cast<AOilCanister>(singleActor);
 				GetWorldTimerManager().SetTimer(oilDepositTimer, this, &ARefueler::FillUpOilCanister, oilCanisterFillUpTime, true);
+				if(refuelerOilSound) oilAudioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), refuelerOilSound, GetActorLocation());
+			}else
+			{
+				if(wrongCanisterSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), wrongCanisterSound, GetActorLocation());
 			}
 		}
 	}
@@ -151,6 +187,7 @@ void ARefueler::CheckLubricantBoxForActorsAction()
 
 	if(actorsInLubricantBox.Num() == 0)
 	{
+		if(missingCanisterSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), missingCanisterSound, GetActorLocation());
 		GetWorldTimerManager().ClearTimer(lubricantDepositTimer);
 		isLubricantCanisterFull = false;
 		lubricantCanister = nullptr;
@@ -164,6 +201,10 @@ void ARefueler::CheckLubricantBoxForActorsAction()
 			{
 				lubricantCanister = Cast<ALubricantCanister>(singleActor);
 				GetWorldTimerManager().SetTimer(lubricantDepositTimer, this, &ARefueler::FillUpLubricantCanister, lubricantCanisterFillUpTime, true);
+				if(refuelerLubricantSound) lubricantAudioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), refuelerLubricantSound, GetActorLocation());
+			}else
+			{
+				if(wrongCanisterSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), wrongCanisterSound, GetActorLocation());
 			}
 		}
 	}
@@ -183,6 +224,11 @@ void ARefueler::FillUpOilCanister()
 			}else
 			{
 				isOilCanisterFull = true;
+				if(oilAudioHandle)
+				{
+					oilAudioHandle->Stop();
+					oilAudioHandle = nullptr;
+				}
 			}
 		}	
 	}
@@ -202,6 +248,11 @@ void ARefueler::FillUpLubricantCanister()
 			}else
 			{
 				isLubricantCanisterFull = true;
+				if(lubricantAudioHandle)
+				{
+					lubricantAudioHandle->Stop();
+					lubricantAudioHandle = nullptr;
+				}
 			}
 		}
 	}

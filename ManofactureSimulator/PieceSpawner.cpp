@@ -63,17 +63,17 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 	{
 		switch (orderToSpawn.Quality)
 		{
-		case EMaterialQuality::QUALITY_LOW:
+		case EPieceMaterial::QUALITY_LOW:
 			pieceInitialQuality = minQuality;
 			selectedMaterial = qualityMaterial[0];
 			productCode += "M1";
 			break;
-		case EMaterialQuality::QUALITY_MEDIUM:
+		case EPieceMaterial::QUALITY_MEDIUM:
 			pieceInitialQuality = midQuality;
 			selectedMaterial = qualityMaterial[1];
 			productCode += "M2";
 			break;
-		case EMaterialQuality::QUALITY_HIGH:
+		case EPieceMaterial::QUALITY_HIGH:
 			pieceInitialQuality = maxQuality;
 			selectedMaterial = qualityMaterial[3];
 			productCode += "M3";
@@ -85,15 +85,15 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 
 		switch (orderToSpawn.Size)
 		{
-		case EMaterialSize::SIZE_SMALL:
+		case EPieceSize::SIZE_SMALL:
 			selectesSize = productSize[0];
 			productCode += "S1";
 			break;
-		case EMaterialSize::SIZE_MEDIUM:
+		case EPieceSize::SIZE_MEDIUM:
 			selectesSize = productSize[1];
 			productCode += "S2";
 			break;
-		case EMaterialSize::SIZE_BIG:
+		case EPieceSize::SIZE_BIG:
 			selectesSize = productSize[2];
 			productCode += "S3";
 			break;
@@ -104,15 +104,15 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 
 		switch (orderToSpawn.Length)
 		{
-		case EMaterialLength::LENGTH_SHORT:
+		case EPieceLenght::LENGTH_SHORT:
 			selectedMesh = productMesh[0];
 			productCode += "L1";
 			break;
-		case EMaterialLength::LENGTH_MEDIUM:
+		case EPieceLenght::LENGTH_MEDIUM:
 			selectedMesh = productMesh[1];
 			productCode += "L2";
 			break;
-		case EMaterialLength::LENGTH_LARGE:
+		case EPieceLenght::LENGTH_LARGE:
 			selectedMesh = productMesh[2];
 			productCode += "L3";
 			break;

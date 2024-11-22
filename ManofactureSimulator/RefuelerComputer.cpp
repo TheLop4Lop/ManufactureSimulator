@@ -24,6 +24,8 @@ void ARefuelerComputer::Tick(float DeltaTime)
 
     if(refuelerMachine && computerWidget)
     {
+        computerWidget->SetPowerLight(refuelerMachine->GetMachinePower());
+        
         float oilLevel = ((float)refuelerMachine->GetOilDepositLevel()/(float)refuelerMachine->GetMaxOilDepositLevel());
         computerWidget->SetOilBarLevel(oilLevel);
 

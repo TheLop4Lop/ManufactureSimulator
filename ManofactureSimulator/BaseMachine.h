@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include <map>
 #include <string>
+#include "EProductProperties.h" // To get access to the enum.
 #include "BaseMachine.generated.h"
 
 DECLARE_DELEGATE_TwoParams(FActiveConveyor, FName, bool);
@@ -13,6 +14,7 @@ DECLARE_DELEGATE_TwoParams(FActiveConveyor, FName, bool);
 UENUM(BlueprintType)
 enum class EMachineStatus : uint8
 {
+	ON_WARMING,
 	ON_MAINTENANCE,
 	ON_PRODUCTION,
 	ON_HOLD,
@@ -23,7 +25,7 @@ enum class EMachineStatus : uint8
 
 };
 
-UENUM(BlueprintType)
+/*UENUM(BlueprintType)
 enum class EProductMaterial : uint8 
 {
 	M1,
@@ -66,7 +68,7 @@ enum class EProductColor : uint8
 	C2,
 	C3
 
-};
+};*/
 
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseMachine : public AActor
@@ -85,8 +87,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
+	// Called Computer after widget Power interactio; change status between ON and OFF.
 	void SetMachinePower();
+
+	// Returns Computer Status for Widget interaction light.
+	bool GetMachinePower();
 
 	// Sets value of order code for the machinery to process.
 	void SetProductionMachineOrder(FString orderToProduce);
@@ -112,11 +117,13 @@ public:
 	// Gets MAX Lubricant Level.
 	int GetMaxLubricantLevel();
 
+	FColor GetMachineStatusColor();
+
 	// Delegate event for active or desable a single conveyor belt.
 	FActiveConveyor conveyorEvent;
 
 private:
-	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
+	/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
 	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
 
 	// Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
@@ -132,10 +139,10 @@ private:
 	static std::map<FString, EProductForm> StringToEnumFormMap;
 
 	// Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EProductColor> StringToEnumColorMap;
+	static std::map<FString, EProductColor> StringToEnumColorMap;*/
 
 protected:
-	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
+	/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
 	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
 
 	// Initialize singlenton for all maps.
@@ -154,7 +161,7 @@ protected:
 	EProductForm GetStringToEnumFormMap(const FString& formString) const;
 
 	// Gets the StringToEnumColorMap
-	EProductColor GetStringToEnumColorMap(const FString& colorString) const;
+	EProductColor GetStringToEnumColorMap(const FString& colorString) const;*/
 
 	///////////////////////////////////// MACHINE PROPERTIES ////////////////////////////////
 	// Section for all the machine initial properties.
@@ -194,6 +201,46 @@ protected:
 	// Holds reference to conveyor belt that provides product for production.
 	class ABaseConveyorBelt* entranceConveyor;
 
+	///////////////////////////////////// MACHINE SOUND PROPERTIES ////////////////////////////////
+	// Section for all the machine sound properties.
+
+	// Sound class for machine WarmUp state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineWarmUpSound;
+
+	// Sound class machine turned down state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineTurnDownSound;
+
+	// Sound class for service state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* serviceSound;
+
+	// Sound class for service state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineOnSound;
+
+	// Sound class for service state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* machineProductionSound;
+	
+	// Sound class for piece error state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* pieceErrorSound;
+
+	// Sound class for code error state.
+	UPROPERTY(EditAnywhere, Category = "Machine Sound Properties", meta = (AllowPrivateAccess))
+	USoundBase* codeErrorSound;
+
+	// Handles audio Spawned in the world.
+	class UAudioComponent* audioHandle;
+
+	// Manages production of Sound on machine mange status.
+	void ReproduceMachineSound(USoundBase* soundToReproduce);
+
+	// Controls audio flow for machineProductionSound.
+	bool bProductionOnPlaying;
+
 	///////////////////////////////////// STATUS PROPERTIES ////////////////////////////////
 	// Main varibles that controll the machine mechanic.
 
@@ -225,13 +272,22 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Status Properties", meta = (AllowPrivateAccess))
 	EMachineStatus productionStatus;
 
-	// Checks the conditions of power machine and changes status for production.
+	// Checks the conditions of machine at being gameplay.
 	void SetInitialMachineStatus();
+
+	// Checks the conditions of power machine and changes status for production.
+	void SetPowerUpMachineStatus();
+
+	// Checks the conditions of to turn off machine.
+	void SetPowerDownMachineStatus();
 
 	// Sets ready status to true and clears timer.
 	void SetReadyMachineStatus();
 	// Sets ready status to false and clears timer.
 	void ResetReadyMachineStatus();
+
+	// Timer handle for ready machine status.
+	FTimerHandle readySetUpTimer;
 
 	///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 	// Section for all the logic in process the product.
@@ -276,6 +332,9 @@ protected:
 
 	// Checks if boxExit is clear for spawn product.
 	bool CheckClearExit();
+
+	// Holds color status value of maachine.
+	FColor machineStatusColor;
 
 	// Controls MachineStatus flow
 	EMachineStatus PreviousStatus = EMachineStatus::ON_HOLD;

@@ -4,6 +4,7 @@
 #include "BaseMachineComputerWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 
 void UBaseMachineComputerWidget::NativeConstruct()
 {
@@ -92,6 +93,19 @@ void UBaseMachineComputerWidget::SetProductDoorLogic()
 void UBaseMachineComputerWidget::SetServiceDoorLogic()
 {
     serviceDoorAction.ExecuteIfBound();
+
+}
+
+// Sets the color of the Power Button Light.
+void UBaseMachineComputerWidget::SetPowerLight(bool bMachinePower)
+{
+    if(powerLight)
+    {
+        FLinearColor powerColor;
+        (bMachinePower) ? powerColor = FLinearColor::Green : powerColor = FLinearColor::Red;
+
+        powerLight->SetColorAndOpacity(powerColor);
+    }
 
 }
 

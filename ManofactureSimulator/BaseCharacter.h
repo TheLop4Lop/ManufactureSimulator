@@ -29,6 +29,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//Resets movement on character.
 	void ResetMoveInput();
 
 	// Simple release grab action.
@@ -49,51 +50,68 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
 	class UCameraComponent* Camera;
 
-	// Character controller pinter.
-	class ACharacterController* CharacterController;
-
 	// Move character forward method.
 	void MoveForward(float AxisValue);
+
 	// Move character right method.
 	void MoveRight(float AxisValue);
 
-	///////////////////////////////////// OBJECT INTERACTION ////////////////////////////////
-	// Interaction object section.
+	// Character controller pinter.
+	class ACharacterController* CharacterController;
 
-	// Interaction widget.
-	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
-	TSubclassOf<class UUserWidget> computerInteractionWidgetClass;
-
-	// Interaction widget.
-	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
-	TSubclassOf<class UUserWidget> grabInteractionWidgetClass;
-
-	// Interaction widget.
-	UPROPERTY(EditAnywhere, Category = "Widgets", meta = (AllowPrivateAccess))
-	TSubclassOf<class UUserWidget> releaseInteractionWidgetClass;
-
-	// Holds the Widget Class to an specific interaction.
-	UUserWidget* InteractionWidget;
-
-	// Set Interaction widget to a specific WidgetClass.
-	void SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass);
+	///////////////////////////////////// GENERAL INTERACTION ////////////////////////////////
+	// Interaction for base interaction section.
 
 	// Range for object interaction.
 	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
 	float ObjectRangeSight = 100;
-	
+
+	// Holds the Widget Class to an specific interaction.
+	UUserWidget* InteractionWidget;
+
 	// Checks if there's an actor in front of the character.
 	FHitResult InSightLine();
+
+	// Set Interaction widget to a specific WidgetClass.
+	void SetInteractionWidget(TSubclassOf<class UUserWidget> widgetClass);
+
+	// Controls the flow of Widget added in Tick.
 	bool DoOnceWidget = true;
 
+	///////////////////////////////////// COMPUTER INTERACTION ////////////////////////////////
+	// Interaction computer section.
+
+	// Interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Computer Widgets", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> computerInteractionWidgetClass;
+
 	// Method that interacts directly with the object displaying widget.
-	void Interaction();
+	void ComputerInteraction();
 	
+	// Reference to computer seen by character.
 	class ABaseComputer* Computer;
 
+	// Holds value reference for an displayed widget to avoid overlapping.
+	bool bIsWidgetDisplayed;
+
+	///////////////////////////////////// GRAB INTERACTION ////////////////////////////////
+	// Interaction with grabbing objects section.
+
 	// Component responsable for holdin in place object
-	UPROPERTY(EditAnywhere, Category = "Character Properties", meta = (AllowPrivateAccess))
+	UPROPERTY(EditAnywhere, Category = "Grab Properties", meta = (AllowPrivateAccess))
 	USceneComponent* holdComponent;
+
+	// Grab Interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Grab Widgets", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> grabInteractionWidgetClass;
+
+	// Release Interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Grab Widgets", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> releaseInteractionWidgetClass;
+
+	// Canister indicator widget.
+	UPROPERTY(EditAnywhere, Category = "Grab Widgets", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> canisterLevelIndicatorClass;
 
 	// Grabs object and attach it to holdComponent.
 	void GrabObject();
@@ -104,11 +122,33 @@ private:
 	// Releases objecto from holdComponent.
 	void ReleaseObject();
 
+	// Holds the Widget Class to an specific interaction.
+	class UCanisterWidget* canisterWidget;
+
 	// Holds reference to the object holded by character.
 	AActor* objectHolded;
-	// Holds value if an object can be placed on a boxComponent.
-	bool canPlaceObject;
+
 	// Holds the location of the boxComponent to place the holded object.
 	UPrimitiveComponent* HitComponent;
+
+	// Use to get values of cannister to update value on widget.
+	ABaseCanister* holdedCanister;
+
+	// Holds value if an object can be placed on a boxComponent.
+	bool canPlaceObject;
+
+	///////////////////////////////////// GRAB INTERACTION SOUND ////////////////////////////////
+	// Interaction with grabbing objects sound section.
+
+	// Canister grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* canisterGrabSound;
+
+	// Canister grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* pieceGrabSound;
+
+	// Plays sound of grabbed object by the player.
+	void PlayGrabbedObjectSound(USoundBase* grabbedObjectSound);
 
 };

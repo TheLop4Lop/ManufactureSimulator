@@ -40,6 +40,9 @@ public:
 	// Delehate event for service machine door to open or close.
 	FServideDoor serviceDoorAction;
 
+	// Sets the color of the Power Button Light.
+	void SetPowerLight(bool bMachinePower);
+
 	// Set Oil Bar percent level.
 	void SetOilLevel(float oilLevel);
 
@@ -53,6 +56,10 @@ protected:
 	// Machine Power Button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* powerButton;
+
+	// Machine Power Button Light indicator.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* powerLight;
 
 	// Machine service button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))

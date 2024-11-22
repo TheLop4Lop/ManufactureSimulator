@@ -17,7 +17,8 @@ void AMachineCutter::CheckEntranceForProduct()
         TArray<AActor*> actorsOnEntrance;
         boxEntrance->GetOverlappingActors(actorsOnEntrance);
 
-        EMachineStatus NewStatus = EMachineStatus::ON_PRODUCTION;
+        EMachineStatus NewStatus;
+        (productsToProcess > 0)? NewStatus = EMachineStatus::ON_PRODUCTION : NewStatus = EMachineStatus::ON_HOLD;
 
         for (AActor* singleActor : actorsOnEntrance)
         {
@@ -68,18 +69,18 @@ void AMachineCutter::InsertQualityToArray(int pieceQuality)
 // Gets the initialPieceAtributes and convert it to BaseMachine product code.
 void AMachineCutter::ManageInitialProductProperties(FString properties)
 {
-    switch (GetStringToEnumMaterialMap(properties.Left(2)))
+    switch (UEProductProperties::ConverStringToEnumQuality(properties.Left(2)))
     {
-    case EProductMaterial::M1:
-        cuttedProductCode.Quality = EProductMaterial::M1;
+    case EPieceMaterial::QUALITY_LOW:
+        cuttedProductCode.Quality = EPieceMaterial::QUALITY_LOW;
         timeByMaterial = timeByMaterialLow;
         break;
-	case EProductMaterial::M2:
-        cuttedProductCode.Quality = EProductMaterial::M2;
+	case EPieceMaterial::QUALITY_MEDIUM:
+        cuttedProductCode.Quality = EPieceMaterial::QUALITY_MEDIUM;
         timeByMaterial = timeByMaterialMidd;
         break;
-	case EProductMaterial::M3:
-        cuttedProductCode.Quality = EProductMaterial::M3;
+	case EPieceMaterial::QUALITY_HIGH:
+        cuttedProductCode.Quality = EPieceMaterial::QUALITY_HIGH;
         timeByMaterial = timeByMaterialHigh;
         break;
     
@@ -87,18 +88,18 @@ void AMachineCutter::ManageInitialProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumSizeMap(properties.Mid(2, 2)))
+	switch (UEProductProperties::ConverStringToEnumSize(properties.Mid(2, 2)))
     {
-    case EProductSize::S1:
-        cuttedProductCode.Size = EProductSize::S1;
+    case EPieceSize::SIZE_SMALL:
+        cuttedProductCode.Size = EPieceSize::SIZE_SMALL;
         timeBySize = timeBySizeLow;
         break;
-	case EProductSize::S2:
-        cuttedProductCode.Size = EProductSize::S2;
+	case EPieceSize::SIZE_MEDIUM:
+        cuttedProductCode.Size = EPieceSize::SIZE_MEDIUM;
         timeBySize = timeBySizeMidd;
         break;
-	case EProductSize::S3:
-        cuttedProductCode.Size = EProductSize::S3;
+	case EPieceSize::SIZE_BIG:
+        cuttedProductCode.Size = EPieceSize::SIZE_BIG;
         timeBySize = timeBySizeHigh;
         break;
     
@@ -106,15 +107,15 @@ void AMachineCutter::ManageInitialProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumLengthMap(properties.Right(2)))
+	switch (UEProductProperties::ConverStringToEnumLength(properties.Right(2)))
     {
-    case EProductLength::L1:
+    case EPieceLenght::LENGTH_SHORT:
         productsToProcess += 3;
         break;
-	case EProductLength::L2:
+	case EPieceLenght::LENGTH_MEDIUM:
         productsToProcess += 5;
         break;
-	case EProductLength::L3:
+	case EPieceLenght::LENGTH_LARGE:
         productsToProcess += 10;
         break;
 
@@ -142,17 +143,17 @@ void AMachineCutter::SpawnProducedProduct()
         productMeshToSpawn = productMesh[0];
 		switch (cuttedProductCode.Quality)
         {
-        case EProductMaterial::M1:
+        case EPieceMaterial::QUALITY_LOW:
             productMaterialToSpawn = qualityMaterial[0];
             productCode += "M1";
             break;
         
-        case EProductMaterial::M2:
+        case EPieceMaterial::QUALITY_MEDIUM:
             productMaterialToSpawn = qualityMaterial[1];
             productCode += "M2";
             break;
 
-        case EProductMaterial::M3:
+        case EPieceMaterial::QUALITY_HIGH:
             productMaterialToSpawn = qualityMaterial[2];
             productCode += "M3";
             break;
@@ -163,17 +164,17 @@ void AMachineCutter::SpawnProducedProduct()
 
         switch (cuttedProductCode.Size)
         {
-        case EProductSize::S1:
+        case EPieceSize::SIZE_SMALL:
             productSizeToSpawn = productSize[0];
             productCode += "S1";
             break;
         
-        case EProductSize::S2:
+        case EPieceSize::SIZE_MEDIUM:
             productSizeToSpawn = productSize[1];
             productCode += "S2";
             break;
 
-        case EProductSize::S3:
+        case EPieceSize::SIZE_BIG:
             productSizeToSpawn = productSize[2];
             productCode += "S3";
             break;

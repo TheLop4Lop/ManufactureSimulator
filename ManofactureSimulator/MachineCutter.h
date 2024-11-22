@@ -13,14 +13,14 @@ struct FBasicProduct
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductMaterial Quality;
+	EPieceMaterial Quality;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductSize Size;
+	EPieceSize Size;
 
 	FBasicProduct() 
-		: Quality(EProductMaterial::M1),
-		  Size(EProductSize::S1)
+		: Quality(EPieceMaterial::QUALITY_LOW),
+		  Size(EPieceSize::SIZE_SMALL)
 	{}
 
 };

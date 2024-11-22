@@ -12,18 +12,18 @@ struct FProductForm
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductMaterial Quality;
+	EPieceMaterial Quality;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductSize Size;
+	EPieceSize Size;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductForm Form;
+	EPieceForm Form;
 
 	FProductForm()
-        : Quality(EProductMaterial::M1),
-          Size(EProductSize::S1),
-          Form(EProductForm::F1)
+        : Quality(EPieceMaterial::QUALITY_LOW),
+          Size(EPieceSize::SIZE_SMALL),
+          Form(EPieceForm::FORM_CONE)
     {}
 
 };

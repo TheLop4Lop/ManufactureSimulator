@@ -14,6 +14,8 @@ ABaseProduct::ABaseProduct()
 	productMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Raw Product Mesh"));
 	RootComponent = productMesh;
 
+	productMesh->OnComponentHit.AddDynamic(this, &ABaseProduct::HitSound);
+
 }
 
 // Called when the game starts or when spawned
@@ -27,6 +29,8 @@ void ABaseProduct::BeginPlay()
 	productMesh->SetRenderCustomDepth(true);
 	productMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 	productMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+	productMesh->SetNotifyRigidBodyCollision(true);
 
 }
 
@@ -98,6 +102,13 @@ FString& ABaseProduct::GetProductCode()
 
 }
 
+// Returns the state of product finished.
+bool ABaseProduct::IsProductFinished()
+{
+	return bProductFinished;
+
+}
+
 // Changes the finish product status
 void ABaseProduct::SetProductFinishProduction()
 {
@@ -131,7 +142,6 @@ void ABaseProduct::InteractionFunctionality_Implementation()
 
 void ABaseProduct::SetProductReleaseReset()
 {
-	UE_LOG(LogTemp, Display, TEXT("SIMPLE RELEASE"));
 	productMesh->SetSimulatePhysics(true);
 
 	character = nullptr;
@@ -144,13 +154,26 @@ void ABaseProduct::SetProductComplexReleaseReset(UPrimitiveComponent* hitCompone
 	if(hitComponent)
 	{
 		FVector boxLocation = hitComponent->GetComponentLocation();
-		UE_LOG(LogTemp, Display, TEXT("COMPLEX RELEASE X: %f, Y: %f, Z: %f"), boxLocation.X, boxLocation.Y, boxLocation.Z);
+		productReleasedOnComponentSound = LoadObject<USoundBase>(nullptr, TEXT("SoundCue'/Game/Sounds/Pieces/Piece_Cue2.Piece_Cue2'"));
+		if(productReleasedOnComponentSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), productReleasedOnComponentSound, boxLocation);
 
 		AttachToComponent(hitComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		SetActorLocation(boxLocation);
 		productMesh->SetSimulatePhysics(true);
 
 		character = nullptr;
+	}
+
+}
+
+void ABaseProduct::HitSound(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	float volumeMultiplier = FMath::Clamp(NormalImpulse.Size() / MaxImpulse, 0.0f, 2.0f);
+	productReleasedFreeSound = LoadObject<USoundBase>(nullptr, TEXT("SoundCue'/Game/Sounds/Pieces/Piece_Cue3.Piece_Cue3'"));
+	if(productReleasedFreeSound && volumeMultiplier > 0.06)
+	{
+		UE_LOG(LogTemp, Display, TEXT("SOUND! VOLUME: %f"), volumeMultiplier);
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), productReleasedFreeSound, GetActorLocation(), volumeMultiplier);
 	}
 
 }

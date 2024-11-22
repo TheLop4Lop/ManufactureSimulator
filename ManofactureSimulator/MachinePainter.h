@@ -12,22 +12,22 @@ struct FProductColor
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductMaterial Quality;
+	EPieceMaterial Quality;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductSize Size;
+	EPieceSize Size;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductForm Form;
+	EPieceForm Form;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EProductColor Color;
+	EPieceColor Color;
 
 	FProductColor()
-		: Quality(EProductMaterial::M1),
-          Size(EProductSize::S1),
-          Form(EProductForm::F1),
-		  Color(EProductColor::C1)
+		: Quality(EPieceMaterial::QUALITY_LOW),
+          Size(EPieceSize::SIZE_SMALL),
+          Form(EPieceForm::FORM_CONE),
+		  Color(EPieceColor::COLOR_BLUE)
 	{}
 
 };

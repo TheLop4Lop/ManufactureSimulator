@@ -16,7 +16,8 @@ void AMachinePainter::CheckEntranceForProduct()
         TArray<AActor*> actorsOnEntrance;
         boxEntrance->GetOverlappingActors(actorsOnEntrance);
 
-        EMachineStatus NewStatus = EMachineStatus::ON_PRODUCTION;
+        EMachineStatus NewStatus;
+        (productsToProcess > 0)? NewStatus = EMachineStatus::ON_PRODUCTION : NewStatus = EMachineStatus::ON_HOLD;
 
         for (AActor* singleActor : actorsOnEntrance)
         {
@@ -61,18 +62,18 @@ void AMachinePainter::CheckEntranceForProduct()
 // Gets the cuttedProduct properties and proces production product code.
 void AMachinePainter::ManageMolderedProductProperties(FString properties)
 {
-    switch (GetStringToEnumMaterialMap(properties.Left(2)))
+    switch (UEProductProperties::ConverStringToEnumQuality(properties.Left(2)))
     {
-    case EProductMaterial::M1:
-        paintedProductCode.Quality = EProductMaterial::M1;
+    case EPieceMaterial::QUALITY_LOW:
+        paintedProductCode.Quality = EPieceMaterial::QUALITY_LOW;
         timeByMaterial = timeByMaterialLow;
         break;
-	case EProductMaterial::M2:
-        paintedProductCode.Quality = EProductMaterial::M2;
+	case EPieceMaterial::QUALITY_MEDIUM:
+        paintedProductCode.Quality = EPieceMaterial::QUALITY_MEDIUM;
         timeByMaterial = timeByMaterialMidd;
         break;
-	case EProductMaterial::M3:
-        paintedProductCode.Quality = EProductMaterial::M3;
+	case EPieceMaterial::QUALITY_HIGH:
+        paintedProductCode.Quality = EPieceMaterial::QUALITY_HIGH;
         timeByMaterial = timeByMaterialHigh;
         break;
     
@@ -80,18 +81,18 @@ void AMachinePainter::ManageMolderedProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumSizeMap(properties.Mid(2, 2)))
+	switch (UEProductProperties::ConverStringToEnumSize(properties.Mid(2, 2)))
     {
-    case EProductSize::S1:
-        paintedProductCode.Size = EProductSize::S1;
+    case EPieceSize::SIZE_SMALL:
+        paintedProductCode.Size = EPieceSize::SIZE_SMALL;
         timeBySize = timeBySizeLow;
         break;
-	case EProductSize::S2:
-        paintedProductCode.Size = EProductSize::S2;
+	case EPieceSize::SIZE_MEDIUM:
+        paintedProductCode.Size = EPieceSize::SIZE_MEDIUM;
         timeBySize = timeBySizeMidd;
         break;
-	case EProductSize::S3:
-        paintedProductCode.Size = EProductSize::S3;
+	case EPieceSize::SIZE_BIG:
+        paintedProductCode.Size = EPieceSize::SIZE_BIG;
         timeBySize = timeBySizeHigh;
         break;
     
@@ -99,18 +100,18 @@ void AMachinePainter::ManageMolderedProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumFormMap(properties.Right(2)))
+	switch (UEProductProperties::ConverStringToEnumForm(properties.Right(2)))
     {
-    case EProductForm::F1:
-        paintedProductCode.Form = EProductForm::F1;
+    case EPieceForm::FORM_CONE:
+        paintedProductCode.Form = EPieceForm::FORM_CONE;
         timeByForm = timeByFormF1;
         break;
-	case EProductForm::F2:
-        paintedProductCode.Form = EProductForm::F2;
+	case EPieceForm::FORM_CYLINDER:
+        paintedProductCode.Form = EPieceForm::FORM_CYLINDER;
         timeByForm = timeByFormF2;
         break;
-	case EProductForm::F3:
-        paintedProductCode.Form = EProductForm::F3;
+	case EPieceForm::FORM_TORUS:
+        paintedProductCode.Form = EPieceForm::FORM_TORUS;
         timeByForm = timeByFormF3;
         break;
 
@@ -118,18 +119,18 @@ void AMachinePainter::ManageMolderedProductProperties(FString properties)
         break;
     }
 
-    switch (GetStringToEnumColorMap(codeToProcess.Right(2)))
+    switch (UEProductProperties::ConverStringToEnumColor(codeToProcess.Right(2)))
     {
-    case EProductColor::C1:
-        paintedProductCode.Color = EProductColor::C1;
+    case EPieceColor::COLOR_BLUE:
+        paintedProductCode.Color = EPieceColor::COLOR_BLUE;
         timeByColor = timeByColorC1;
         break;
-	case EProductColor::C2:
-        paintedProductCode.Color = EProductColor::C2;
+	case EPieceColor::COLOR_RED:
+        paintedProductCode.Color = EPieceColor::COLOR_RED;
         timeByColor = timeByColorC2;
         break;
-	case EProductColor::C3:
-        paintedProductCode.Color = EProductColor::C3;
+	case EPieceColor::COLOR_GREEN:
+        paintedProductCode.Color = EPieceColor::COLOR_GREEN;
         timeByColor = timeByColorC3;
         break;
 
@@ -156,15 +157,15 @@ void AMachinePainter::SpawnProducedProduct()
 	{
         switch (paintedProductCode.Quality)
         {
-        case EProductMaterial::M1:
+        case EPieceMaterial::QUALITY_LOW:
             productCode += "M1";
             break;
         
-        case EProductMaterial::M2:
+        case EPieceMaterial::QUALITY_MEDIUM:
             productCode += "M2";
             break;
 
-        case EProductMaterial::M3:
+        case EPieceMaterial::QUALITY_HIGH:
             productCode += "M3";
             break;
 
@@ -174,17 +175,17 @@ void AMachinePainter::SpawnProducedProduct()
 
         switch (paintedProductCode.Size)
         {
-        case EProductSize::S1:
+        case EPieceSize::SIZE_SMALL:
             productSizeToSpawn = productSize[0];
             productCode += "S1";
             break;
         
-        case EProductSize::S2:
+        case EPieceSize::SIZE_MEDIUM:
             productSizeToSpawn = productSize[1];
             productCode += "S2";
             break;
 
-        case EProductSize::S3:
+        case EPieceSize::SIZE_BIG:
             productSizeToSpawn = productSize[2];
             productCode += "S3";
             break;
@@ -195,17 +196,17 @@ void AMachinePainter::SpawnProducedProduct()
 
         switch (paintedProductCode.Form)
         {
-        case EProductForm::F1:
+        case EPieceForm::FORM_CONE:
             productMeshToSpawn = productMesh[0];
             productCode += "F1";
             break;
         
-        case EProductForm::F2:
+        case EPieceForm::FORM_CYLINDER:
             productMeshToSpawn = productMesh[1];
             productCode += "F2";
             break;
 
-        case EProductForm::F3:
+        case EPieceForm::FORM_TORUS:
             productMeshToSpawn = productMesh[2];
             productCode += "F3";
             break;
@@ -216,18 +217,18 @@ void AMachinePainter::SpawnProducedProduct()
 
         switch (paintedProductCode.Color)
         {
-        case EProductColor::C1: // BLUE COLOR
+        case EPieceColor::COLOR_BLUE: // BLUE COLOR
             switch (paintedProductCode.Quality)
             {
-            case EProductMaterial::M1:
+            case EPieceMaterial::QUALITY_LOW:
                 productMaterialToSpawn = color1Quality[0];
                 break;
             
-            case EProductMaterial::M2:
+            case EPieceMaterial::QUALITY_MEDIUM:
                 productMaterialToSpawn = color2Quality[0];
                 break;
 
-            case EProductMaterial::M3:
+            case EPieceMaterial::QUALITY_HIGH:
                 productMaterialToSpawn = color3Quality[0];
                 break;
 
@@ -237,18 +238,18 @@ void AMachinePainter::SpawnProducedProduct()
             productCode += "C1";
             break;
         
-        case EProductColor::C2:// RED COLOR
+        case EPieceColor::COLOR_RED:// RED COLOR
             switch (paintedProductCode.Quality)
             {
-            case EProductMaterial::M1:
+            case EPieceMaterial::QUALITY_LOW:
                 productMaterialToSpawn = color1Quality[1];
                 break;
             
-            case EProductMaterial::M2:
+            case EPieceMaterial::QUALITY_MEDIUM:
                 productMaterialToSpawn = color2Quality[1];
                 break;
 
-            case EProductMaterial::M3:
+            case EPieceMaterial::QUALITY_HIGH:
                 productMaterialToSpawn = color3Quality[1];
                 break;
 
@@ -258,18 +259,18 @@ void AMachinePainter::SpawnProducedProduct()
             productCode += "C2";
             break;
 
-        case EProductColor::C3: // GREEN COLOR
+        case EPieceColor::COLOR_GREEN: // GREEN COLOR
             switch (paintedProductCode.Quality)
             {
-            case EProductMaterial::M1:
+            case EPieceMaterial::QUALITY_LOW:
                 productMaterialToSpawn = color1Quality[2];
                 break;
             
-            case EProductMaterial::M2:
+            case EPieceMaterial::QUALITY_MEDIUM:
                 productMaterialToSpawn = color2Quality[2];
                 break;
 
-            case EProductMaterial::M3:
+            case EPieceMaterial::QUALITY_HIGH:
                 productMaterialToSpawn = color3Quality[2];
                 break;
 

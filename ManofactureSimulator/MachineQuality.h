@@ -37,6 +37,9 @@ public:
 	// Change Power machine Status.
 	void SetMachinePower();
 
+	// Get the actual stage of the scanner machine.
+	bool GetMachinePower();
+
 	// Scan Produc inside de boxDetector.
 	EMachineQualityStatus ScanForProduct();
 
@@ -66,5 +69,31 @@ protected:
 	bool isPowered;
 
 	class ABaseProduct* scannedProduct;
+
+	///////////////////////////////////// SCANNER SOUNDS ////////////////////////////////
+	// Section for Scanner sounds.
+
+	// Holds the reference to a SoundBase for PowerOn machine.
+	UPROPERTY(EditAnywhere, Category = "Scanner Sounds", meta = (AllowPrivateAccess))
+	USoundBase* scannerOnSound;
+
+	// Holds the reference to a SoundBase for empty scanner.
+	UPROPERTY(EditAnywhere, Category = "Scanner Sounds", meta = (AllowPrivateAccess))
+	USoundBase* emptyScannerSound;
+
+	// Holds the reference to a SoundBase for no piece detected on scanner.
+	UPROPERTY(EditAnywhere, Category = "Scanner Sounds", meta = (AllowPrivateAccess))
+	USoundBase* noPieceOnScannerSound;
+
+	// Holds the reference to a SoundBase for multiple pieces detected on scanner.
+	UPROPERTY(EditAnywhere, Category = "Scanner Sounds", meta = (AllowPrivateAccess))
+	USoundBase* multiplePiecesOnScannerSound;
+
+	// Holds the reference to a SoundBase for no piece detected on scanner.
+	UPROPERTY(EditAnywhere, Category = "Scanner Sounds", meta = (AllowPrivateAccess))
+	USoundBase* scannerActionSound;
+
+	// Handles On audio Spawned in the world.
+	class UAudioComponent* onAudioHandle;
 
 };

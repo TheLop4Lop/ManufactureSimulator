@@ -42,6 +42,9 @@ public:
 	// Gets cutted piece product code.
 	FString& GetProductCode();
 
+	// Returns the state of product finished.
+	bool IsProductFinished();
+
 	// Method implementation after character interaction, change canister properties for character hold.
 	virtual void InteractionFunctionality_Implementation() override;
 
@@ -91,5 +94,23 @@ protected:
 
 	// Holds reference to character for canister event reset.
 	class ABaseCharacter* character;
+
+	///////////////////////////////////// BASE PRODUCT SOUNDS ////////////////////////////////
+	// Section for PRODUCT sound properties.
+
+	// PRODUCT grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* productReleasedOnComponentSound;
+
+	// PRODUCT grab sound.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	USoundBase* productReleasedFreeSound;
+
+	// Defines the maximum Sound amount.
+	UPROPERTY(EditAnywhere, Category = "Grab Sounds", meta = (AllowPrivateAccess))
+	float MaxImpulse = 15000.0f;
+
+	UFUNCTION()
+	void HitSound(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 };

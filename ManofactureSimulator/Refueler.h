@@ -26,6 +26,9 @@ public:
 	// Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
 	void SetMachinePower();
 
+	// Gets power status for widget interaction.
+	bool GetMachinePower();
+
 	// Called from Refueler Computer after widget Security DOOR interaction; Open or Close Security Door.
 	void SecurityDoorChangePosition();
 
@@ -178,5 +181,45 @@ protected:
 
 	// Controls flow on clear lubricant timer Process.
 	bool DoOnceLubricant;
+
+	///////////////////////////////////// REFUELER SOUNDS ////////////////////////////////
+	// Section for Refueler sounds.
+
+	// Holds the reference to a SoundBase for PowerOn machine.
+	UPROPERTY(EditAnywhere, Category = "Refueler Sounds", meta = (AllowPrivateAccess))
+	USoundBase* refuelerOnSound;
+
+	// Holds the reference to a SoundBase for missingCanister on plaque machine.
+	UPROPERTY(EditAnywhere, Category = "Refueler Sounds", meta = (AllowPrivateAccess))
+	USoundBase* missingCanisterSound;
+
+	// Holds the reference to a SoundBase for wrong object on plaque machine.
+	UPROPERTY(EditAnywhere, Category = "Refueler Sounds", meta = (AllowPrivateAccess))
+	USoundBase* wrongCanisterSound;
+
+	// Holds the reference to a SoundBase for Open door warning on plaque machine.
+	UPROPERTY(EditAnywhere, Category = "Refueler Sounds", meta = (AllowPrivateAccess))
+	USoundBase* openDoorWarningSound;
+
+	// Holds the reference to a SoundBase for actionDoor sound on plaque machine.
+	UPROPERTY(EditAnywhere, Category = "Refueler Sounds", meta = (AllowPrivateAccess))
+	USoundBase* actionDoorSound;
+
+	// Holds the reference to a SoundBase for oil refuil sound.
+	UPROPERTY(EditAnywhere, Category = "Refueler Sounds", meta = (AllowPrivateAccess))
+	USoundBase* refuelerOilSound;
+
+	// Holds the reference to a SoundBase for lubricant refuil sound.
+	UPROPERTY(EditAnywhere, Category = "Refueler Sounds", meta = (AllowPrivateAccess))
+	USoundBase* refuelerLubricantSound;
+
+	// Handles On audio Spawned in the world.
+	class UAudioComponent* onAudioHandle;
+
+	// Handles Oil audio Spawned in the world.
+	class UAudioComponent* oilAudioHandle;
+
+	// Handles Lubricant audio Spawned in the world.
+	class UAudioComponent* lubricantAudioHandle;
 
 };

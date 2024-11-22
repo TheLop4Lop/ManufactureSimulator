@@ -3,13 +3,15 @@
 
 #include "BaseMachine.h"
 #include "Components/PointLightComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "LubricantCanister.h"
 #include "BaseConveyorBelt.h"
 #include "OilCanister.h"
 #include "BaseProduct.h"
 
-// Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
+/*/ Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
 std::map<FString, EProductMaterial> ABaseMachine::StringToEnumMaterialMap;
 
 // Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
@@ -22,7 +24,7 @@ std::map<FString, EProductLength> ABaseMachine::StringToEnumLengthMap;
 std::map<FString, EProductForm> ABaseMachine::StringToEnumFormMap;
 
 // Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EProductColor> ABaseMachine::StringToEnumColorMap;
+std::map<FString, EProductColor> ABaseMachine::StringToEnumColorMap;*/
 
 // Sets default values
 ABaseMachine::ABaseMachine()
@@ -54,10 +56,10 @@ ABaseMachine::ABaseMachine()
 	machineStatusLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Machine Status Light"));
 	machineStatusLight->SetupAttachment(machineMesh);
 
-	if(StringToEnumMaterialMap.empty() && StringToEnumSizeMap.empty() && StringToEnumFormMap.empty() && StringToEnumColorMap.empty())
+	/*if(StringToEnumMaterialMap.empty() && StringToEnumSizeMap.empty() && StringToEnumFormMap.empty() && StringToEnumColorMap.empty())
 	{
 		InitializeConversionMaps();
-	}
+	}*/
 
 }
 
@@ -71,6 +73,8 @@ void ABaseMachine::BeginPlay()
 	boxEntrance->GetOverlappingActors(initialActors);
 	if(initialActors.IsValidIndex(0)) entranceConveyor = Cast<ABaseConveyorBelt>(initialActors[0]);
 
+	SetInitialMachineStatus();
+
 }
 
 // Called every frame
@@ -80,18 +84,18 @@ void ABaseMachine::Tick(float DeltaTime)
 
 	if(isPowered)
 	{
-		SetInitialMachineStatus();
+		SetPowerUpMachineStatus();
 		CheckEntranceForProduct();	
 		CheckConditionsForSpawnProduct();
 		CheckForActorsInServiceBox();
 	}else
 	{
-		ChangeProductionStatus(EMachineStatus::OFF);
+		SetPowerDownMachineStatus();
 	}
 
 }
 
-///////////////////////////////////// MAP CONVERTION ////////////////////////////////
+/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
 // Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
 
 void ABaseMachine::InitializeConversionMaps()
@@ -171,22 +175,58 @@ EProductColor ABaseMachine::GetStringToEnumColorMap(const FString& colorString) 
 
 	return EProductColor::C1;
 
+}*/
+
+///////////////////////////////////// MACHINE SOUND PROPERTIES ////////////////////////////////
+// Section for all the machine sound properties.
+
+// Manages production of Sound on machine mange status.
+void ABaseMachine::ReproduceMachineSound(USoundBase* soundToReproduce)
+{
+	if(audioHandle && soundToReproduce)
+	{
+		audioHandle->Stop();
+		audioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), soundToReproduce, GetActorLocation());
+	}
+
 }
 
 ///////////////////////////////////// STATUS PROPERTIES ////////////////////////////////
 // Main varibles that controll the machine mechanic.
 
-// Checks the conditions of power machine and changes status for production.
+// Checks the conditions of machine at being gameplay.
 void ABaseMachine::SetInitialMachineStatus()
 {
-	if(isPowered && !isReady && !isInMaintenance && !GetWorldTimerManager().IsTimerActive(processTimer))
+	ChangeProductionStatus(EMachineStatus::OFF);
+	isPowered = false;
+	isReady = false;
+
+}
+
+// Checks the conditions of power machine and changes status for production.
+void ABaseMachine::SetPowerUpMachineStatus()
+{
+	if(!isReady && !isInMaintenance && !GetWorldTimerManager().IsTimerActive(readySetUpTimer))
 	{
-		// CONFIGURE PRODCUTION STATE LIGHT ON WARMING.
-		GetWorldTimerManager().SetTimer(processTimer, this, &ABaseMachine::SetReadyMachineStatus, machineWarmUp, false);
-	}else if(!isPowered && isReady && !GetWorldTimerManager().IsTimerActive(processTimer))
+		ChangeProductionStatus(EMachineStatus::ON_WARMING);
+		GetWorldTimerManager().SetTimer(readySetUpTimer, this, &ABaseMachine::SetReadyMachineStatus, machineWarmUp, false);
+		if(machineWarmUpSound)
+		{
+			audioHandle = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), machineWarmUpSound, GetActorLocation());
+		}
+	}
+
+}
+
+// Checks the conditions of to turn off machine.
+void ABaseMachine::SetPowerDownMachineStatus()
+{
+	if(isReady && !GetWorldTimerManager().IsTimerActive(readySetUpTimer))
 	{
-		// CONFIGURE PRODCUTION STATE LIGHT OFF.
-		GetWorldTimerManager().SetTimer(processTimer, this, &ABaseMachine::ResetReadyMachineStatus, machineWarmDown, false);
+		UE_LOG(LogTemp, Display, TEXT("SHOULD SHUT DOWN, CLEARING TIMERS"));
+		GetWorldTimerManager().ClearTimer(processTimer); // Stops production timer.
+		GetWorldTimerManager().SetTimer(readySetUpTimer, this, &ABaseMachine::ResetReadyMachineStatus, machineWarmDown, false);
+		ReproduceMachineSound(machineTurnDownSound);
 	}
 
 }
@@ -194,7 +234,10 @@ void ABaseMachine::SetInitialMachineStatus()
 // Sets ready status to true and clears timer.
 void ABaseMachine::SetReadyMachineStatus()
 {
+	ChangeProductionStatus(EMachineStatus::ON_HOLD);
+	UE_LOG(LogTemp, Display, TEXT("MACHINE ON AND READY!"));
 	isReady = true;
+	GetWorldTimerManager().ClearTimer(readySetUpTimer); // Resets ready timer.
 	GetWorldTimerManager().ClearTimer(processTimer);
 
 }
@@ -202,8 +245,12 @@ void ABaseMachine::SetReadyMachineStatus()
 // Sets ready status to false and clears timer.
 void ABaseMachine::ResetReadyMachineStatus()
 {
+	ChangeProductionStatus(EMachineStatus::OFF);
+	UE_LOG(LogTemp, Display, TEXT("MACHINE OFF AND NOT READY!"));
 	isReady = false;
+	GetWorldTimerManager().ClearTimer(readySetUpTimer); // Resets ready timer.
 	GetWorldTimerManager().ClearTimer(processTimer);
+
 }
 
 // Sets the position and status of product door.
@@ -268,6 +315,12 @@ int ABaseMachine::GetMaxLubricantLevel()
 
 }
 
+FColor ABaseMachine::GetMachineStatusColor()
+{
+	return machineStatusColor;
+
+}
+
 ///////////////////////////////////// PRODUCT PROCESS ////////////////////////////////
 // Section for all the logic in process the product.
 
@@ -286,7 +339,7 @@ void ABaseMachine::CheckEntranceForProduct()
             	ABaseProduct* productOnEntrance = Cast<ABaseProduct>(singleActor); // THIS CHANGE DEPENDING ON THE MACHINE
 				if(productOnEntrance && productsToProcess < maxProductOrder) // THIS CHANGE DEPENDING ON THE MACHINE
 				{
-					ChangeProductionStatus(EMachineStatus::ON_PRODUCTION);
+					if(productsToProcess > 0) ChangeProductionStatus(EMachineStatus::ON_PRODUCTION);
 					productsToProcess++;
 
 					InsertQualityToArray(productOnEntrance->GetProductQuality());
@@ -309,45 +362,87 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 {
 	switch (newStatus)
 	{
+	case EMachineStatus::ON_WARMING:
+		// Sound being initiated on SetPowerUpMachineStatus().
+		bProductionOnPlaying = false;
+
+		machineStatusLight->SetIntensity(2500.0f);
+		machineStatusLight->SetLightColor(FColor::White);
+		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::White;
+		break;
+	
 	case EMachineStatus::ON_MAINTENANCE:
+		ReproduceMachineSound(serviceSound);
+		bProductionOnPlaying = false;
+
+		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Blue);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Blue;
 		break;
 
 	case EMachineStatus::ON_PRODUCTION:
+		if(!bProductionOnPlaying) ReproduceMachineSound(machineProductionSound);
+		bProductionOnPlaying = true;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to ON_PRODUCTION"), *GetActorLabel());
+		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Green);
 		conveyorEvent.ExecuteIfBound(machineName, true);
+		machineStatusColor = FColor::Green;
 		break;
 
 	case EMachineStatus::ON_HOLD:
+		ReproduceMachineSound(machineOnSound);
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to ON_HOLD"), *GetActorLabel());
-		machineStatusLight->SetLightColor(FColor::White);
+		machineStatusLight->SetIntensity(2500.0f);
+		machineStatusLight->SetLightColor(FColor::Yellow);
 		conveyorEvent.ExecuteIfBound(machineName, true);
+		machineStatusColor = FColor::Yellow;
 		break;
 
 	case EMachineStatus::FULL_PRODUCTION:
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to FULL_PRODUCTION"), *GetActorLabel());
-		machineStatusLight->SetLightColor(FColor::Orange);
+		machineStatusLight->SetIntensity(2500.0f);
+		machineStatusLight->SetLightColor(FColor::Turquoise);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Turquoise;
 		break;
 
 	case EMachineStatus::PRODUCT_ERROR:
+		if(pieceErrorSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), pieceErrorSound, GetActorLocation());
+		ReproduceMachineSound(machineOnSound);
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to PRODUCT_ERROR"), *GetActorLabel());
+		machineStatusLight->SetIntensity(2500.0f);
 		machineStatusLight->SetLightColor(FColor::Red);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Red;
 		break;
 
 	case EMachineStatus::CODE_ERROR:
+		if(codeErrorSound) UGameplayStatics::PlaySoundAtLocation(GetWorld(), codeErrorSound, GetActorLocation());
+		ReproduceMachineSound(machineOnSound);
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Changing status to CODE_ERROR"), *GetActorLabel());
-		machineStatusLight->SetLightColor(FColor::Yellow);
+		machineStatusLight->SetIntensity(2500.0f);
+		machineStatusLight->SetLightColor(FColor::Orange);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Orange;
 		break;
 
 	case EMachineStatus::OFF:
+		bProductionOnPlaying = false;
+
 		UE_LOG(LogTemp, Warning, TEXT("Machine: %s, Machine OFF"), *GetActorLabel());
 		machineStatusLight->SetIntensity(0.0f);
 		conveyorEvent.ExecuteIfBound(machineName, false);
+		machineStatusColor = FColor::Black;
 		break;
 	
 	default:
@@ -359,7 +454,18 @@ void ABaseMachine::ChangeProductionStatus(EMachineStatus newStatus)
 // Called frm Refueler Computer after widget Power interactio; change status between ON and OFF.
 void ABaseMachine::SetMachinePower()
 {
-	isPowered = !isPowered;
+	if(!GetWorldTimerManager().IsTimerActive(readySetUpTimer))
+	{
+		isPowered = !isPowered;
+		UE_LOG(LogTemp, Display, TEXT("CHANGIN POWER: %s"), isPowered? TEXT("ON") : TEXT("OFF"));
+	}
+
+}
+
+// Returns Computer Status for Widget interaction light.
+bool ABaseMachine::GetMachinePower()
+{
+	return isPowered;
 
 }
 
