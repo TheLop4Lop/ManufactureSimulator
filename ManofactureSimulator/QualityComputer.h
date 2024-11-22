@@ -8,42 +8,6 @@
 #include <string>
 #include "QualityComputer.generated.h"
 
-UENUM(BlueprintType)
-enum class EMaterial : uint8 
-{
-	M1,
-	M2,
-	M3
-
-};
-
-UENUM(BlueprintType)
-enum class ESize : uint8
-{
-	S1,
-	S2,
-	S3
-
-};
-
-UENUM(BlueprintType)
-enum class EForm : uint8
-{
-	F1,
-	F2,
-	F3
-
-};
-
-UENUM(BlueprintType)
-enum class EColor : uint8
-{
-	C1,
-	C2,
-	C3
-
-};
-
 /**
  * 
  */
@@ -65,41 +29,7 @@ public:
 	// Adds widget and assign the player controller to it.
 	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);
 
-private:
-	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
-	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
-
-	// Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EMaterial> StringToEnumMaterialMap;
-
-	// Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, ESize> StringToEnumSizeMap;
-
-	// Static FORM map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EForm> StringToEnumFormMap;
-
-	// Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EColor> StringToEnumColorMap;
-
 protected:
-	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
-	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
-
-	// Initialize singlenton for all maps.
-	static void InitializeConversionMaps();
-
-	// Gets the StringToEnumMaterialMap
-	EMaterial GetStringToEnumMaterialMap(const FString& materialString) const;
-
-	// Gets the StringToEnumSizeMap
-	ESize GetStringToEnumSizeMap(const FString& sizeString) const;
-
-	// Gets the StringToEnumFormMap
-	EForm GetStringToEnumFormMap(const FString& formString) const;
-
-	// Gets the StringToEnumColorMap
-	EColor GetStringToEnumColorMap(const FString& colorString) const;
-
 	///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
 	// Sections for the actor properties.
 

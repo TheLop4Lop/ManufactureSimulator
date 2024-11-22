@@ -5,26 +5,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "ComputerQualityWidget.h"
 #include "CharacterController.h"
+#include "EProductProperties.h" // To get access to ENUM.
 #include "MachineQuality.h"
-
-// Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EMaterial> AQualityComputer::StringToEnumMaterialMap;
-
-// Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, ESize> AQualityComputer::StringToEnumSizeMap;
-
-// Static FORM map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EForm> AQualityComputer::StringToEnumFormMap;
-
-// Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EColor> AQualityComputer::StringToEnumColorMap;
 
 AQualityComputer::AQualityComputer()
 {
-    if(StringToEnumMaterialMap.empty() && StringToEnumSizeMap.empty() && StringToEnumFormMap.empty() && StringToEnumColorMap.empty())
-	{
-		InitializeConversionMaps();
-	}
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
 
 }
 
@@ -57,73 +44,6 @@ void AQualityComputer::Tick(float DeltaTime)
 		computerWidget->SetProductActualQuality(productActualQuality/100);
 		computerWidget->SetProducExpectedQuality(productExpectedQuality/100);
     }
-
-}
-
-///////////////////////////////////// MAP CONVERTION ////////////////////////////////
-// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
-
-void AQualityComputer::InitializeConversionMaps()
-{
-	StringToEnumMaterialMap = {{"M1", EMaterial::M1}, {"M2", EMaterial::M2}, {"M3", EMaterial::M3}};
-
-	StringToEnumSizeMap = {{"S1", ESize::S1}, {"S2", ESize::S2}, {"S3", ESize::S3}};
-
-	StringToEnumFormMap = {{"F1", EForm::F1}, {"F2", EForm::F2}, {"F3", EForm::F3}};
-
-	StringToEnumColorMap = {{"C1", EColor::C1}, {"C2", EColor::C2}, {"C3", EColor::C3}};
-
-}
-
-// Gets the StringToEnumMaterialMap
-EMaterial AQualityComputer::GetStringToEnumMaterialMap(const FString& materialString) const
-{
-	auto it = StringToEnumMaterialMap.find(materialString);
-	if(it != StringToEnumMaterialMap.end())
-	{
-		return it->second;
-	}
-
-	return EMaterial::M1;
-
-}
-
-// Gets the StringToEnumSizeMap
-ESize AQualityComputer::GetStringToEnumSizeMap(const FString& sizeString) const
-{
-	auto it = StringToEnumSizeMap.find(sizeString);
-	if(it != StringToEnumSizeMap.end())
-	{
-		return it->second;
-	}
-
-	return ESize::S1;
-
-}
-
-// Gets the StringToEnumFormMap
-EForm AQualityComputer::GetStringToEnumFormMap(const FString& formString) const
-{
-	auto it = StringToEnumFormMap.find(formString);
-	if(it != StringToEnumFormMap.end())
-	{
-		return it->second;
-	}
-
-	return EForm::F1;
-
-}
-
-// Gets the StringToEnumColorMap
-EColor AQualityComputer::GetStringToEnumColorMap(const FString& colorString) const
-{
-	auto it = StringToEnumColorMap.find(colorString);
-	if(it != StringToEnumColorMap.end())
-	{
-		return it->second;
-	}
-
-	return EColor::C1;
 
 }
 
@@ -257,19 +177,19 @@ void AQualityComputer::ReadProductQuality(float productQuality)
 void AQualityComputer::GetMaterialCodeSetMaterialQuality(FString materialCode)
 {
 	// Gets Mx no Matter the size of the materialCode.
-	switch (GetStringToEnumMaterialMap(materialCode))
+	switch (UEProductProperties::ConverStringToEnumQuality(materialCode))
 	{
-	case EMaterial::M1:
+	case EPieceMaterial::QUALITY_LOW:
 		materialQuality = TEXT("M1 - Low Quality Material.");
 		productExpectedQuality = 40.0;
 		break;
 
-	case EMaterial::M2:
+	case EPieceMaterial::QUALITY_MEDIUM:
 		materialQuality = TEXT("M2 - Medium Quality Material.");
 		productExpectedQuality = 70.0;
 		break;
 
-	case EMaterial::M3:
+	case EPieceMaterial::QUALITY_HIGH:
 		materialQuality = TEXT("M3 - High Quality Material.");
 		productExpectedQuality = 100.0;
 		break;
@@ -283,17 +203,17 @@ void AQualityComputer::GetMaterialCodeSetMaterialQuality(FString materialCode)
 // Set product materialSize.
 void AQualityComputer::GetSizeCodeSetMaterialSize(FString sizeCode)
 {
-	switch (GetStringToEnumSizeMap(sizeCode))
+	switch (UEProductProperties::ConverStringToEnumSize(sizeCode))
 	{
-	case ESize::S1:
+	case EPieceSize::SIZE_SMALL:
 		materialSize = TEXT("S1 - Small Size Material.");
 		break;
 
-	case ESize::S2:
+	case EPieceSize::SIZE_MEDIUM:
 		materialSize = TEXT("S2 - Medium Size Material.");
 		break;
 
-	case ESize::S3:
+	case EPieceSize::SIZE_BIG:
 		materialSize = TEXT("S3 - Big Size Material.");
 		break;
 	
@@ -306,17 +226,17 @@ void AQualityComputer::GetSizeCodeSetMaterialSize(FString sizeCode)
 // Set product materialForm.
 void AQualityComputer::GetFormCodeSetMaterialForm(FString formCode)
 {
-	switch (GetStringToEnumFormMap(formCode))
+	switch (UEProductProperties::ConverStringToEnumForm(formCode))
 	{
-	case EForm::F1:
+	case EPieceForm::FORM_CONE:
 		materialForm = TEXT("F1 - Cone Form Product.");
 		break;
 
-	case EForm::F2:
+	case EPieceForm::FORM_CYLINDER:
 		materialForm = TEXT("F2 - Cylinder Form Product.");
 		break;
 
-	case EForm::F3:
+	case EPieceForm::FORM_TORUS:
 		materialForm = TEXT("F3 - Torus Form Product.");
 		break;
 	
@@ -329,17 +249,17 @@ void AQualityComputer::GetFormCodeSetMaterialForm(FString formCode)
 // Set product materialColor.
 void AQualityComputer::GetColorCodeSetMaterialColor(FString colorCode)
 {
-	switch (GetStringToEnumColorMap(colorCode))
+	switch (UEProductProperties::ConverStringToEnumColor(colorCode))
 	{
-	case EColor::C1:
+	case EPieceColor::COLOR_BLUE:
 		materialColor = TEXT("C1 - Blue Color Product.");
 		break;
 
-	case EColor::C2:
+	case EPieceColor::COLOR_RED:
 		materialColor = TEXT("C2 - Red Color Product.");
 		break;
 
-	case EColor::C3:
+	case EPieceColor::COLOR_GREEN:
 		materialColor = TEXT("C3 - Green Color Product.");
 		break;
 	
