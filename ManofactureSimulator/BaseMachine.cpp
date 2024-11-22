@@ -11,7 +11,7 @@
 #include "OilCanister.h"
 #include "BaseProduct.h"
 
-// Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
+/*/ Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
 std::map<FString, EProductMaterial> ABaseMachine::StringToEnumMaterialMap;
 
 // Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
@@ -24,7 +24,7 @@ std::map<FString, EProductLength> ABaseMachine::StringToEnumLengthMap;
 std::map<FString, EProductForm> ABaseMachine::StringToEnumFormMap;
 
 // Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EProductColor> ABaseMachine::StringToEnumColorMap;
+std::map<FString, EProductColor> ABaseMachine::StringToEnumColorMap;*/
 
 // Sets default values
 ABaseMachine::ABaseMachine()
@@ -56,10 +56,10 @@ ABaseMachine::ABaseMachine()
 	machineStatusLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Machine Status Light"));
 	machineStatusLight->SetupAttachment(machineMesh);
 
-	if(StringToEnumMaterialMap.empty() && StringToEnumSizeMap.empty() && StringToEnumFormMap.empty() && StringToEnumColorMap.empty())
+	/*if(StringToEnumMaterialMap.empty() && StringToEnumSizeMap.empty() && StringToEnumFormMap.empty() && StringToEnumColorMap.empty())
 	{
 		InitializeConversionMaps();
-	}
+	}*/
 
 }
 
@@ -95,7 +95,7 @@ void ABaseMachine::Tick(float DeltaTime)
 
 }
 
-///////////////////////////////////// MAP CONVERTION ////////////////////////////////
+/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
 // Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
 
 void ABaseMachine::InitializeConversionMaps()
@@ -175,7 +175,7 @@ EProductColor ABaseMachine::GetStringToEnumColorMap(const FString& colorString) 
 
 	return EProductColor::C1;
 
-}
+}*/
 
 ///////////////////////////////////// MACHINE SOUND PROPERTIES ////////////////////////////////
 // Section for all the machine sound properties.

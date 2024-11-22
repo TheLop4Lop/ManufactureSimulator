@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include <map>
 #include <string>
+#include "EProductProperties.h" // To get access to the enum.
 #include "BaseMachine.generated.h"
 
 DECLARE_DELEGATE_TwoParams(FActiveConveyor, FName, bool);
@@ -24,7 +25,7 @@ enum class EMachineStatus : uint8
 
 };
 
-UENUM(BlueprintType)
+/*UENUM(BlueprintType)
 enum class EProductMaterial : uint8 
 {
 	M1,
@@ -67,7 +68,7 @@ enum class EProductColor : uint8
 	C2,
 	C3
 
-};
+};*/
 
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseMachine : public AActor
@@ -122,7 +123,7 @@ public:
 	FActiveConveyor conveyorEvent;
 
 private:
-	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
+	/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
 	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
 
 	// Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
@@ -138,10 +139,10 @@ private:
 	static std::map<FString, EProductForm> StringToEnumFormMap;
 
 	// Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EProductColor> StringToEnumColorMap;
+	static std::map<FString, EProductColor> StringToEnumColorMap;*/
 
 protected:
-	///////////////////////////////////// MAP CONVERTION ////////////////////////////////
+	/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
 	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
 
 	// Initialize singlenton for all maps.
@@ -160,7 +161,7 @@ protected:
 	EProductForm GetStringToEnumFormMap(const FString& formString) const;
 
 	// Gets the StringToEnumColorMap
-	EProductColor GetStringToEnumColorMap(const FString& colorString) const;
+	EProductColor GetStringToEnumColorMap(const FString& colorString) const;*/
 
 	///////////////////////////////////// MACHINE PROPERTIES ////////////////////////////////
 	// Section for all the machine initial properties.

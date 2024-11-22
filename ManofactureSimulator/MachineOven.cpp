@@ -63,18 +63,18 @@ void AMachineOven::CheckEntranceForProduct()
 // Gets the cuttedProduct properties and proces production product code.
 void AMachineOven::ManageMolderedProductProperties(FString properties)
 {
-    switch (GetStringToEnumMaterialMap(properties.Left(2)))
+    switch (UEProductProperties::ConverStringToEnumQuality(properties.Left(2)))
     {
-    case EProductMaterial::M1:
-        paintedProductCode.Quality = EProductMaterial::M1;
+    case EPieceMaterial::QUALITY_LOW:
+        paintedProductCode.Quality = EPieceMaterial::QUALITY_LOW;
         timeByMaterial = timeByMaterialLow;
         break;
-	case EProductMaterial::M2:
-        paintedProductCode.Quality = EProductMaterial::M2;
+	case EPieceMaterial::QUALITY_MEDIUM:
+        paintedProductCode.Quality = EPieceMaterial::QUALITY_MEDIUM;
         timeByMaterial = timeByMaterialMidd;
         break;
-	case EProductMaterial::M3:
-        paintedProductCode.Quality = EProductMaterial::M3;
+	case EPieceMaterial::QUALITY_HIGH:
+        paintedProductCode.Quality = EPieceMaterial::QUALITY_HIGH;
         timeByMaterial = timeByMaterialHigh;
         break;
     
@@ -82,18 +82,18 @@ void AMachineOven::ManageMolderedProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumSizeMap(properties.Mid(2, 2)))
+	switch (UEProductProperties::ConverStringToEnumSize(properties.Mid(2, 2)))
     {
-    case EProductSize::S1:
-        paintedProductCode.Size = EProductSize::S1;
+    case EPieceSize::SIZE_SMALL:
+        paintedProductCode.Size = EPieceSize::SIZE_SMALL;
         timeBySize = timeBySizeLow;
         break;
-	case EProductSize::S2:
-        paintedProductCode.Size = EProductSize::S2;
+	case EPieceSize::SIZE_MEDIUM:
+        paintedProductCode.Size = EPieceSize::SIZE_MEDIUM;
         timeBySize = timeBySizeMidd;
         break;
-	case EProductSize::S3:
-        paintedProductCode.Size = EProductSize::S3;
+	case EPieceSize::SIZE_BIG:
+        paintedProductCode.Size = EPieceSize::SIZE_BIG;
         timeBySize = timeBySizeHigh;
         break;
     
@@ -101,18 +101,18 @@ void AMachineOven::ManageMolderedProductProperties(FString properties)
         break;
     }
 
-	switch (GetStringToEnumFormMap(properties.Mid(4, 2)))
+	switch (UEProductProperties::ConverStringToEnumForm(properties.Mid(4, 2)))
     {
-    case EProductForm::F1:
-        paintedProductCode.Form = EProductForm::F1;
+    case EPieceForm::FORM_CONE:
+        paintedProductCode.Form = EPieceForm::FORM_CONE;
         timeByForm = timeByFormF1;
         break;
-	case EProductForm::F2:
-        paintedProductCode.Form = EProductForm::F2;
+	case EPieceForm::FORM_CYLINDER:
+        paintedProductCode.Form = EPieceForm::FORM_CYLINDER;
         timeByForm = timeByFormF2;
         break;
-	case EProductForm::F3:
-        paintedProductCode.Form = EProductForm::F3;
+	case EPieceForm::FORM_TORUS:
+        paintedProductCode.Form = EPieceForm::FORM_TORUS;
         timeByForm = timeByFormF3;
         break;
 
@@ -120,18 +120,18 @@ void AMachineOven::ManageMolderedProductProperties(FString properties)
         break;
     }
 
-    switch (GetStringToEnumColorMap(properties.Right(2)))
+    switch (UEProductProperties::ConverStringToEnumColor(properties.Right(2)))
     {
-    case EProductColor::C1:
-        paintedProductCode.Color = EProductColor::C1;
+    case EPieceColor::COLOR_BLUE:
+        paintedProductCode.Color = EPieceColor::COLOR_BLUE;
         timeByColor = timeByColorC1;
         break;
-	case EProductColor::C2:
-        paintedProductCode.Color = EProductColor::C2;
+	case EPieceColor::COLOR_RED:
+        paintedProductCode.Color = EPieceColor::COLOR_RED;
         timeByColor = timeByColorC2;
         break;
-	case EProductColor::C3:
-        paintedProductCode.Color = EProductColor::C3;
+	case EPieceColor::COLOR_GREEN:
+        paintedProductCode.Color = EPieceColor::COLOR_GREEN;
         timeByColor = timeByColorC3;
         break;
 
