@@ -23,6 +23,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Sets the value of quiantity of Products produced.
+	void SetProductsProduced(int produced);
+
 private:
 	///////////////////////////////////// ACTOR PROPERTIES ////////////////////////////////
 	// Actor properties.
@@ -58,5 +61,11 @@ private:
 
 	// Holds reference for OvenMachine.
 	class AMachineOven* ovenMachine;
+
+	///////////////////////////////////// PRODUCTION PIECES ////////////////////////////////
+	// Production Screen for pieces properties.
+
+	// Holds value of pieces produced.
+	int piecesProduced;
 
 };

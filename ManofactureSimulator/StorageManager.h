@@ -61,6 +61,9 @@ public:
 	// Recieve a FString to convert into Enum. Returns False if not enough material or returns true othewise and trigger event for spawn product.
 	EStorageProductionStatus CanProduceProductOrder(FString Order, int quantity);
 
+	// Gets the quaintity of pieces produced stored in Final Storage.
+	int GetTotalAmountOfProducedProducts();
+
 protected:
 	///////////////////////////////////// STORAGE/SPAWNER REFERENCES ////////////////////////////////
 	// Section for Storages references

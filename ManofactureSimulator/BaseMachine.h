@@ -25,51 +25,6 @@ enum class EMachineStatus : uint8
 
 };
 
-/*UENUM(BlueprintType)
-enum class EProductMaterial : uint8 
-{
-	M1,
-	M2,
-	M3
-
-};
-
-UENUM(BlueprintType)
-enum class EProductSize : uint8
-{
-	S1,
-	S2,
-	S3
-
-};
-
-UENUM(BlueprintType)
-enum class EProductLength : uint8
-{
-	L1,
-	L2,
-	L3
-
-};
-
-UENUM(BlueprintType)
-enum class EProductForm : uint8
-{
-	F1,
-	F2,
-	F3
-
-};
-
-UENUM(BlueprintType)
-enum class EProductColor : uint8
-{
-	C1,
-	C2,
-	C3
-
-};*/
-
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseMachine : public AActor
 {
@@ -122,47 +77,7 @@ public:
 	// Delegate event for active or desable a single conveyor belt.
 	FActiveConveyor conveyorEvent;
 
-private:
-	/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
-	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
-
-	// Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EProductMaterial> StringToEnumMaterialMap;
-
-	// Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EProductSize> StringToEnumSizeMap;
-
-	// Static LENGTH map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EProductLength> StringToEnumLengthMap;
-
-	// Static FORM map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EProductForm> StringToEnumFormMap;
-
-	// Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-	static std::map<FString, EProductColor> StringToEnumColorMap;*/
-
 protected:
-	/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
-	// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
-
-	// Initialize singlenton for all maps.
-	static void InitializeConversionMaps();
-
-	// Gets the StringToEnumMaterialMap
-	EProductMaterial GetStringToEnumMaterialMap(const FString& materialString) const;
-
-	// Gets the StringToEnumSizeMap
-	EProductSize GetStringToEnumSizeMap(const FString& sizeString) const;
-
-	// Gets the StringToEnumLengthMap
-	EProductLength GetStringToEnumLengthMap(const FString& lengthString) const;
-
-	// Gets the StringToEnumFormMap
-	EProductForm GetStringToEnumFormMap(const FString& formString) const;
-
-	// Gets the StringToEnumColorMap
-	EProductColor GetStringToEnumColorMap(const FString& colorString) const;*/
-
 	///////////////////////////////////// MACHINE PROPERTIES ////////////////////////////////
 	// Section for all the machine initial properties.
 

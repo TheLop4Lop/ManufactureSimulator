@@ -67,7 +67,14 @@ void AProductionScreen::Tick(float DeltaTime)
 		screenWidget->SetPainterMachineColorStatus(painterMachine->GetMachineStatusColor());
 		screenWidget->SetOvenMachineColorStatus(ovenMachine->GetMachineStatusColor());
 
-		//screenWidget->SetPiecesProduced(testData);
+		screenWidget->SetPiecesProduced(piecesProduced);
 	}
+
+}
+
+// Sets the value of quiantity of Products produced.
+void AProductionScreen::SetProductsProduced(int produced)
+{
+	piecesProduced = produced;
 
 }

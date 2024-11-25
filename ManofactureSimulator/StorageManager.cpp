@@ -111,3 +111,15 @@ void AStorageManager::SpawnProductOrder()
 	}
 
 }
+
+// Gets the quaintity of pieces produced stored in Final Storage.
+int AStorageManager::GetTotalAmountOfProducedProducts()
+{
+	if(finalStorage)
+	{
+		return finalStorage->GetTotalOfProductsStored();
+	}
+
+	return 0;
+	
+}
