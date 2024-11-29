@@ -64,6 +64,9 @@ public:
 	// Gets the quaintity of pieces produced stored in Final Storage.
 	int GetTotalAmountOfProducedProducts();
 
+	// Called to ask for raw material.
+	void ReplenishRawMaterial(int quantity, FString rawMaterialCode);
+
 protected:
 	///////////////////////////////////// STORAGE/SPAWNER REFERENCES ////////////////////////////////
 	// Section for Storages references

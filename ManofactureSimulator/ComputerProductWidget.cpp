@@ -66,12 +66,12 @@ void UComputerProductWidget::SetOperationButtons()
 {
     if(increaseButton)
     {
-        increaseButton->OnClicked.AddDynamic(this, &UComputerProductWidget::SetIncreaseLogic);
+        increaseButton->OnReleased.AddDynamic(this, &UComputerProductWidget::SetIncreaseLogic);
     }
 
     if(decreaseButton)
     {
-        decreaseButton->OnClicked.AddDynamic(this, &UComputerProductWidget::SetDecreaseLogic);
+        decreaseButton->OnReleased.AddDynamic(this, &UComputerProductWidget::SetDecreaseLogic);
     }
 
     if(confirmButton)

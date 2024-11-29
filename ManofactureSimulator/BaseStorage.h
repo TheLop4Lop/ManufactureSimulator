@@ -71,6 +71,9 @@ public:
 	// Returns the Piece Map inventory.
 	const TMap<FInitialPieceAttribute, int>& GetInventory() const;
 
+	// Called to ask for raw material.
+	void ReplenishStorage(int quantity, FString rawMaterialCode);
+
 private:
 	///////////////////////////////////// STORAGE PIECE SETTINGS ////////////////////////////////
 	// Section for all inventory variables.

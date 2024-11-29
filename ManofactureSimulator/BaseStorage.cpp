@@ -14,13 +14,6 @@ ABaseStorage::ABaseStorage()
 void ABaseStorage::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	FInitialPieceAttribute testProduct;
-	testProduct.Quality = EPieceMaterial::QUALITY_LOW;
-	testProduct.Size = EPieceSize::SIZE_MEDIUM;
-	testProduct.Length = EPieceLenght::LENGTH_LARGE;
-
-	AddInitialPieceToMap(testProduct, 10);
 
 }
 
@@ -66,5 +59,22 @@ bool ABaseStorage::OrderIsInInventory(FInitialPieceAttribute order, int quantity
 const TMap<FInitialPieceAttribute, int>& ABaseStorage::GetInventory() const
 {
 	return initialPieceMap;
+
+}
+
+// Called to ask for raw material.
+void ABaseStorage::ReplenishStorage(int quantity, FString rawMaterialCode)
+{
+	UE_LOG(LogTemp, Display, TEXT("ORDER: %s, QUANTITY: %i"), *rawMaterialCode, quantity);
+	FInitialPieceAttribute orderedProduct;
+
+	orderedProduct.Quality = UEProductProperties::ConverStringToEnumQuality(rawMaterialCode.Left(2));
+	UE_LOG(LogTemp, Display, TEXT("ASKED QUALITY: %s"), *rawMaterialCode.Left(2));
+	orderedProduct.Size = UEProductProperties::ConverStringToEnumSize(rawMaterialCode.Mid(2, 2));
+	UE_LOG(LogTemp, Display, TEXT("ASKED SIZE: %s"), *rawMaterialCode.Mid(2, 2));
+	orderedProduct.Length = UEProductProperties::ConverStringToEnumLength(rawMaterialCode.Right(2));
+	UE_LOG(LogTemp, Display, TEXT("ASKED LENGTH: %s"), *rawMaterialCode.Right(2));
+
+	AddInitialPieceToMap(orderedProduct, quantity);
 
 }

@@ -59,7 +59,7 @@ EStorageProductionStatus AStorageManager::CanProduceProductOrder(FString Order, 
 
 	if (baseStorage->OrderIsInInventory(productToOrder, quantity) && (ordersToSpawn.Num() < maxProductOrder))
 	{
-		UE_LOG(LogTemp, Display, TEXT("ENOUGH FOR PRODUCT!"));
+		UE_LOG(LogTemp, Display, TEXT("ENOUGH FOR PRODUCT: %s"), *Order);
 		FProductQuantity productToSpawn(productToOrder, quantity);
 		ordersToSpawn.Add(productToSpawn);
 		baseStorage->DecreacePieceFromInventory(ordersToSpawn[0].codeProduct, quantity);
@@ -72,7 +72,7 @@ EStorageProductionStatus AStorageManager::CanProduceProductOrder(FString Order, 
 		return EStorageProductionStatus::FULL_PRODUCTION;
 	}
 
-	UE_LOG(LogTemp, Display, TEXT("NOT ENOUGH FOR PRODUCT!"));
+	UE_LOG(LogTemp, Display, TEXT("NOT ENOUGH FOR PRODUCT: %s"), *Order);
 	return EStorageProductionStatus::CANNOT_PRODUCE;
 
 }
@@ -122,4 +122,14 @@ int AStorageManager::GetTotalAmountOfProducedProducts()
 
 	return 0;
 	
+}
+
+// Called to ask for raw material.
+void AStorageManager::ReplenishRawMaterial(int quantity, FString rawMaterialCode)
+{
+	if(baseStorage)
+	{
+		baseStorage->ReplenishStorage(quantity, rawMaterialCode);
+	}
+
 }
