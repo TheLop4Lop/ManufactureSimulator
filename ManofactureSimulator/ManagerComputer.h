@@ -54,13 +54,16 @@ protected:
 	void GenerateOrdersForTheDay();
 
 	// Stores the selected index in computer to hold the ordeds for the day from the Generated Orders.
-	void StoreSelectedOrders(TArray<int> selectedOrders);
+	void StoreSelectedOrders(TArray<int> selectedOrders, int expected);
 
 	// Holds the generated orders for the day to selection.
 	TArray<struct FOrderSelection> gneratedOrders;
 
 	// Orders selected on Manager Suppler for orders fo the day.
 	TArray<FString> ordersByIndex;
+
+	// Holds the total amount of exppected earnings as a goal for money production.
+	int expectedEarnings;
 
 	///////////////////////////////////// GAMEPLAY MONEY LOGIC PROPERTIES ////////////////////////////////
 	// For the moment, this class holds the money interaction in game.

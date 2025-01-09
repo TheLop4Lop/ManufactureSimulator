@@ -67,14 +67,22 @@ void AProductionScreen::Tick(float DeltaTime)
 		screenWidget->SetPainterMachineColorStatus(painterMachine->GetMachineStatusColor());
 		screenWidget->SetOvenMachineColorStatus(ovenMachine->GetMachineStatusColor());
 
-		screenWidget->SetPiecesProduced(piecesProduced);
+		screenWidget->SetGoal(goalEarningToProduce);
+		screenWidget->SetCurrent(currentEarnigProduced);
 	}
 
 }
 
-// Sets the value of quiantity of Products produced.
-void AProductionScreen::SetProductsProduced(int produced)
+// Sets the earnigns goal of the day.
+void AProductionScreen::SetEarningsGoal(int produced)
 {
-	piecesProduced = produced;
+	goalEarningToProduce = produced;
+
+}
+
+// Sets current earnigns produced.
+void AProductionScreen::SetCurrentEarnings(int currentEarings)
+{
+	currentEarnigProduced = currentEarings;
 
 }

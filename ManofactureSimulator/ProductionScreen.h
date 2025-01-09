@@ -23,8 +23,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Sets the value of quiantity of Products produced.
-	void SetProductsProduced(int produced);
+	// Sets the earnigns goal of the day.
+	void SetEarningsGoal(int earningGoals);
+
+	// Sets current earnigns produced.
+	void SetCurrentEarnings(int currentEarings);
 
 private:
 	///////////////////////////////////// ACTOR PROPERTIES ////////////////////////////////
@@ -65,7 +68,10 @@ private:
 	///////////////////////////////////// PRODUCTION PIECES ////////////////////////////////
 	// Production Screen for pieces properties.
 
-	// Holds value of pieces produced.
-	int piecesProduced;
+	// Holds the value of Goal earnigns to widget display.
+	int goalEarningToProduce;
+
+	// Holds the value of current earnign for widget display.
+	int currentEarnigProduced;
 
 };

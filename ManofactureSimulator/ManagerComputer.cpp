@@ -57,7 +57,9 @@ void AManagerComputer::Tick(float DeltaTime)
 
     if(storageManager && productionScreen)
     {
-        productionScreen->SetProductsProduced(storageManager->GetTotalAmountOfProducedProducts());
+        productionScreen->SetEarningsGoal(expectedEarnings);
+        productionScreen->SetCurrentEarnings(expectedEarnings);
+        //storageManager->GetTotalAmountOfProducedProducts()
     }
 
     if(computerWidget)
@@ -220,9 +222,9 @@ void AManagerComputer::GenerateOrdersForTheDay()
 }
 
 // Stores the selected index in computer to hold the ordeds for the day from the Generated Orders.
-void AManagerComputer::StoreSelectedOrders(TArray<int> selectedOrders)
+void AManagerComputer::StoreSelectedOrders(TArray<int> selectedOrders, int expected)
 {
-    UE_LOG(LogTemp, Display, TEXT("STORING IN MEMORY..."));
+    expectedEarnings = expected;
 
     for(int i = 0; i < selectedOrders.Num(); i ++)
     {

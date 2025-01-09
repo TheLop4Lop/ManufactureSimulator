@@ -271,7 +271,7 @@ void UManagerSupplierWidget::SetAcceptButtonLogic()
                 UE_LOG(LogTemp, Display, TEXT("Selection Array: %i"), idexSelected[i]);
             }
 
-            ordersSelectedDelegate.ExecuteIfBound(idexSelected);
+            ordersSelectedDelegate.ExecuteIfBound(idexSelected, int(totalEarnings));
         }else
         {
             selectionLight->SetColorAndOpacity(FColor::Red);

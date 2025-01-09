@@ -6,7 +6,7 @@
 #include "ComputerProductWidget.h"
 #include "ManagerSupplierWidget.generated.h"
 
-DECLARE_DELEGATE_OneParam(FSelectionOrders, TArray<int>);
+DECLARE_DELEGATE_TwoParams(FSelectionOrders, TArray<int>, int);
 
 USTRUCT(BlueprintType)
 struct FOrderSelection
@@ -294,6 +294,10 @@ protected:
 	// Accept the orders for the day.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* acceptSelectedOrders;
+
+	// Holds the value of total estimated earnings.
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	float totalEarnings;
 
 	// Holds the value of total estimated earnings.
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess))
