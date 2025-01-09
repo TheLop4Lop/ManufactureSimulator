@@ -72,5 +72,8 @@ public:
 
 	// Retrieves a string and convert it into a EPieceColor enum.
 	static EPieceColor ConverStringToEnumColor(FString color);
+
+	///////////////////////////////////// CONVERT TO ENUMS ////////////////////////////////
+	// Methods for convert FString to enum.
 	
 };
