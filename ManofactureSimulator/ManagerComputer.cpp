@@ -58,8 +58,7 @@ void AManagerComputer::Tick(float DeltaTime)
     if(storageManager && productionScreen)
     {
         productionScreen->SetEarningsGoal(expectedEarnings);
-        productionScreen->SetCurrentEarnings(expectedEarnings);
-        //storageManager->GetTotalAmountOfProducedProducts()
+        productionScreen->SetCurrentEarnings(currentEarnings);
     }
 
     if(computerWidget)
@@ -112,6 +111,121 @@ void AManagerComputer::ReplenishRawMaterialInStorage(FString rawMaterialCode, in
 
 }
 
+///////////////////////////////////// PRODUCTION COST PROPERTIES ////////////////////////////////
+// Section for the piece production cost and product final cost.
+
+// Calculates the value of material by FString.
+float AManagerComputer::CalculateMaterialProductionCostByString(FString materialCode)
+{
+    float materialCost;
+    switch (UEProductProperties::ConverStringToEnumQuality(materialCode))
+    {
+    case EPieceMaterial::QUALITY_LOW:
+        materialCost = (lowQualityCost * sellPercent);
+        break;
+    
+    case EPieceMaterial::QUALITY_MEDIUM:
+        materialCost = (lowQualityCost * sellPercent);
+        break;
+
+    case EPieceMaterial::QUALITY_HIGH:
+        materialCost = (lowQualityCost * sellPercent);
+        break;
+
+    default:
+        break;
+    }
+
+    return materialCost;
+
+}
+
+// Calculates the value of size by FString.
+float AManagerComputer::CalculateSizeProductionCostByString(FString sizeCode)
+{
+    float sizeCost;
+    switch (UEProductProperties::ConverStringToEnumSize(sizeCode))
+    {
+    case EPieceSize::SIZE_SMALL:
+        sizeCost = (smallSizeCost * sellPercent);
+        break;
+    
+    case EPieceSize::SIZE_MEDIUM:
+        sizeCost = (middSizeCost * sellPercent);
+        break;
+
+    case EPieceSize::SIZE_BIG:
+        sizeCost = (bigSizeCost * sellPercent);
+        break;
+
+    default:
+        break;
+    }
+
+    return sizeCost;
+    
+}
+
+// Calculates the value of shape by FString.
+float AManagerComputer::CalculateFormProductionCostByString(FString formCode)
+{
+    float shapeCost;
+    switch (UEProductProperties::ConverStringToEnumForm(formCode))
+    {
+    case EPieceForm::FORM_CONE:
+        shapeCost = (f1Cost * sellPercent);
+        break;
+    
+    case EPieceForm::FORM_CYLINDER:
+        shapeCost = (f2Cost * sellPercent);
+        break;
+
+    case EPieceForm::FORM_TORUS:
+        shapeCost = (f3Cost * sellPercent);
+        break;
+
+    default:
+        break;
+    }
+
+    return shapeCost;
+    
+}
+
+// Calculates the value of color by FString.
+float AManagerComputer::CalculateColorProductionCostByString(FString colorCode)
+{
+    float colorCost;
+    switch (UEProductProperties::ConverStringToEnumColor(colorCode))
+    {
+    case EPieceColor::COLOR_BLUE:
+        colorCost = (c1Cost * sellPercent);
+        break;
+    
+    case EPieceColor::COLOR_RED:
+        colorCost = (c2Cost * sellPercent);
+        break;
+
+    case EPieceColor::COLOR_GREEN:
+        colorCost = (c3Cost * sellPercent);
+        break;
+
+    default:
+        break;
+    }
+
+    return colorCost;
+    
+}
+
+// Updates the current earnings produced to dislay,
+void AManagerComputer::UpdateCurrentEarnings(FString productCode)
+{
+    currentEarnings += CalculateMaterialProductionCostByString("") + CalculateSizeProductionCostByString("") + 
+                            CalculateFormProductionCostByString("") + CalculateColorProductionCostByString("");
+
+}
+
 ///////////////////////////////////// CUSTOMER PROPERTIES ////////////////////////////////
 // Sections for customer code petitions properties. FOR THE MOMENT THIS CLASS ACTS LIKE THE COSTUMERS.
 
@@ -128,17 +242,17 @@ void AManagerComputer::GenerateOrdersForTheDay()
         {
         case 1:
             orderToSelect = "M1";
-            earnings = (15.0f * sellPercent);
+            earnings = (lowQualityCost * sellPercent);
             break;
 
         case 2:
             orderToSelect = "M2";
-            earnings = (20.0f * sellPercent);
+            earnings = (middQualityCost * sellPercent);
             break;
 
         case 3:
             orderToSelect = "M3";
-            earnings = (15.0f * sellPercent);
+            earnings = (highQualityCost * sellPercent);
             break;
         
         default:
@@ -150,17 +264,17 @@ void AManagerComputer::GenerateOrdersForTheDay()
         {
         case 1:
             orderToSelect += "S1";
-            earnings += (15.0f * sellPercent);
+            earnings += (smallSizeCost * sellPercent);
             break;
 
         case 2:
             orderToSelect += "S2";
-            earnings += (20.0f * sellPercent);
+            earnings += (middSizeCost * sellPercent);
             break;
 
         case 3:
             orderToSelect += "S3";
-            earnings += (25.0f * sellPercent);
+            earnings += (bigSizeCost * sellPercent);
             break;
         
         default:
@@ -172,17 +286,17 @@ void AManagerComputer::GenerateOrdersForTheDay()
         {
         case 1:
             orderToSelect += "F1";
-            earnings += (15.0f * sellPercent);
+            earnings += (f1Cost * sellPercent);
             break;
 
         case 2:
             orderToSelect += "F2";
-            earnings += (20.0f * sellPercent);
+            earnings += (f2Cost * sellPercent);
             break;
 
         case 3:
             orderToSelect += "F3";
-            earnings += (25.0f * sellPercent);
+            earnings += (f3Cost * sellPercent);
             break;
         
         default:
@@ -194,17 +308,17 @@ void AManagerComputer::GenerateOrdersForTheDay()
         {
         case 1:
             orderToSelect += "C1";
-            earnings += (15.0f * sellPercent);
+            earnings += (c1Cost * sellPercent);
             break;
 
         case 2:
             orderToSelect += "C2";
-            earnings += (20.0f * sellPercent);
+            earnings += (c2Cost * sellPercent);
             break;
 
         case 3:
             orderToSelect += "C3";
-            earnings += (25.0f * sellPercent);
+            earnings += (c3Cost * sellPercent);
             break;
         
         default:
