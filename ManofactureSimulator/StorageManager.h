@@ -7,6 +7,8 @@
 #include "BaseStorage.h" // To access Enums and Struct
 #include "StorageManager.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOrderStored, FString)
+
 UENUM(BlueprintType)
 enum class EStorageProductionStatus : uint8
 {
@@ -58,6 +60,9 @@ public:
 	// Delegate event to Spawn order.
 	FOnOrderProcessed orderToProcess;
 
+	// Delegate that execute an orders stored to be counted on Manager Computer for sell.
+	FOrderStored orderStored;
+
 	// Recieve a FString to convert into Enum. Returns False if not enough material or returns true othewise and trigger event for spawn product.
 	EStorageProductionStatus CanProduceProductOrder(FString Order, int quantity);
 
@@ -66,6 +71,9 @@ public:
 
 	// Called to ask for raw material.
 	void ReplenishRawMaterial(int quantity, FString rawMaterialCode);
+
+	// Gets the orders of the day for production follow up.
+	void GetOrdersOfTheDay(TArray<FString> ordersSelectedDay);
 
 protected:
 	///////////////////////////////////// STORAGE/SPAWNER REFERENCES ////////////////////////////////
@@ -97,5 +105,14 @@ protected:
 
 	// Spawn product.
 	void SpawnProductOrder();
+
+	///////////////////////////////////// PRODUCT QUANTITY MANAGER ////////////////////////////////
+	// Section manages the order quantity the player can make.
+
+	// Holds the order of the day selected by player. I will compare a product on Final Store for processing or for storage.
+	TArray<FString> ordersOfTheDay;
+
+	// Called to check order in Final Storage to sell on Manager Computer.
+	void CheckOrderInOrdersOfTheDay(FString storedOrder);
 
 };

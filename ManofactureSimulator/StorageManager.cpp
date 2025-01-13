@@ -30,6 +30,8 @@ void AStorageManager::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFinalStorage::StaticClass(), actorsInWorld);
 	if (actorsInWorld.IsValidIndex(0)) finalStorage = Cast<AFinalStorage>(actorsInWorld[0]);
 
+	if(finalStorage) finalStorage->pieceInStorage.BindUObject(this, &AStorageManager::CheckOrderInOrdersOfTheDay);
+
 	actorsInWorld.Empty();
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APieceSpawner::StaticClass(), actorsInWorld);
@@ -130,6 +132,34 @@ void AStorageManager::ReplenishRawMaterial(int quantity, FString rawMaterialCode
 	if(baseStorage)
 	{
 		baseStorage->ReplenishStorage(quantity, rawMaterialCode);
+	}
+
+}
+
+///////////////////////////////////// PRODUCT QUANTITY MANAGER ////////////////////////////////
+// Section manages the order quantity the player can make.
+
+// Gets the orders of the day for production follow up.
+void AStorageManager::GetOrdersOfTheDay(TArray<FString> ordersSelectedDay)
+{
+	for(int i = 0; i < ordersSelectedDay.Num(); i++)
+	{
+		ordersOfTheDay.Add(ordersSelectedDay[i]);
+	}
+
+}
+
+// Called to check order in Final Storage to sell on Manager Computer.
+void AStorageManager::CheckOrderInOrdersOfTheDay(FString storedOrder)
+{
+	UE_LOG(LogTemp, Display, TEXT("CHECKING ORDER WITH OOTD..."));
+	for(FString singleOrder : ordersOfTheDay)
+	{
+		if(singleOrder.Equals(storedOrder))
+		{
+			UE_LOG(LogTemp, Display, TEXT("CHECKED!"));
+			orderStored.ExecuteIfBound(storedOrder);
+		}
 	}
 
 }

@@ -24,6 +24,8 @@ void AManagerComputer::BeginPlay()
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStorageManager::StaticClass(), actorInWorld);
     if(actorInWorld.IsValidIndex(0)) storageManager = Cast<AStorageManager>(actorInWorld[0]);
 
+    if(storageManager) storageManager->orderStored.BindUObject(this, &AManagerComputer::UpdateCurrentEarnings);
+
     actorInWorld.Empty();
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProductionScreen::StaticClass(), actorInWorld);
     if(actorInWorld.IsValidIndex(0)) productionScreen = Cast<AProductionScreen>(actorInWorld[0]);
@@ -46,8 +48,6 @@ void AManagerComputer::BeginPlay()
     }
 
     GenerateOrdersForTheDay(); // Generates random orders.
-    UE_LOG(LogTemp, Display, TEXT("%s"), *gneratedOrders[0].selectionOrder);
-    UE_LOG(LogTemp, Display, TEXT("%i"), gneratedOrders[0].orderQuantity);
 
 }
 
@@ -117,7 +117,7 @@ void AManagerComputer::ReplenishRawMaterialInStorage(FString rawMaterialCode, in
 // Calculates the value of material by FString.
 float AManagerComputer::CalculateMaterialProductionCostByString(FString materialCode)
 {
-    float materialCost;
+    float materialCost = 0.0f;
     switch (UEProductProperties::ConverStringToEnumQuality(materialCode))
     {
     case EPieceMaterial::QUALITY_LOW:
@@ -143,7 +143,7 @@ float AManagerComputer::CalculateMaterialProductionCostByString(FString material
 // Calculates the value of size by FString.
 float AManagerComputer::CalculateSizeProductionCostByString(FString sizeCode)
 {
-    float sizeCost;
+    float sizeCost = 0.0f;
     switch (UEProductProperties::ConverStringToEnumSize(sizeCode))
     {
     case EPieceSize::SIZE_SMALL:
@@ -169,7 +169,7 @@ float AManagerComputer::CalculateSizeProductionCostByString(FString sizeCode)
 // Calculates the value of shape by FString.
 float AManagerComputer::CalculateFormProductionCostByString(FString formCode)
 {
-    float shapeCost;
+    float shapeCost = 0.0f;
     switch (UEProductProperties::ConverStringToEnumForm(formCode))
     {
     case EPieceForm::FORM_CONE:
@@ -195,7 +195,7 @@ float AManagerComputer::CalculateFormProductionCostByString(FString formCode)
 // Calculates the value of color by FString.
 float AManagerComputer::CalculateColorProductionCostByString(FString colorCode)
 {
-    float colorCost;
+    float colorCost = 0.0f;
     switch (UEProductProperties::ConverStringToEnumColor(colorCode))
     {
     case EPieceColor::COLOR_BLUE:
@@ -221,9 +221,22 @@ float AManagerComputer::CalculateColorProductionCostByString(FString colorCode)
 // Updates the current earnings produced to dislay,
 void AManagerComputer::UpdateCurrentEarnings(FString productCode)
 {
-    currentEarnings += CalculateMaterialProductionCostByString("") + CalculateSizeProductionCostByString("") + 
-                            CalculateFormProductionCostByString("") + CalculateColorProductionCostByString("");
+    UE_LOG(LogTemp, Display, TEXT("STORED CODE: %s"), *productCode);
+    UE_LOG(LogTemp, Display, TEXT("STORED MATERIAL CODE: %s"), *productCode.Left(2));
+    UE_LOG(LogTemp, Display, TEXT("STORED SIZE CODE: %s"), *productCode.Mid(2, 2));
+    UE_LOG(LogTemp, Display, TEXT("STORED FORM CODE: %s"), *productCode.Mid(4, 2));
+    UE_LOG(LogTemp, Display, TEXT("STORED COLOR CODE: %s"), *productCode.Right(2));
 
+    UE_LOG(LogTemp, Display, TEXT("STORED MATERIAL COST: %f"), CalculateMaterialProductionCostByString(productCode.Left(2)));
+    UE_LOG(LogTemp, Display, TEXT("STORED SIZE COST: %f"), CalculateSizeProductionCostByString(productCode.Mid(2, 2)));
+    UE_LOG(LogTemp, Display, TEXT("STORED FORM COST: %f"), CalculateFormProductionCostByString(productCode.Mid(4, 2)));
+    UE_LOG(LogTemp, Display, TEXT("STORED COLOR COST: %f"), CalculateColorProductionCostByString(productCode.Right(2)));
+
+    currentEarnings += CalculateMaterialProductionCostByString(productCode.Left(2)) + CalculateSizeProductionCostByString(productCode.Mid(2, 2)) + 
+                            CalculateFormProductionCostByString(productCode.Mid(4, 2)) + CalculateColorProductionCostByString(productCode.Right(2));
+
+    currentMoney += currentEarnings;
+    
 }
 
 ///////////////////////////////////// CUSTOMER PROPERTIES ////////////////////////////////
@@ -236,7 +249,7 @@ void AManagerComputer::GenerateOrdersForTheDay()
     {
         int randomIndex = (int)FMath::RandRange(1, 3);
         FString orderToSelect;
-        float earnings;
+        float earnings = 0.0f;
 
         switch (randomIndex)
         {
@@ -339,13 +352,18 @@ void AManagerComputer::GenerateOrdersForTheDay()
 void AManagerComputer::StoreSelectedOrders(TArray<int> selectedOrders, int expected)
 {
     expectedEarnings = expected;
-
     for(int i = 0; i < selectedOrders.Num(); i ++)
     {
-        FString order = FString::FromInt(gneratedOrders[selectedOrders[i]].orderQuantity) + " X " 
-                            + gneratedOrders[selectedOrders[i]].selectionOrder;
-
+        //FString order = FString::FromInt(gneratedOrders[selectedOrders[i]].orderQuantity) + " X " 
+        //                    + gneratedOrders[selectedOrders[i]].selectionOrder;
+        FString order = gneratedOrders[selectedOrders[i]].selectionOrder;
+        UE_LOG(LogTemp, Display, TEXT("ORDER SELECTED: %s"), *order);
         ordersByIndex.Add(order);
+    }
+
+    if(storageManager)
+    {
+        storageManager->GetOrdersOfTheDay(ordersByIndex);
     }
 
 }
