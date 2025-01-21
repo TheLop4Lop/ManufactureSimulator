@@ -8,13 +8,16 @@
 #include "StorageManager.generated.h"
 
 DECLARE_DELEGATE_OneParam(FOrderStored, FString)
+DECLARE_DELEGATE_OneParam(FOrderOfTheDayStatusOnStock, TArray<FOrderInfo>)
 
 UENUM(BlueprintType)
 enum class EStorageProductionStatus : uint8
 {
 	CAN_PRODUCE,
 	CANNOT_PRODUCE,
-	FULL_PRODUCTION
+	FULL_PRODUCTION,
+	NO_PRODUCT_STOCKED
+	
 };
 
 USTRUCT(BlueprintType)
@@ -35,6 +38,51 @@ struct FProductQuantity
 	FProductQuantity(FInitialPieceAttribute InCode, int InQuantity)
         : codeProduct(InCode), quantity(InQuantity)
     {}
+
+};
+
+USTRUCT(BlueprintType)
+struct FOrdersForProduction
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int orderForProductionQuantity = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString orderForProductionCode;
+
+};
+
+USTRUCT(BlueprintType)
+struct FOrdersInLengthMaterial
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int l1Quantity = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int l2Quantity = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int l3Quantity = 0;
+
+};
+
+USTRUCT(BlueprintType)
+struct FOrderInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EStorageProductionStatus orderStatusInfoEnum;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FOrdersInLengthMaterial orderLenghtsInfo;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int totalAmountOfPieceFromStock = 0;
 
 };
 
@@ -63,6 +111,9 @@ public:
 	// Delegate that execute an orders stored to be counted on Manager Computer for sell.
 	FOrderStored orderStored;
 
+	// Delegate for passing on the Status on Orders of the day for player interpretation.
+	FOrderOfTheDayStatusOnStock statusOnStock;
+
 	// Recieve a FString to convert into Enum. Returns False if not enough material or returns true othewise and trigger event for spawn product.
 	EStorageProductionStatus CanProduceProductOrder(FString Order, int quantity);
 
@@ -73,7 +124,7 @@ public:
 	void ReplenishRawMaterial(int quantity, FString rawMaterialCode);
 
 	// Gets the orders of the day for production follow up.
-	void GetOrdersOfTheDay(TArray<FString> ordersSelectedDay);
+	void GetOrdersOfTheDay(TArray<FOrdersForProduction> ordersSelectedDay);
 
 protected:
 	///////////////////////////////////// STORAGE/SPAWNER REFERENCES ////////////////////////////////
@@ -110,9 +161,17 @@ protected:
 	// Section manages the order quantity the player can make.
 
 	// Holds the order of the day selected by player. I will compare a product on Final Store for processing or for storage.
-	TArray<FString> ordersOfTheDay;
+	TArray<FOrdersForProduction> ordersOfTheDay;
+
+	// Holds the specification of order quantity, Lenght pieces and status in stock for each order fo the day.
+	TArray<FOrderInfo> ordersOfTheDayInfo;
 
 	// Called to check order in Final Storage to sell on Manager Computer.
 	void CheckOrderInOrdersOfTheDay(FString storedOrder);
+
+	// With the Order of the Day check in stock if has the necessary materials for production.
+	FOrdersInLengthMaterial ConvertQuantityProductionOrderToStock(int orderQuantityOnStock);
+
+	void SetOrderInfo(FOrdersInLengthMaterial orderQuantityAsked, FOrderInfo* orderInfo, FString productionCode, FString lengthCode);
 
 };

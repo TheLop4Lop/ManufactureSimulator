@@ -42,6 +42,19 @@ struct FInitialPieceAttribute
 
 };
 
+USTRUCT(BlueprintType)
+struct FStock
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool orderInStock;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int orderStockQuantity;
+
+};
+
 UCLASS()
 class MANOFACTURESIMULATOR_API ABaseStorage : public AActor
 {
@@ -66,13 +79,16 @@ public:
 	void DecreacePieceFromInventory(FInitialPieceAttribute pieceCode, int quantity);
 
 	// Checks in the Initial Piece inventory the order that needs to be ordered.
-	bool OrderIsInInventory(FInitialPieceAttribute order, int quantity);
+	FStock GetStockOrders(FInitialPieceAttribute order);
 
 	// Returns the Piece Map inventory.
 	const TMap<FInitialPieceAttribute, int>& GetInventory() const;
 
 	// Called to ask for raw material.
 	void ReplenishStorage(int quantity, FString rawMaterialCode);
+
+	// Randomice and store initial pieces to stock on Base Storage.
+	void GenerateRandomStock();
 
 private:
 	///////////////////////////////////// STORAGE PIECE SETTINGS ////////////////////////////////

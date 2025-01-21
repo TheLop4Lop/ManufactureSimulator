@@ -24,7 +24,11 @@ void AManagerComputer::BeginPlay()
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStorageManager::StaticClass(), actorInWorld);
     if(actorInWorld.IsValidIndex(0)) storageManager = Cast<AStorageManager>(actorInWorld[0]);
 
-    if(storageManager) storageManager->orderStored.BindUObject(this, &AManagerComputer::UpdateCurrentEarnings);
+    if(storageManager)
+    {
+        storageManager->orderStored.BindUObject(this, &AManagerComputer::UpdateCurrentEarnings);
+        storageManager->statusOnStock.BindUObject(this, &AManagerComputer::UpdateOrdersDataOnStock);
+    }
 
     actorInWorld.Empty();
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProductionScreen::StaticClass(), actorInWorld);
@@ -222,21 +226,28 @@ float AManagerComputer::CalculateColorProductionCostByString(FString colorCode)
 void AManagerComputer::UpdateCurrentEarnings(FString productCode)
 {
     UE_LOG(LogTemp, Display, TEXT("STORED CODE: %s"), *productCode);
-    UE_LOG(LogTemp, Display, TEXT("STORED MATERIAL CODE: %s"), *productCode.Left(2));
-    UE_LOG(LogTemp, Display, TEXT("STORED SIZE CODE: %s"), *productCode.Mid(2, 2));
-    UE_LOG(LogTemp, Display, TEXT("STORED FORM CODE: %s"), *productCode.Mid(4, 2));
-    UE_LOG(LogTemp, Display, TEXT("STORED COLOR CODE: %s"), *productCode.Right(2));
 
     UE_LOG(LogTemp, Display, TEXT("STORED MATERIAL COST: %f"), CalculateMaterialProductionCostByString(productCode.Left(2)));
     UE_LOG(LogTemp, Display, TEXT("STORED SIZE COST: %f"), CalculateSizeProductionCostByString(productCode.Mid(2, 2)));
     UE_LOG(LogTemp, Display, TEXT("STORED FORM COST: %f"), CalculateFormProductionCostByString(productCode.Mid(4, 2)));
     UE_LOG(LogTemp, Display, TEXT("STORED COLOR COST: %f"), CalculateColorProductionCostByString(productCode.Right(2)));
 
-    currentEarnings += CalculateMaterialProductionCostByString(productCode.Left(2)) + CalculateSizeProductionCostByString(productCode.Mid(2, 2)) + 
-                            CalculateFormProductionCostByString(productCode.Mid(4, 2)) + CalculateColorProductionCostByString(productCode.Right(2));
+    currentEarnings += (int)(CalculateMaterialProductionCostByString(productCode.Left(2)) + CalculateSizeProductionCostByString(productCode.Mid(2, 2)) + 
+                            CalculateFormProductionCostByString(productCode.Mid(4, 2)) + CalculateColorProductionCostByString(productCode.Right(2)));
 
-    currentMoney += currentEarnings;
+    currentMoney += (float)currentEarnings;
     
+}
+
+// Updates the data on Stock.
+void AManagerComputer::UpdateOrdersDataOnStock(TArray<FOrderInfo> updatedStockStatus)
+{
+    for(int i = 0 ; i < updatedStockStatus.Num(); i++)
+    {
+        UE_LOG(LogTemp, Display, TEXT("Index: %i, L1: %i, L2: %i, L3: %i. Total Quantity to Produce: %i"), i, updatedStockStatus[i].orderLenghtsInfo.l1Quantity, 
+                                        updatedStockStatus[i].orderLenghtsInfo.l2Quantity, updatedStockStatus[i].orderLenghtsInfo.l3Quantity, updatedStockStatus[i].totalAmountOfPieceFromStock);
+    }
+
 }
 
 ///////////////////////////////////// CUSTOMER PROPERTIES ////////////////////////////////
@@ -351,19 +362,26 @@ void AManagerComputer::GenerateOrdersForTheDay()
 // Stores the selected index in computer to hold the ordeds for the day from the Generated Orders.
 void AManagerComputer::StoreSelectedOrders(TArray<int> selectedOrders, int expected)
 {
+    TArray<FOrdersForProduction> ordersForDayProduction;
     expectedEarnings = expected;
+
     for(int i = 0; i < selectedOrders.Num(); i ++)
     {
-        //FString order = FString::FromInt(gneratedOrders[selectedOrders[i]].orderQuantity) + " X " 
-        //                    + gneratedOrders[selectedOrders[i]].selectionOrder;
-        FString order = gneratedOrders[selectedOrders[i]].selectionOrder;
-        UE_LOG(LogTemp, Display, TEXT("ORDER SELECTED: %s"), *order);
+        FString order = FString::FromInt(gneratedOrders[selectedOrders[i]].orderQuantity) + " X " 
+                            + gneratedOrders[selectedOrders[i]].selectionOrder;
+
         ordersByIndex.Add(order);
+        
+        FOrdersForProduction orderSelected;
+        orderSelected.orderForProductionQuantity = gneratedOrders[selectedOrders[i]].orderQuantity;
+        orderSelected.orderForProductionCode = gneratedOrders[selectedOrders[i]].selectionOrder;
+
+        ordersForDayProduction.Add(orderSelected);
     }
 
     if(storageManager)
     {
-        storageManager->GetOrdersOfTheDay(ordersByIndex);
+        storageManager->GetOrdersOfTheDay(ordersForDayProduction);
     }
 
 }

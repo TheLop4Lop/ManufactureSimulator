@@ -6,6 +6,8 @@
 #include "BaseComputer.h"
 #include "ManagerComputer.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOFTD, TArray<FString>)
+
 /**
  * 
  */
@@ -24,6 +26,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Delegate to pass on the orders to the character.
+	FOFTD ordersForMonitor;
 
 	// Adds widget and assign the player controller to it.
 	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);
@@ -124,6 +129,9 @@ protected:
 
 	// Updates the current earnings produced to dislay,
 	void UpdateCurrentEarnings(FString productCode);
+
+	// Updates the data on Stock.
+	void UpdateOrdersDataOnStock(TArray<struct FOrderInfo> updatedStockStatus);
 	
 	///////////////////////////////////// CUSTOMER PROPERTIES ////////////////////////////////
 	// Sections for customer code petitions properties. FOR THE MOMENT THIS CLASS ACTS LIKE THE COSTUMERS.
