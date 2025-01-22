@@ -242,11 +242,37 @@ void AManagerComputer::UpdateCurrentEarnings(FString productCode)
 // Updates the data on Stock.
 void AManagerComputer::UpdateOrdersDataOnStock(TArray<FOrderInfo> updatedStockStatus)
 {
+    TArray<FOrderOTD> ordersStatus;
     for(int i = 0 ; i < updatedStockStatus.Num(); i++)
     {
-        UE_LOG(LogTemp, Display, TEXT("Index: %i, L1: %i, L2: %i, L3: %i. Total Quantity to Produce: %i"), i, updatedStockStatus[i].orderLenghtsInfo.l1Quantity, 
-                                        updatedStockStatus[i].orderLenghtsInfo.l2Quantity, updatedStockStatus[i].orderLenghtsInfo.l3Quantity, updatedStockStatus[i].totalAmountOfPieceFromStock);
+        FOrderOTD singleOrder;
+        switch (updatedStockStatus[i].orderStatusInfoEnum)
+        {
+        case EStorageProductionStatus::CAN_PRODUCE:
+            singleOrder.orderColorStatus = FColor::FromHex("094A0BFF"); // Green color, selected from UEditor.
+            break;
+        
+        case EStorageProductionStatus::CANNOT_PRODUCE:
+            singleOrder.orderColorStatus = FColor::FromHex("716E03FF"); // Yellow color, selected from UEditor.
+            break;
+
+        case EStorageProductionStatus::NO_PRODUCT_STOCKED:
+            singleOrder.orderColorStatus = FColor::FromHex("63110DFF"); // Red color, selected from UEditor.
+            break;
+
+        default:
+            break;
+        }
+
+        singleOrder.lxProperties[0] = updatedStockStatus[i].orderLenghtsInfo.l1Quantity;
+        singleOrder.lxProperties[1] = updatedStockStatus[i].orderLenghtsInfo.l2Quantity;
+        singleOrder.lxProperties[2] = updatedStockStatus[i].orderLenghtsInfo.l3Quantity;
+
+        singleOrder.canProduceByStock = updatedStockStatus[i].totalAmountOfPieceFromStock;
+
+        ordersStatus.Add(singleOrder);
     }
+    ordersForMonitor.ExecuteIfBound(ordersByIndex, ordersStatus);
 
 }
 

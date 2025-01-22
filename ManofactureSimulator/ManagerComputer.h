@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "BaseComputer.h"
+#include "MonitorComputerWidget.h" // For Struct.
 #include "ManagerComputer.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOFTD, TArray<FString>)
+DECLARE_DELEGATE_TwoParams(FOFTDStatus, TArray<FString>, TArray<FOrderOTD>)
 
 /**
  * 
@@ -28,7 +29,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Delegate to pass on the orders to the character.
-	FOFTD ordersForMonitor;
+	FOFTDStatus ordersForMonitor;
 
 	// Adds widget and assign the player controller to it.
 	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);
