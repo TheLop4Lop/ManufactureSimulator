@@ -15,9 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	AOrderScreen();
 
-	// Set Order Screen Code.
-	void SetOrderCodeToDisplay(FString displayCode);
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,6 +22,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Set the producing order to display.
+	void SetProductionOrderOnScreen(FString orderOnProduction);
+
+	// Returns the current producing order to display.
+	FString GetProductionOrderOnScreen();
 
 private:
 	///////////////////////////////////// ACTOR PROPERTIES ////////////////////////////////
@@ -46,5 +49,8 @@ private:
 
 	// Holds reference of the actual Production Screen Widget.
 	class UOrderWidget* screenWidget;
+
+	// Holds the production Order.
+	FString productionOrder = "";
 
 };

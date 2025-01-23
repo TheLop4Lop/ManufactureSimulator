@@ -42,12 +42,20 @@ void AOrderScreen::Tick(float DeltaTime)
 
 }
 
-// Set Order Screen Code.
-void AOrderScreen::SetOrderCodeToDisplay(FString displayCode)
+// Set the producing order to display.
+void AOrderScreen::SetProductionOrderOnScreen(FString orderOnProduction)
 {
+	productionOrder = orderOnProduction;
 	if(screenWidget)
 	{
-		screenWidget->SetProductScreenCode(displayCode);
+		screenWidget->SetProductScreenCode(productionOrder);
 	}
+
+}
+
+// Returns the current producing order to display.
+FString AOrderScreen::GetProductionOrderOnScreen()
+{
+	return productionOrder;
 
 }

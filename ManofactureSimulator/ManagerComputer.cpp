@@ -37,11 +37,7 @@ void AManagerComputer::BeginPlay()
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOrderScreen::StaticClass(), actorInWorld);
     for(AActor* singleActor : actorInWorld)
     {
-        if(singleActor && singleActor->ActorHasTag(upcomingTag))
-        {
-            upcomingOrderScreen = Cast<AOrderScreen>(singleActor);
-
-        }else if(singleActor && singleActor->ActorHasTag(currentTag))
+        if(singleActor && singleActor->ActorHasTag(currentTag))
         {
             currentOrderScreen = Cast<AOrderScreen>(singleActor);
 
@@ -225,6 +221,7 @@ float AManagerComputer::CalculateColorProductionCostByString(FString colorCode)
 // Updates the current earnings produced to dislay,
 void AManagerComputer::UpdateCurrentEarnings(FString productCode)
 {
+    UpdateOrderProductionStatusOnScreen(productCode);
     UE_LOG(LogTemp, Display, TEXT("STORED CODE: %s"), *productCode);
 
     UE_LOG(LogTemp, Display, TEXT("STORED MATERIAL COST: %f"), CalculateMaterialProductionCostByString(productCode.Left(2)));
@@ -408,6 +405,20 @@ void AManagerComputer::StoreSelectedOrders(TArray<int> selectedOrders, int expec
     if(storageManager)
     {
         storageManager->GetOrdersOfTheDay(ordersForDayProduction);
+    }
+
+}
+
+// Updates the order status on screen, this is based on the order being produced on the production line.
+void AManagerComputer::UpdateOrderProductionStatusOnScreen(FString orderInProduction)
+{
+    if(currentOrderScreen->GetProductionOrderOnScreen().IsEmpty())
+    {
+        currentOrderScreen->SetProductionOrderOnScreen(orderInProduction);
+    }else if(!currentOrderScreen->GetProductionOrderOnScreen().Equals(orderInProduction))
+    {
+        lastOrderScreen->SetProductionOrderOnScreen(currentOrderScreen->GetProductionOrderOnScreen());
+        currentOrderScreen->SetProductionOrderOnScreen(orderInProduction);
     }
 
 }

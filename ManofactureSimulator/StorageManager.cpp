@@ -159,6 +159,7 @@ void AStorageManager::GetOrdersOfTheDay(TArray<FOrdersForProduction> ordersSelec
 	{
 		ordersOfTheDay.Add(ordersSelectedDay[i]);
 	}
+	UpdateOrdersOfTheDayOnStock();
 
 }
 

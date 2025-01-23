@@ -167,10 +167,6 @@ protected:
 	///////////////////////////////////// ORDER SCREEN PROPERTIES ////////////////////////////////
 	// Holds the reference of the orders screen in the world.
 
-	// Holds the tag for upcoming screen.
-	UPROPERTY(EditAnywhere, Category = "Order Screens", meta = (AllowPrivateAccess))
-	FName upcomingTag;
-
 	// Holds the tag for current screen.
 	UPROPERTY(EditAnywhere, Category = "Order Screens", meta = (AllowPrivateAccess))
 	FName currentTag;
@@ -179,13 +175,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Order Screens", meta = (AllowPrivateAccess))
 	FName lastTag;
 
-	// Reference to a order screen in the world, shows NEXT Upcoming Orders of the day.
-	class AOrderScreen* upcomingOrderScreen;
-
 	// Reference to a order screen in the world, shows order currently being produced.
 	class AOrderScreen* currentOrderScreen;
 
 	// Reference to a order screen in the world, shows tha last order produced.
 	class AOrderScreen* lastOrderScreen;
+
+	// Updates the order status on screen, this is based on the order being produced on the production line.
+	void UpdateOrderProductionStatusOnScreen(FString orderInProduction);
 
 };
