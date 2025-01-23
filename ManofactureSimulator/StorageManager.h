@@ -169,6 +169,9 @@ protected:
 	// Called to check order in Final Storage to sell on Manager Computer.
 	void CheckOrderInOrdersOfTheDay(FString storedOrder);
 
+	// Updated the stock information for player interpretation.
+	void UpdateOrdersOfTheDayOnStock();
+
 	// With the Order of the Day check in stock if has the necessary materials for production.
 	FOrdersInLengthMaterial ConvertQuantityProductionOrderToStock(int orderQuantityOnStock);
 

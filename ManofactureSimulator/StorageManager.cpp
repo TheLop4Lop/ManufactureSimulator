@@ -141,6 +141,10 @@ void AStorageManager::ReplenishRawMaterial(int quantity, FString rawMaterialCode
 	if(baseStorage)
 	{
 		baseStorage->ReplenishStorage(quantity, rawMaterialCode);
+		if(ordersOfTheDay.Num() > 0)
+		{
+			UpdateOrdersOfTheDayOnStock(); // Updates the information on player after replenish the storage.
+		}
 	}
 
 }
@@ -151,14 +155,22 @@ void AStorageManager::ReplenishRawMaterial(int quantity, FString rawMaterialCode
 // Gets the orders of the day for production follow up.
 void AStorageManager::GetOrdersOfTheDay(TArray<FOrdersForProduction> ordersSelectedDay)
 {
+	for(int i = 0; i < ordersSelectedDay.Num(); i++)
+	{
+		ordersOfTheDay.Add(ordersSelectedDay[i]);
+	}
+
+}
+
+// Updated the stock information for player interpretation.
+void AStorageManager::UpdateOrdersOfTheDayOnStock()
+{
 	const int piecesPerL3 = 10; // 10 is the quantity amout of pieces the Cutter Machine can cut from an L3 initial log.
     const int piecesPerL2 = 5; // 5 is the quantity amout of pieces the Cutter Machine can cut from an L2 initial log.
     const int piecesPerL1 = 3; // 3 is the quantity amout of pieces the Cutter Machine can cut from an L1 initial log.
 
-	for(int i = 0; i < ordersSelectedDay.Num(); i++)
+	for(int i = 0; i < ordersOfTheDay.Num(); i++)
 	{
-		ordersOfTheDay.Add(ordersSelectedDay[i]);
-
 		FOrdersInLengthMaterial orderLengthStock = ConvertQuantityProductionOrderToStock(ordersOfTheDay[i].orderForProductionQuantity);
 		FOrderInfo orderOnstockStatus; // To add in ordersOfTheDayInfo TArray to pass to Character info.
 
