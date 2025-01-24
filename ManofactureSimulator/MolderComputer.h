@@ -54,5 +54,8 @@ protected:
 	
 	// Calls machine service door for interaction.
 	void CallsServiceDoorAction();
+
+	// Recieve the wrongCode on entrance by Machine.
+	virtual void GetTheWrongCodeOnEntrance(FString codeOnEntrance) override;
 	
 };

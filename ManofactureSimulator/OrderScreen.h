@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ProductionScreen.generated.h"
+#include "OrderScreen.generated.h"
 
 UCLASS()
-class MANOFACTURESIMULATOR_API AProductionScreen : public AActor
+class MANOFACTURESIMULATOR_API AOrderScreen : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AProductionScreen();
+	AOrderScreen();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,11 +23,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Sets the earnigns goal of the day.
-	void SetEarningsGoal(int earningGoals);
+	// Set the producing order to display.
+	void SetProductionOrderOnScreen(FString orderOnProduction);
 
-	// Sets current earnigns produced.
-	void SetCurrentEarnings(int currentEarings);
+	// Returns the current producing order to display.
+	FString GetProductionOrderOnScreen();
 
 private:
 	///////////////////////////////////// ACTOR PROPERTIES ////////////////////////////////
@@ -48,30 +48,9 @@ private:
 	class UWidgetComponent* screenWidgetComponent;
 
 	// Holds reference of the actual Production Screen Widget.
-	class UProductionScreenWidget* screenWidget;
+	class UOrderWidget* screenWidget;
 
-	///////////////////////////////////// PRODUCTION SCREEN MACHINES ////////////////////////////////
-	// Production Screen actor properties.
-
-	// Holds reference for CutterMachine.
-	class AMachineCutter* cutterMachine;
-
-	// Holds reference for MolderMachine.
-	class AMachineMolder* molderMachine;
-
-	// Holds reference for PainterMachine.
-	class AMachinePainter* painterMachine;
-
-	// Holds reference for OvenMachine.
-	class AMachineOven* ovenMachine;
-
-	///////////////////////////////////// PRODUCTION PIECES ////////////////////////////////
-	// Production Screen for pieces properties.
-
-	// Holds the value of Goal earnigns to widget display.
-	int goalEarningToProduce;
-
-	// Holds the value of current earnign for widget display.
-	int currentEarnigProduced;
+	// Holds the production Order.
+	FString productionOrder = "";
 
 };

@@ -14,13 +14,8 @@ ABaseStorage::ABaseStorage()
 void ABaseStorage::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	FInitialPieceAttribute testProduct;
-	testProduct.Quality = EPieceMaterial::QUALITY_LOW;
-	testProduct.Size = EPieceSize::SIZE_MEDIUM;
-	testProduct.Length = EPieceLenght::LENGTH_LARGE;
 
-	AddInitialPieceToMap(testProduct, 10);
+	GenerateRandomStock(); // Initialice Stock.
 
 }
 
@@ -56,9 +51,19 @@ void ABaseStorage::DecreacePieceFromInventory(FInitialPieceAttribute pieceCode, 
 }
 
 // Checks in the Initial Piece inventory the order that needs to be ordered.
-bool ABaseStorage::OrderIsInInventory(FInitialPieceAttribute order, int quantity)
+FStock ABaseStorage::GetStockOrders(FInitialPieceAttribute order)
 {
-	return (initialPieceMap.Contains(order) && initialPieceMap[order] >= quantity);
+	FStock orderAsked;
+	orderAsked.orderInStock = initialPieceMap.Contains(order);
+	if(initialPieceMap.Contains(order))
+	{
+		orderAsked.orderStockQuantity = initialPieceMap[order];
+	}else
+	{
+		orderAsked.orderStockQuantity = 0;
+	}
+
+	return orderAsked;
 
 }
 
@@ -66,5 +71,99 @@ bool ABaseStorage::OrderIsInInventory(FInitialPieceAttribute order, int quantity
 const TMap<FInitialPieceAttribute, int>& ABaseStorage::GetInventory() const
 {
 	return initialPieceMap;
+
+}
+
+// Called to ask for raw material.
+void ABaseStorage::ReplenishStorage(int quantity, FString rawMaterialCode)
+{
+	FInitialPieceAttribute orderedProduct;
+
+	orderedProduct.Quality = UEProductProperties::ConverStringToEnumQuality(rawMaterialCode.Left(2));
+	orderedProduct.Size = UEProductProperties::ConverStringToEnumSize(rawMaterialCode.Mid(2, 2));
+	orderedProduct.Length = UEProductProperties::ConverStringToEnumLength(rawMaterialCode.Right(2));
+
+	AddInitialPieceToMap(orderedProduct, quantity);
+
+}
+
+// Randomice and store initial pieces to stock on Base Storage.
+void ABaseStorage::GenerateRandomStock()
+{
+	int randomGeneratorIteration = (int)FMath::RandRange(10, 25); // 25, 30 are only a random numbers selected, it doesn't have a specific reason.
+	for(int i = 0; i < randomGeneratorIteration; i++)
+	{
+		int randomIndex = (int)FMath::RandRange(1, 3);
+        FInitialPieceAttribute orderGenerated;
+        FString testStringOrder; /////////////////////////////
+        switch (randomIndex)
+        {
+        case 1:
+            orderGenerated.Quality = EPieceMaterial::QUALITY_LOW;
+            testStringOrder = "M1"; /////////////////////////////
+            break;
+
+        case 2:
+            orderGenerated.Quality = EPieceMaterial::QUALITY_MEDIUM;
+            testStringOrder = "M2"; /////////////////////////////
+            break;
+
+        case 3:
+            orderGenerated.Quality = EPieceMaterial::QUALITY_HIGH;
+            testStringOrder = "M3"; /////////////////////////////
+            break;
+        
+        default:
+            break;
+        }
+        
+        randomIndex = (int)FMath::RandRange(1, 3);
+        switch (randomIndex)
+        {
+        case 1:
+            orderGenerated.Size = EPieceSize::SIZE_SMALL;
+            testStringOrder += "S1"; /////////////////////////////
+            break;
+
+        case 2:
+            orderGenerated.Size = EPieceSize::SIZE_MEDIUM;
+            testStringOrder += "S2"; /////////////////////////////
+            break;
+
+        case 3:
+            orderGenerated.Size = EPieceSize::SIZE_BIG;
+            testStringOrder += "S3"; /////////////////////////////
+            break;
+        
+        default:
+            break;
+        }
+
+        randomIndex = (int)FMath::RandRange(1, 3);
+        switch (randomIndex)
+        {
+        case 1:
+            orderGenerated.Length = EPieceLenght::LENGTH_SHORT;
+            testStringOrder += "L1"; /////////////////////////////
+            break;
+
+        case 2:
+            orderGenerated.Length = EPieceLenght::LENGTH_MEDIUM;
+            testStringOrder += "L2"; /////////////////////////////
+            break;
+
+        case 3:
+            orderGenerated.Length = EPieceLenght::LENGTH_LARGE;
+            testStringOrder += "L3"; /////////////////////////////
+            break;
+        
+        default:
+            break;
+        }
+
+		int randomQuantityToAddOnStock = (int)FMath::RandRange(1, 5); // 5, 20 are only a random numbers selected, it doesn't have a specific reason.
+		AddInitialPieceToMap(orderGenerated, randomQuantityToAddOnStock);
+        UE_LOG(LogTemp, Display, TEXT("Stock Generated: %s, Quantity: %i"), *testStringOrder, randomQuantityToAddOnStock);
+	}
 
 }

@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
+#include "ManagerComputer.h"
 #include "CanisterWidget.h"
 #include "Interactable.h"
 #include "BaseComputer.h"
@@ -38,6 +39,14 @@ void ABaseCharacter::BeginPlay()
 
 	CharacterController = Cast<ACharacterController>(GetController());
 	CharacterController->resetMovement.BindUObject(this, &ABaseCharacter::ResetMoveInput);
+
+	TArray<AActor*> actorsInWorld;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AManagerComputer::StaticClass(), actorsInWorld);
+	if (actorsInWorld.IsValidIndex(0))
+	{
+		computerManager = Cast<AManagerComputer>(actorsInWorld[0]);
+		computerManager->ordersForMonitor.BindUObject(this, &ABaseCharacter::GetOrderOfTheDayStatus);
+	}
 	
 }
 
@@ -46,49 +55,17 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AActor* actorInSight = InSightLine().GetActor();
-	UPrimitiveComponent* sightHitComponent = InSightLine().GetComponent();
-
-	//Checks if the controller isn't nullptr and if there's a actor in Character sight
-	if(actorInSight != nullptr && DoOnceWidget)
-	{
-		if(actorInSight->IsA(ABaseComputer::StaticClass()))
-		{
-			Computer = Cast<ABaseComputer>(actorInSight);
-
-			SetInteractionWidget(computerInteractionWidgetClass);
-			canPlaceObject = false;
-			DoOnceWidget = false;
-		}else if(actorInSight->IsA(ABaseProduct::StaticClass()) || actorInSight->IsA(ABaseCanister::StaticClass()))
-		{
-			SetInteractionWidget(grabInteractionWidgetClass);
-			canPlaceObject = false;
-			DoOnceWidget = false;
-		}else if(sightHitComponent && sightHitComponent->IsA(UBoxComponent::StaticClass()) && objectHolded)
-		{
-			SetInteractionWidget(releaseInteractionWidgetClass);
-			HitComponent = sightHitComponent;
-
-			canPlaceObject = true;
-			DoOnceWidget = false;
-		}
-
-	}else if(actorInSight == nullptr && !DoOnceWidget)
-	{
-		if(InteractionWidget)
-		{
-			InteractionWidget->RemoveFromParent();
-			InteractionWidget = nullptr;
-		}
-		canPlaceObject = false;
-		DoOnceWidget = true;
-	}
-
+	InteractionOnSight();
 	UpdateHoldedObjectLocation();
 
 	if(holdedCanister && canisterWidget)
 	{
 		canisterWidget->SetIndicatorCanisterLevel((float)holdedCanister->GetCanisterCurrentLevel()/(float)holdedCanister->GetCanisterMaxCapacity());
+	}
+
+	if(computerManager && monitorWidget)
+	{
+		UE_LOG(LogTemp, Display, TEXT("SHOW SOMETHING SOMETHING"));
 	}
 
 }
@@ -107,6 +84,8 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction(TEXT("Interaction"), EInputEvent::IE_Released, this, &ABaseCharacter::ComputerInteraction);
 	PlayerInputComponent->BindAction(TEXT("Grab"), EInputEvent::IE_Pressed, this, &ABaseCharacter::GrabObject);
 	PlayerInputComponent->BindAction(TEXT("Release"), EInputEvent::IE_Released, this, &ABaseCharacter::ReleaseObject);
+
+	PlayerInputComponent->BindAction(TEXT("ShowMonitor"), EInputEvent::IE_Released, this, &ABaseCharacter::SetMonitorWidget);
 
 }
 
@@ -175,6 +154,49 @@ void ABaseCharacter::SetInteractionWidget(TSubclassOf<class UUserWidget> widgetC
 		}
 	}
 	
+}
+
+// Continiously check interactions on world.
+void ABaseCharacter::InteractionOnSight()
+{
+	AActor* actorInSight = InSightLine().GetActor();
+	UPrimitiveComponent* sightHitComponent = InSightLine().GetComponent();
+
+	//Checks if the controller isn't nullptr and if there's a actor in Character sight
+	if(actorInSight != nullptr && DoOnceWidget)
+	{
+		if(actorInSight->IsA(ABaseComputer::StaticClass()))
+		{
+			Computer = Cast<ABaseComputer>(actorInSight);
+
+			SetInteractionWidget(computerInteractionWidgetClass);
+			canPlaceObject = false;
+			DoOnceWidget = false;
+		}else if(actorInSight->IsA(ABaseProduct::StaticClass()) || actorInSight->IsA(ABaseCanister::StaticClass()))
+		{
+			SetInteractionWidget(grabInteractionWidgetClass);
+			canPlaceObject = false;
+			DoOnceWidget = false;
+		}else if(sightHitComponent && sightHitComponent->IsA(UBoxComponent::StaticClass()) && objectHolded)
+		{
+			SetInteractionWidget(releaseInteractionWidgetClass);
+			HitComponent = sightHitComponent;
+
+			canPlaceObject = true;
+			DoOnceWidget = false;
+		}
+
+	}else if(actorInSight == nullptr && !DoOnceWidget)
+	{
+		if(InteractionWidget)
+		{
+			InteractionWidget->RemoveFromParent();
+			InteractionWidget = nullptr;
+		}
+		canPlaceObject = false;
+		DoOnceWidget = true;
+	}
+
 }
 
 ///////////////////////////////////// COMPUTER INTERACTION ////////////////////////////////
@@ -282,6 +304,48 @@ void ABaseCharacter::PlayGrabbedObjectSound(USoundBase* grabbedObjectSound)
 	if(grabbedObjectSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), grabbedObjectSound, holdComponent->GetComponentLocation());
+	}
+
+}
+
+///////////////////////////////////// MONITOR WIDGET PROPERTIES ////////////////////////////////
+// Interaction with grabbing objects sound section.
+
+// Set the Monitor Widget to player to see Stock information.
+void ABaseCharacter::SetMonitorWidget()
+{
+	if(monitorWidgetClass && CharacterController)
+	{
+		if(!isMonitorWidgetSet)
+		{
+			monitorWidget = Cast<UMonitorComputerWidget>(CreateWidget(CharacterController, monitorWidgetClass));
+			if(monitorWidget)
+			{
+				monitorWidget->AddToViewport();
+				isMonitorWidgetSet = true;
+				if(ordersOfTheDay.Num() > 0 && ordersOfTheDayStatus.Num() > 0)
+				{
+					monitorWidget->SetOrderOTDsStatus(ordersOfTheDay, ordersOfTheDayStatus);
+				}
+			}
+		}else
+		{
+			monitorWidget->RemoveFromParent();
+			monitorWidget = nullptr;
+			isMonitorWidgetSet = false;
+		}
+	}
+
+}
+
+// Get an struct array with the orders status from stock.
+void ABaseCharacter::GetOrderOfTheDayStatus(TArray<FString> orders, TArray<FOrderOTD> ordersStatus)
+{
+	for(int i = 0; i < orders.Num(); i++)
+	{
+		ordersOfTheDay.Add(orders[i]);
+		ordersOfTheDayStatus.Add(ordersStatus[i]);
+		UE_LOG(LogTemp, Display, TEXT("TOTAL ORDER STATUS: %i"), ordersOfTheDayStatus[i].canProduceByStock);
 	}
 
 }

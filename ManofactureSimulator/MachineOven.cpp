@@ -41,8 +41,7 @@ void AMachineOven::CheckEntranceForProduct()
                 else
                 {
                     NewStatus = EMachineStatus::CODE_ERROR;
-                    UE_LOG(LogTemp, Error, TEXT("Product Code: %s"), *productOnEntrance->GetProductCode());
-                    UE_LOG(LogTemp, Error, TEXT("Machine Code: %s"), *codeToProcess);
+                    wrongCodeOnEntrance.ExecuteIfBound(productOnEntrance->GetProductCode());
                 }
                 break;
             }

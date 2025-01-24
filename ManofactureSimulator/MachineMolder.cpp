@@ -55,6 +55,7 @@ void AMachineMolder::CheckEntranceForProduct()
                 else
                 {
                     NewStatus = EMachineStatus::CODE_ERROR;
+                    wrongCodeOnEntrance.ExecuteIfBound(productOnEntrance->GetProductCode());
                 }
                 break; // Exit the loop once we find a valid product
             }

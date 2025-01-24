@@ -27,7 +27,11 @@ public:
 	// Sets Oven Machine color Status.
 	void SetOvenMachineColorStatus(FColor machineStatus);
 
-	void SetPiecesProduced(int data);
+	// Sets the total amount of earnigns needed for the day.
+	void SetGoal(int goal);
+
+	// Sets the current amount of earnings.
+	void SetCurrent(int current);
 
 private:
 	///////////////////////////////////// PRODUCTION SCREEN MACHINES ////////////////////////////////
@@ -49,7 +53,12 @@ private:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* ovenImage;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Test Data", meta = (AllowPrivateAccess))
-	int producedPieces;
+	// Holds the total earnign of the day.
+	UPROPERTY(BlueprintReadWrite, Category = "Earning Data", meta = (AllowPrivateAccess))
+	int earningGoal;
+
+	// Holds the current earnings.
+	UPROPERTY(BlueprintReadWrite, Category = "Earning Data", meta = (AllowPrivateAccess))
+	int currentEarning;
 	
 };

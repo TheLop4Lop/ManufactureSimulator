@@ -36,8 +36,16 @@ void UProductionScreenWidget::SetOvenMachineColorStatus(FColor machineStatus)
 
 }
 
-void UProductionScreenWidget::SetPiecesProduced(int data)
+// Sets the total amount of earnigns needed for the day.
+void UProductionScreenWidget::SetGoal(int goal)
 {
-    producedPieces = data;
+    earningGoal = goal;
 
+}
+
+// Sets the current amount of earnings.
+void UProductionScreenWidget::SetCurrent(int current)
+{
+    currentEarning = current;
+    
 }
