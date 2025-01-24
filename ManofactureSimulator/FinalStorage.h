@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "FinalStorage.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOrderInStorage, FString)
+
 UCLASS()
 class MANOFACTURESIMULATOR_API AFinalStorage : public AActor
 {
@@ -22,6 +24,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	FOrderInStorage pieceInStorage;
 
 	// Returns the total amount of product stored.
 	int GetTotalOfProductsStored();

@@ -117,7 +117,6 @@ void ABaseCanister::HitSound(UPrimitiveComponent* HitComponent, AActor* OtherAct
 	float volumeMultiplier = FMath::Clamp(NormalImpulse.Size() / MaxImpulse, 0.0f, 2.0f);
 	if(canisterReleasedFreeSound && volumeMultiplier > 0.06)
 	{
-		UE_LOG(LogTemp, Display, TEXT("SOUND! VOLUME: %f"), volumeMultiplier);
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), canisterReleasedFreeSound, GetActorLocation(), volumeMultiplier);
 	}
 

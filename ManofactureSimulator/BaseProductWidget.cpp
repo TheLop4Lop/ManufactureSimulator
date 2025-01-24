@@ -47,14 +47,14 @@ void UBaseProductWidget::SetM1ButtonLogic()
 // Set M2 button logic.
 void UBaseProductWidget::SetM2ButtonLogic()
 {
-    materialType = "M1";
+    materialType = "M2";
 
 }
 
 // Set M3 button logic.
 void UBaseProductWidget::SetM3ButtonLogic()
 {
-    materialType = "M1";
+    materialType = "M3";
 
 }
 

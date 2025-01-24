@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "MonitorComputerWidget.h" // For Struct.
 #include "BaseCharacter.generated.h"
 
 DECLARE_DELEGATE(FHold);
@@ -78,6 +79,9 @@ private:
 	// Controls the flow of Widget added in Tick.
 	bool DoOnceWidget = true;
 
+	// Continiously check interactions on world.
+	void InteractionOnSight();
+
 	///////////////////////////////////// COMPUTER INTERACTION ////////////////////////////////
 	// Interaction computer section.
 
@@ -150,5 +154,33 @@ private:
 
 	// Plays sound of grabbed object by the player.
 	void PlayGrabbedObjectSound(USoundBase* grabbedObjectSound);
+
+	///////////////////////////////////// MONITOR WIDGET PROPERTIES ////////////////////////////////
+	// Interaction with grabbing objects sound section.
+
+	// Monitor computer interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Monitor Widget", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> monitorWidgetClass;
+
+	// Holds the Widget Class to monitor computer.
+	UMonitorComputerWidget* monitorWidget;
+
+	// Set the Monitor Widget to player to see Stock information.
+	void SetMonitorWidget();
+
+	// Boolean to control flip-flop interaction on widget display.
+	bool isMonitorWidgetSet;
+
+	// Holds reference of Manager Computer in the world.
+	class AManagerComputer* computerManager;
+
+	// Get an struct array with the orders status from stock.
+	void GetOrderOfTheDayStatus(TArray<FString> orders, TArray<struct FOrderOTD> ordersStatus);
+
+	// Holds the ordes of the day.
+	TArray<FString> ordersOfTheDay;
+
+	// Hold the order status from storage.
+	TArray<struct FOrderOTD> ordersOfTheDayStatus;
 
 };

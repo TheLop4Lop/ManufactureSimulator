@@ -38,6 +38,8 @@ void AFinalStorage::Tick(float DeltaTime)
 			APaintedProduct* productOnStorageEntrance = Cast<APaintedProduct>(singleActor);
 			if(productOnStorageEntrance->IsProductFinished())
 			{
+				UE_LOG(LogTemp, Display, TEXT("STORING..."));
+				pieceInStorage.ExecuteIfBound(productOnStorageEntrance->GetProductCode());
 				if(finishedPiecesCodeInStorage.Contains(productOnStorageEntrance->GetProductCode()))
 				{
 					finishedPiecesCodeInStorage[productOnStorageEntrance->GetProductCode()] ++;

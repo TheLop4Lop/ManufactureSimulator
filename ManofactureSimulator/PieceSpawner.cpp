@@ -75,7 +75,7 @@ void APieceSpawner::SpawnInitialPiece(FInitialPieceAttribute orderToSpawn)
 			break;
 		case EPieceMaterial::QUALITY_HIGH:
 			pieceInitialQuality = maxQuality;
-			selectedMaterial = qualityMaterial[3];
+			selectedMaterial = qualityMaterial[2];
 			productCode += "M3";
 			break;
 		

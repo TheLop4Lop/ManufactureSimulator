@@ -172,7 +172,6 @@ void ABaseProduct::HitSound(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	productReleasedFreeSound = LoadObject<USoundBase>(nullptr, TEXT("SoundCue'/Game/Sounds/Pieces/Piece_Cue3.Piece_Cue3'"));
 	if(productReleasedFreeSound && volumeMultiplier > 0.06)
 	{
-		UE_LOG(LogTemp, Display, TEXT("SOUND! VOLUME: %f"), volumeMultiplier);
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), productReleasedFreeSound, GetActorLocation(), volumeMultiplier);
 	}
 

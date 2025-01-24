@@ -3,6 +3,7 @@
 
 #include "BaseMachineComputerWidget.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 
@@ -120,5 +121,22 @@ void UBaseMachineComputerWidget::SetOilLevel(float oilLevel)
 void UBaseMachineComputerWidget::SetLubricantLevel(float lubricantLevel)
 {
     lubricantLevelBar->SetPercent(lubricantLevel);
+
+}
+
+///////////////////////////////////// MACHINE CONFIGURATION PROPERTIES ////////////////////////////////
+// Section for computer product characteristic orders.
+
+// Set the currentConfiguration to display.
+void UBaseMachineComputerWidget::SetCurrentConfigurationCode(FString currentCode)
+{
+    currentConfiguration->SetText(FText::FromString(currentCode));
+
+}
+
+// Set the wrongConfiguration to display.
+void UBaseMachineComputerWidget::SetWrongConfigurationCode(FString wrongCode)
+{
+    wrongConfiguration->SetText(FText::FromString(wrongCode));
 
 }

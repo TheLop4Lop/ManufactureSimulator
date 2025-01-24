@@ -11,21 +11,6 @@
 #include "OilCanister.h"
 #include "BaseProduct.h"
 
-/*/ Static MATERIAL map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EProductMaterial> ABaseMachine::StringToEnumMaterialMap;
-
-// Static SIZE map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EProductSize> ABaseMachine::StringToEnumSizeMap;
-
-// Static LENGTH map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EProductLength> ABaseMachine::StringToEnumLengthMap;
-
-// Static FORM map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EProductForm> ABaseMachine::StringToEnumFormMap;
-
-// Static COLOR map for string to ENUM data, this is used for product interpretation in respective machine.
-std::map<FString, EProductColor> ABaseMachine::StringToEnumColorMap;*/
-
 // Sets default values
 ABaseMachine::ABaseMachine()
 {
@@ -55,11 +40,6 @@ ABaseMachine::ABaseMachine()
 
 	machineStatusLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Machine Status Light"));
 	machineStatusLight->SetupAttachment(machineMesh);
-
-	/*if(StringToEnumMaterialMap.empty() && StringToEnumSizeMap.empty() && StringToEnumFormMap.empty() && StringToEnumColorMap.empty())
-	{
-		InitializeConversionMaps();
-	}*/
 
 }
 
@@ -94,88 +74,6 @@ void ABaseMachine::Tick(float DeltaTime)
 	}
 
 }
-
-/*//////////////////////////////////// MAP CONVERTION ////////////////////////////////
-// Singleton implementation for String-ENUM convertion, this help to all child classes access to transformation.
-
-void ABaseMachine::InitializeConversionMaps()
-{
-	StringToEnumMaterialMap = {{"M1", EProductMaterial::M1}, {"M2", EProductMaterial::M2}, {"M3", EProductMaterial::M3}};
-
-	StringToEnumSizeMap = {{"S1", EProductSize::S1}, {"S2", EProductSize::S2}, {"S3", EProductSize::S3}};
-
-	StringToEnumLengthMap = {{"L1", EProductLength::L1}, {"L2", EProductLength::L2}, {"L3", EProductLength::L3}};
-
-	StringToEnumFormMap = {{"F1", EProductForm::F1}, {"F2", EProductForm::F2}, {"F3", EProductForm::F3}};
-
-	StringToEnumColorMap = {{"C1", EProductColor::C1}, {"C2", EProductColor::C2}, {"C3", EProductColor::C3}};
-
-}
-
-// Gets the StringToEnumMaterialMap
-EProductMaterial ABaseMachine::GetStringToEnumMaterialMap(const FString& materialString) const
-{
-	auto it = StringToEnumMaterialMap.find(materialString);
-	if(it != StringToEnumMaterialMap.end())
-	{
-		return it->second;
-	}
-
-	return EProductMaterial::M1;
-
-}
-
-// Gets the StringToEnumSizeMap
-EProductSize ABaseMachine::GetStringToEnumSizeMap(const FString& sizeString) const
-{
-	auto it = StringToEnumSizeMap.find(sizeString);
-	if(it != StringToEnumSizeMap.end())
-	{
-		return it->second;
-	}
-
-	return EProductSize::S1;
-
-}
-
-// Gets the StringToEnumLengthMap
-EProductLength ABaseMachine::GetStringToEnumLengthMap(const FString& lengthString) const
-{
-	auto it = StringToEnumLengthMap.find(lengthString);
-	if(it != StringToEnumLengthMap.end())
-	{
-		return it->second;
-	}
-
-	return EProductLength::L1;
-
-}
-
-// Gets the StringToEnumFormMap
-EProductForm ABaseMachine::GetStringToEnumFormMap(const FString& formString) const
-{
-	auto it = StringToEnumFormMap.find(formString);
-	if(it != StringToEnumFormMap.end())
-	{
-		return it->second;
-	}
-
-	return EProductForm::F1;
-
-}
-
-// Gets the StringToEnumColorMap
-EProductColor ABaseMachine::GetStringToEnumColorMap(const FString& colorString) const
-{
-	auto it = StringToEnumColorMap.find(colorString);
-	if(it != StringToEnumColorMap.end())
-	{
-		return it->second;
-	}
-
-	return EProductColor::C1;
-
-}*/
 
 ///////////////////////////////////// MACHINE SOUND PROPERTIES ////////////////////////////////
 // Section for all the machine sound properties.
@@ -469,6 +367,7 @@ bool ABaseMachine::GetMachinePower()
 
 }
 
+// Sets value of order code for the machinery to process from machine computer.
 void ABaseMachine::SetProductionMachineOrder(FString orderToProduce)
 {
 	codeToProcess = orderToProduce;
