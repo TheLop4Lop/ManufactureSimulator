@@ -9,6 +9,7 @@
 #include "EProductProperties.h" // To get access to the enum.
 #include "BaseMachine.generated.h"
 
+DECLARE_DELEGATE_OneParam(FWrongCode, FString);
 DECLARE_DELEGATE_TwoParams(FActiveConveyor, FName, bool);
 
 UENUM(BlueprintType)
@@ -48,7 +49,7 @@ public:
 	// Returns Computer Status for Widget interaction light.
 	bool GetMachinePower();
 
-	// Sets value of order code for the machinery to process.
+	// Sets value of order code for the machinery to process from machine computer.
 	void SetProductionMachineOrder(FString orderToProduce);
 
 	// Sets the position and status of product door.
@@ -73,6 +74,9 @@ public:
 	int GetMaxLubricantLevel();
 
 	FColor GetMachineStatusColor();
+
+	// Delegate event to pass on to the machine computer the code on the entrance machine to display.
+	FWrongCode wrongCodeOnEntrance;
 
 	// Delegate event for active or desable a single conveyor belt.
 	FActiveConveyor conveyorEvent;

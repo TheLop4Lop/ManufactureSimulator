@@ -14,8 +14,12 @@ void APainterComputer::BeginPlay()
 
 	TArray<AActor*> actorsInWorld;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMachinePainter::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) painterMachine = Cast<AMachinePainter>(actorsInWorld[0]);	
-	
+	if(actorsInWorld.IsValidIndex(0))
+	{
+		painterMachine = Cast<AMachinePainter>(actorsInWorld[0]);
+		painterMachine->wrongCodeOnEntrance.BindUObject(this, &APainterComputer::GetTheWrongCodeOnEntrance);
+	}
+
 }
 
 // Called every frame
@@ -32,6 +36,9 @@ void APainterComputer::Tick(float DeltaTime)
 
 		float lubricantLevel = ((float)painterMachine->GetLubricantLevel()/(float)painterMachine->GetMaxLubricantLevel());
 		computerWidget->SetLubricantLevel(lubricantLevel);
+
+		computerWidget->SetCurrentConfigurationCode(currentProductionCode);
+		computerWidget->SetWrongConfigurationCode(productionCodeOnEntrance);
 	}
 
 }
@@ -100,6 +107,8 @@ void APainterComputer::WidgetBindProductOrder(FString productCode)
 	if(painterMachine)
 	{
 		painterMachine->SetProductionMachineOrder(productCode);
+		currentProductionCode = productCode;
+		productionCodeOnEntrance = "";
 	}
 
 }
@@ -127,5 +136,12 @@ void APainterComputer::CallsServiceDoorAction()
 	{
 		painterMachine->SetPositionOfServiceDoor();
 	}
+
+}
+
+// Recieve the wrongCode on entrance by Machine.
+void APainterComputer::GetTheWrongCodeOnEntrance(FString codeOnEntrance)
+{
+	productionCodeOnEntrance = codeOnEntrance;
 
 }

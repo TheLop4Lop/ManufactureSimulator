@@ -14,7 +14,11 @@ void AOvenComputer::BeginPlay()
 
 	TArray<AActor*> actorsInWorld;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMachineOven::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) ovenMachine = Cast<AMachineOven>(actorsInWorld[0]);
+	if(actorsInWorld.IsValidIndex(0))
+	{
+		ovenMachine = Cast<AMachineOven>(actorsInWorld[0]);
+		ovenMachine->wrongCodeOnEntrance.BindUObject(this, &AOvenComputer::GetTheWrongCodeOnEntrance);
+	}
 
 }
 
@@ -32,6 +36,9 @@ void AOvenComputer::Tick(float DeltaTime)
 
 		float lubricantLevel = ((float)ovenMachine->GetLubricantLevel()/(float)ovenMachine->GetMaxLubricantLevel());
 		computerWidget->SetLubricantLevel(lubricantLevel);
+
+		computerWidget->SetCurrentConfigurationCode(currentProductionCode);
+		computerWidget->SetWrongConfigurationCode(productionCodeOnEntrance);
 	}
 
 }
@@ -100,6 +107,8 @@ void AOvenComputer::WidgetBindProductOrder(FString productCode)
 	if(ovenMachine)
 	{
 		ovenMachine->SetProductionMachineOrder(productCode);
+		currentProductionCode = productCode;
+		productionCodeOnEntrance = "";
 	}
 
 }
@@ -130,3 +139,9 @@ void AOvenComputer::CallsServiceDoorAction()
 
 }
 
+// Recieve the wrongCode on entrance by Machine.
+void AOvenComputer::GetTheWrongCodeOnEntrance(FString codeOnEntrance)
+{
+	productionCodeOnEntrance = codeOnEntrance;
+
+}

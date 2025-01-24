@@ -14,7 +14,11 @@ void ACutterComputer::BeginPlay()
 
 	TArray<AActor*> actorsInWorld;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMachineCutter::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) cutterMachine = Cast<AMachineCutter>(actorsInWorld[0]);	
+	if(actorsInWorld.IsValidIndex(0))
+	{
+		cutterMachine = Cast<AMachineCutter>(actorsInWorld[0]);	
+		cutterMachine->wrongCodeOnEntrance.BindUObject(this, &ACutterComputer::GetTheWrongCodeOnEntrance);
+	}
 	
 }
 
@@ -32,6 +36,9 @@ void ACutterComputer::Tick(float DeltaTime)
 
 		float lubricantLevel = ((float)cutterMachine->GetLubricantLevel()/(float)cutterMachine->GetMaxLubricantLevel());
 		computerWidget->SetLubricantLevel(lubricantLevel);
+
+		computerWidget->SetCurrentConfigurationCode(currentProductionCode);
+		computerWidget->SetWrongConfigurationCode(productionCodeOnEntrance);
 	}
 
 }
@@ -99,6 +106,8 @@ void ACutterComputer::WidgetBindProductOrder(FString productCode)
 	if(cutterMachine)
 	{
 		cutterMachine->SetProductionMachineOrder(productCode);
+		currentProductionCode = productCode;
+		productionCodeOnEntrance = "";
 	}
 
 }
@@ -120,5 +129,12 @@ void ACutterComputer::CallsServiceDoorAction()
 	{
 		cutterMachine->SetPositionOfServiceDoor();
 	}
+
+}
+
+// Recieve the wrongCode on entrance by Machine.
+void ACutterComputer::GetTheWrongCodeOnEntrance(FString codeOnEntrance)
+{
+	productionCodeOnEntrance = codeOnEntrance;
 
 }

@@ -57,3 +57,10 @@ void ABaseComputer::PublicWidgetBindResetController()
     WidgetBindResetController();
 
 }
+
+// Recieve the wrongCode on entrance by Machine.
+void ABaseComputer::GetTheWrongCodeOnEntrance(FString codeOnEntrance)
+{
+	// Implemente in child classes.
+
+}

@@ -41,11 +41,6 @@ ABaseMachine::ABaseMachine()
 	machineStatusLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Machine Status Light"));
 	machineStatusLight->SetupAttachment(machineMesh);
 
-	/*if(StringToEnumMaterialMap.empty() && StringToEnumSizeMap.empty() && StringToEnumFormMap.empty() && StringToEnumColorMap.empty())
-	{
-		InitializeConversionMaps();
-	}*/
-
 }
 
 // Called when the game starts or when spawned
@@ -372,6 +367,7 @@ bool ABaseMachine::GetMachinePower()
 
 }
 
+// Sets value of order code for the machinery to process from machine computer.
 void ABaseMachine::SetProductionMachineOrder(FString orderToProduce)
 {
 	codeToProcess = orderToProduce;

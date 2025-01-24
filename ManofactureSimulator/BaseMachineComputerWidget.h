@@ -49,6 +49,12 @@ public:
 	// Set Lubricant Bar percent level.
 	void SetLubricantLevel(float lubricantLevel);
 
+	// Set the currentConfiguration to display.
+	void SetCurrentConfigurationCode(FString currentCode);
+
+	// Set the wrongConfiguration to display.
+	void SetWrongConfigurationCode(FString wrongCode);
+
 protected:
 	///////////////////////////////////// COMPUTER BUTTON PROPERTIES ////////////////////////////////
 	// Section for computer product characteristic orders.
@@ -115,5 +121,16 @@ protected:
 	// Lubricant Machine Level progress Bar.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UProgressBar* lubricantLevelBar;
+
+	///////////////////////////////////// MACHINE CONFIGURATION PROPERTIES ////////////////////////////////
+	// Section for computer product characteristic orders.
+
+	// Show the current machine configuration for production.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* currentConfiguration;
+
+	// Show the wrong error code for machine configuraation.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* wrongConfiguration;
 	
 };

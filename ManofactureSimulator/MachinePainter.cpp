@@ -42,6 +42,7 @@ void AMachinePainter::CheckEntranceForProduct()
                 else
                 {
                     NewStatus = EMachineStatus::CODE_ERROR;
+                    wrongCodeOnEntrance.ExecuteIfBound(productOnEntrance->GetProductCode());
                 }
                 break;
             }

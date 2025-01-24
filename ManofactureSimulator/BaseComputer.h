@@ -50,4 +50,16 @@ protected:
 	// Hold reference to character controller.
 	class ACharacterController* characterController;
 
+	///////////////////////////////////// MACHINE CODE INTERACTION PROPERTIES ////////////////////////////////
+	// Sections for the actor properties.
+
+	// Holds the actual production code conffiguration on machine.
+	FString currentProductionCode;
+
+	// Holds the wrongErrorCode on entrance.
+	FString productionCodeOnEntrance;
+
+	// Recieve the wrongCode on entrance by Machine.
+	virtual void GetTheWrongCodeOnEntrance(FString codeOnEntrance);
+
 };
