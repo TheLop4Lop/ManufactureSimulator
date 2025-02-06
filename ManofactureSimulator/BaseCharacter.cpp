@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
+#include "InformationScreen.h"
 #include "ManagerComputer.h"
 #include "CanisterWidget.h"
 #include "Interactable.h"
@@ -112,6 +113,9 @@ void ABaseCharacter::ResetMoveInput()
 	this->GetMovementComponent()->Activate();
 	bIsWidgetDisplayed = false;
 
+	Computer = nullptr;
+	infoScreen = nullptr;
+
 }
 
 ///////////////////////////////////// GENERAL INTERACTION ////////////////////////////////
@@ -165,7 +169,14 @@ void ABaseCharacter::InteractionOnSight()
 	//Checks if the controller isn't nullptr and if there's a actor in Character sight
 	if(actorInSight != nullptr && DoOnceWidget)
 	{
-		if(actorInSight->IsA(ABaseComputer::StaticClass()))
+		if(actorInSight->IsA(AInformationScreen::StaticClass())) 
+		{
+			infoScreen = Cast<AInformationScreen>(actorInSight);
+			SetInteractionWidget(informationScreenWidgetClass);
+
+			canPlaceObject = false;
+			DoOnceWidget = false;
+		}else if(actorInSight->IsA(ABaseComputer::StaticClass()))
 		{
 			Computer = Cast<ABaseComputer>(actorInSight);
 
@@ -210,6 +221,13 @@ void ABaseCharacter::ComputerInteraction()
 		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
 		{
 			Computer->AddWidgetFromComputer(CharacterController);
+			this->GetMovementComponent()->Deactivate();
+			CharacterController->SetMovement(true);
+
+			bIsWidgetDisplayed = true;
+		}else if(CharacterController != nullptr && infoScreen != nullptr && infoScreen->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
+		{
+			infoScreen->AddWidgetFromComputer(CharacterController);
 			this->GetMovementComponent()->Deactivate();
 			CharacterController->SetMovement(true);
 

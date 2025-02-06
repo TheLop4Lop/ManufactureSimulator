@@ -136,7 +136,7 @@ private:
 	UPrimitiveComponent* HitComponent;
 
 	// Use to get values of cannister to update value on widget.
-	ABaseCanister* holdedCanister;
+	class ABaseCanister* holdedCanister;
 
 	// Holds value if an object can be placed on a boxComponent.
 	bool canPlaceObject;
@@ -182,5 +182,15 @@ private:
 
 	// Hold the order status from storage.
 	TArray<struct FOrderOTD> ordersOfTheDayStatus;
+
+	///////////////////////////////////// INFORMATION SCREEN WIDGET PROPERTIES ////////////////////////////////
+	// Interaction with Information Screens.
+
+	// Information Screen interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Monitor Widget", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> informationScreenWidgetClass;
+
+	// Holds the a reference to Information Screens infront of player.
+	class AInformationScreen* infoScreen;
 
 };
