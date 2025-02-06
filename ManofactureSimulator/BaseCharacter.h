@@ -177,6 +177,12 @@ private:
 	// Get an struct array with the orders status from stock.
 	void GetOrderOfTheDayStatus(TArray<FString> orders, TArray<struct FOrderOTD> ordersStatus);
 
+	// Get The current earning to be displayed on Monitor.
+	void GetCurrentEarnings(float earnigns);
+
+	// Holds the current earnings.
+	float currentEarings;
+
 	// Holds the ordes of the day.
 	TArray<FString> ordersOfTheDay;
 

@@ -34,3 +34,10 @@ void UMonitorComputerWidget::SetOrderOTDsStatus(TArray<FString> ordersOTD, TArra
     }
 
 }
+
+// Set the amount of money produced by the factory.
+void UMonitorComputerWidget::UMonitorComputerWidget::SetEarnings(float money)
+{
+    playerMoney->SetText(FText::AsNumber(money));
+
+}

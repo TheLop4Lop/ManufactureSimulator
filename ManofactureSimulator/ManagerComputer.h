@@ -8,6 +8,7 @@
 #include "ManagerComputer.generated.h"
 
 DECLARE_DELEGATE_TwoParams(FOFTDStatus, TArray<FString>, TArray<FOrderOTD>)
+DECLARE_DELEGATE_OneParam(FMoneyStatus, float)
 
 /**
  * 
@@ -30,6 +31,9 @@ public:
 
 	// Delegate to pass on the orders to the character.
 	FOFTDStatus ordersForMonitor;
+
+	// Delegate to pass on tick the current money, to keep track of production and looses.
+	FMoneyStatus currentMoneyStatus;
 
 	// Adds widget and assign the player controller to it.
 	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);

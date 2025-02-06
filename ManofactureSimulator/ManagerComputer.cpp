@@ -65,6 +65,7 @@ void AManagerComputer::Tick(float DeltaTime)
     {
         computerWidget->SetValueofCurrentMoney(currentMoney);
     }
+    currentMoneyStatus.ExecuteIfBound(currentMoney); // Initilices the money for player display.
 
 }
 
@@ -233,6 +234,7 @@ void AManagerComputer::UpdateCurrentEarnings(FString productCode)
                             CalculateFormProductionCostByString(productCode.Mid(4, 2)) + CalculateColorProductionCostByString(productCode.Right(2)));
 
     currentMoney += (float)currentEarnings;
+    currentMoneyStatus.ExecuteIfBound(currentMoney);
     
 }
 

@@ -33,9 +33,12 @@ public:
 	// Method to recieve data from player to show information on widget.
 	void SetOrderOTDsStatus(TArray<FString> ordersOTD, TArray<FOrderOTD> ordersOTDStatus);
 
+	// Set the amount of money produced by the factory.
+	void SetEarnings(float money);
+
 protected:
 	///////////////////////////////////// DISPLAY ORDER STATUS PROPERTIES ////////////////////////////////
-	// Section for buying material.
+	// Section for display orders.
 
 	// Image to change color indicator of aviability on stock based on index.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -190,5 +193,12 @@ protected:
 	// Text block for l3 quantity based on index order.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* l3Index5;
+
+	///////////////////////////////////// DISPLAY MONEY STATUS PROPERTIES ////////////////////////////////
+	// Section for display money.
+	
+	// Holds the Value of the Current Money.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* playerMoney;
 
 };

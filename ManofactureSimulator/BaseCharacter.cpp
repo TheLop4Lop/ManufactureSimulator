@@ -47,6 +47,7 @@ void ABaseCharacter::BeginPlay()
 	{
 		computerManager = Cast<AManagerComputer>(actorsInWorld[0]);
 		computerManager->ordersForMonitor.BindUObject(this, &ABaseCharacter::GetOrderOfTheDayStatus);
+		computerManager->currentMoneyStatus.BindUObject(this, &ABaseCharacter::GetCurrentEarnings);
 	}
 	
 }
@@ -62,11 +63,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 	if(holdedCanister && canisterWidget)
 	{
 		canisterWidget->SetIndicatorCanisterLevel((float)holdedCanister->GetCanisterCurrentLevel()/(float)holdedCanister->GetCanisterMaxCapacity());
-	}
-
-	if(computerManager && monitorWidget)
-	{
-		UE_LOG(LogTemp, Display, TEXT("SHOW SOMETHING SOMETHING"));
 	}
 
 }
@@ -341,6 +337,7 @@ void ABaseCharacter::SetMonitorWidget()
 			{
 				monitorWidget->AddToViewport();
 				isMonitorWidgetSet = true;
+				monitorWidget->SetEarnings(currentEarings);
 				if(ordersOfTheDay.Num() > 0 && ordersOfTheDayStatus.Num() > 0)
 				{
 					monitorWidget->SetOrderOTDsStatus(ordersOfTheDay, ordersOfTheDayStatus);
@@ -364,6 +361,17 @@ void ABaseCharacter::GetOrderOfTheDayStatus(TArray<FString> orders, TArray<FOrde
 		ordersOfTheDay.Add(orders[i]);
 		ordersOfTheDayStatus.Add(ordersStatus[i]);
 		UE_LOG(LogTemp, Display, TEXT("TOTAL ORDER STATUS: %i"), ordersOfTheDayStatus[i].canProduceByStock);
+	}
+
+}
+
+// Get The current earning to be displayed on Monitor.
+void ABaseCharacter::GetCurrentEarnings(float earnigns)
+{
+	currentEarings = earnigns;
+	if(monitorWidget)
+	{
+		monitorWidget->SetEarnings(currentEarings);
 	}
 
 }
