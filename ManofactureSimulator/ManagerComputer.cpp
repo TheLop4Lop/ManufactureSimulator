@@ -6,6 +6,7 @@
 #include "ManagerSupplierWidget.h"
 #include "EProductProperties.h"
 #include "ProductionScreen.h"
+#include "RefuelerComputer.h"
 #include "StorageManager.h"
 #include "SupplierCost.h"
 #include "OrderScreen.h"
@@ -33,6 +34,19 @@ void AManagerComputer::BeginPlay()
     actorInWorld.Empty();
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProductionScreen::StaticClass(), actorInWorld);
     if(actorInWorld.IsValidIndex(0)) productionScreen = Cast<AProductionScreen>(actorInWorld[0]);
+
+    actorInWorld.Empty();
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARefuelerComputer::StaticClass(), actorInWorld);
+    if(actorInWorld.IsValidIndex(0))
+    {
+        refuelerComputer = Cast<ARefuelerComputer>(actorInWorld[0]);
+        if(refuelerComputer)
+        {
+            UE_LOG(LogTemp, Display, TEXT("REFUELER COMPUTER FOUND!"));
+            refuelerComputer->oilCostAmount.BindUObject(this, &AManagerComputer::CalculateOilTransaction);
+            refuelerComputer->lubricantCostAmount.BindUObject(this, &AManagerComputer::CalculateLubricantTransaction);
+        }
+    }
 
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOrderScreen::StaticClass(), actorInWorld);
     for(AActor* singleActor : actorInWorld)
@@ -421,6 +435,43 @@ void AManagerComputer::UpdateOrderProductionStatusOnScreen(FString orderInProduc
     {
         lastOrderScreen->SetProductionOrderOnScreen(currentOrderScreen->GetProductionOrderOnScreen());
         currentOrderScreen->SetProductionOrderOnScreen(orderInProduction);
+    }
+
+}
+
+///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+// Section for oil and Lubricant supply.
+
+// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+void AManagerComputer::CalculateOilTransaction(float oilCost)
+{
+    UE_LOG(LogTemp, Display, TEXT("ASKING OIL"));
+    if((currentMoney - oilCost) >= 0)
+    {
+        UE_LOG(LogTemp, Display, TEXT("MONEY AFTER ASKING OIL: %f"), currentMoney - oilCost);
+        if(refuelerComputer)
+        {
+            UE_LOG(LogTemp, Display, TEXT("BUYING OIL"));
+            refuelerComputer->SetOilTransaction(true);
+        }
+        currentMoney -= oilCost;
+    }
+
+}
+
+// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+void AManagerComputer::CalculateLubricantTransaction(float lubricantCost)
+{
+    UE_LOG(LogTemp, Display, TEXT("ASKING LUBRICANT"));
+    if((currentMoney - lubricantCost) >= 0)
+    {
+        UE_LOG(LogTemp, Display, TEXT("MONEY AFTER ASKING LUBRICANT: %f"), currentMoney - lubricantCost);
+        if(refuelerComputer)
+        {
+            UE_LOG(LogTemp, Display, TEXT("BUYING LUBRICANT"));
+            refuelerComputer->SetOilTransaction(true);
+        }
+        currentMoney -= lubricantCost;
     }
 
 }

@@ -56,6 +56,12 @@ public:
 	// Get MAX Lubricant Deposit Level.
 	int GetMaxLubricantDepositLeve();
 
+	// Fill up the Oil Deposit Level.
+	void ResetUpTheOilDeposit();
+
+	// Fill up the Oil Deposit Level.
+	void ResetUpTheLubricantDeposit();
+
 protected:
 	///////////////////////////////////// REFUELER PROPERTIES ////////////////////////////////
 	// Sections for the actor properties.

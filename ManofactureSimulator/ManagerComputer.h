@@ -188,4 +188,16 @@ protected:
 	// Updates the order status on screen, this is based on the order being produced on the production line.
 	void UpdateOrderProductionStatusOnScreen(FString orderInProduction);
 
+	///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+	// Section for oil and Lubricant supply.
+
+	// Holds reference to the only Machine computer: Refueler Computer.
+	class ARefuelerComputer* refuelerComputer;
+
+	// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+	void CalculateOilTransaction(float oilCost);
+
+	// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+	void CalculateLubricantTransaction(float lubricantCost);
+
 };

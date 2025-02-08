@@ -300,3 +300,17 @@ int ARefueler::GetMaxLubricantDepositLeve()
 	return maxlubricantCapacity;
 
 }
+
+// Fill up the Oil Deposit Level.
+void ARefueler::ResetUpTheOilDeposit()
+{
+	oilLevel = maxOilCapacity;
+
+}
+
+// Fill up the Oil Deposit Level.
+void ARefueler::ResetUpTheLubricantDeposit()
+{
+	lubricantLevel = maxlubricantCapacity;
+
+}
