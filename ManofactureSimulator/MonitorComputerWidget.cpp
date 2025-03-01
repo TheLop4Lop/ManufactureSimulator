@@ -8,6 +8,7 @@
 // Method to recieve data from player to show information on widget.
 void UMonitorComputerWidget::SetOrderOTDsStatus(TArray<FString> ordersOTD, TArray<FOrderOTD> ordersOTDStatus)
 {
+    UE_LOG(LogTemp, Display, TEXT("ordersOTD: %i. ordersOTDStatus: %i."), ordersOTD.Num(), ordersOTDStatus.Num());
     UImage* orderImages[6] = {ImageIndex0, ImageIndex1, ImageIndex2, ImageIndex3, ImageIndex4, ImageIndex5};
 
     UTextBlock* orderNames[6] = {orderIndex0, orderIndex1, orderIndex2, orderIndex3, orderIndex4, orderIndex5};

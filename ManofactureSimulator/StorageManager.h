@@ -7,7 +7,7 @@
 #include "BaseStorage.h" // To access Enums and Struct
 #include "StorageManager.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOrderStored, FString)
+DECLARE_DELEGATE_TwoParams(FOrderStored, FString, bool)
 DECLARE_DELEGATE_OneParam(FOrderOfTheDayStatusOnStock, TArray<FOrderInfo>)
 
 UENUM(BlueprintType)
@@ -125,6 +125,9 @@ public:
 
 	// Gets the orders of the day for production follow up.
 	void GetOrdersOfTheDay(TArray<FOrdersForProduction> ordersSelectedDay);
+
+	// Get the Max produced code by the player.
+	FString GetMaxProducedCode();
 
 protected:
 	///////////////////////////////////// STORAGE/SPAWNER REFERENCES ////////////////////////////////

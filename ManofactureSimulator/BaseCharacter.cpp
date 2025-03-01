@@ -15,6 +15,7 @@
 #include "BaseComputer.h"
 #include "BaseCanister.h"
 #include "BaseProduct.h"
+#include "ExitDoor.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -165,7 +166,14 @@ void ABaseCharacter::InteractionOnSight()
 	//Checks if the controller isn't nullptr and if there's a actor in Character sight
 	if(actorInSight != nullptr && DoOnceWidget)
 	{
-		if(actorInSight->IsA(AInformationScreen::StaticClass())) 
+		if(actorInSight->IsA(AExitDoor::StaticClass()))
+		{
+			exitDoor = Cast<AExitDoor>(actorInSight);
+			SetInteractionWidget(exitDoorWidgetClass);
+			
+			canPlaceObject = false;
+			DoOnceWidget = false;
+		}else if(actorInSight->IsA(AInformationScreen::StaticClass())) 
 		{
 			infoScreen = Cast<AInformationScreen>(actorInSight);
 			SetInteractionWidget(informationScreenWidgetClass);
@@ -217,6 +225,13 @@ void ABaseCharacter::ComputerInteraction()
 		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
 		{
 			Computer->AddWidgetFromComputer(CharacterController);
+			this->GetMovementComponent()->Deactivate();
+			CharacterController->SetMovement(true);
+
+			bIsWidgetDisplayed = true;
+		}else if(CharacterController != nullptr && exitDoor != nullptr && exitDoor->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
+		{
+			exitDoor->AddWidgetFromComputer(CharacterController);
 			this->GetMovementComponent()->Deactivate();
 			CharacterController->SetMovement(true);
 
@@ -340,6 +355,7 @@ void ABaseCharacter::SetMonitorWidget()
 				monitorWidget->SetEarnings(currentEarings);
 				if(ordersOfTheDay.Num() > 0 && ordersOfTheDayStatus.Num() > 0)
 				{
+					UE_LOG(LogTemp, Display, TEXT("ordersOfTheDay: %i. ordersOfTheDayStatus: %i."), ordersOfTheDay.Num(), ordersOfTheDayStatus.Num());
 					monitorWidget->SetOrderOTDsStatus(ordersOfTheDay, ordersOfTheDayStatus);
 				}
 			}
@@ -356,6 +372,8 @@ void ABaseCharacter::SetMonitorWidget()
 // Get an struct array with the orders status from stock.
 void ABaseCharacter::GetOrderOfTheDayStatus(TArray<FString> orders, TArray<FOrderOTD> ordersStatus)
 {
+	ordersOfTheDay.Empty();
+	ordersOfTheDayStatus.Empty();
 	for(int i = 0; i < orders.Num(); i++)
 	{
 		ordersOfTheDay.Add(orders[i]);

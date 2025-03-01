@@ -30,6 +30,9 @@ public:
 	// Returns the total amount of product stored.
 	int GetTotalOfProductsStored();
 
+	// Gets the most produced product during the simulation.
+	FString GetMostProducedCode();
+
 private:
 	///////////////////////////////////// FINAL STORAGE PROPERTIES ////////////////////////////////
 	// Section for Final Storgae Properties.

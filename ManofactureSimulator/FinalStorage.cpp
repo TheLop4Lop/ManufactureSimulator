@@ -61,3 +61,21 @@ int AFinalStorage::GetTotalOfProductsStored()
 	return totalProductsStored;
 
 }
+
+// Gets the most produced product during the simulation.
+FString AFinalStorage::GetMostProducedCode()
+{
+	int maxValue = 0;
+	FString mostProduced = "";
+
+	for (const TPair<FString, int>& entryProduct : finishedPiecesCodeInStorage)
+	{
+		if(entryProduct.Value > maxValue)
+		{
+			maxValue = entryProduct.Value;
+			mostProduced = entryProduct.Key;
+		}
+	}
+	return mostProduced;
+
+}

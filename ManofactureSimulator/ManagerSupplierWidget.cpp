@@ -12,6 +12,7 @@ void UManagerSupplierWidget::NativeConstruct()
     Super::NativeConstruct();
 
     ImplementButtons();
+    ImplementResetButton();
     ImplementAcceptButton();
 
 }
@@ -241,6 +242,26 @@ void UManagerSupplierWidget::DisplayButtonCodeOptions()
 
         textButtonArray[i]->SetText(FText::FromString(baseTextProduct + baseTextQuantity + baseTextEarnings));
     }
+
+}
+
+///////////////////////////////////// RESET SELECTION ORDERS COST PROPERTIES ////////////////////////////////
+// Section for reset orders options and cost.
+
+// Implements Reset button logic interction.
+void UManagerSupplierWidget::ImplementResetButton()
+{
+    if(resetOrdersButton)
+    {
+        resetOrdersButton->OnReleased.AddDynamic(this, &UManagerSupplierWidget::SetResetButtonLogic);
+    }
+
+}
+
+// Set logic for Reset button.
+void UManagerSupplierWidget::SetResetButtonLogic()
+{
+    askNewOrders.ExecuteIfBound();
 
 }
 

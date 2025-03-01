@@ -199,4 +199,14 @@ private:
 	// Holds the a reference to Information Screens infront of player.
 	class AInformationScreen* infoScreen;
 
+	///////////////////////////////////// EXIT DOOR WIDGET PROPERTIES ////////////////////////////////
+	// Interaction with exit door.
+
+	// Exit Door interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Exit Widget", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> exitDoorWidgetClass;
+
+	// Holds the a reference to Exit Door widget info.
+	class AExitDoor* exitDoor;
+
 };
