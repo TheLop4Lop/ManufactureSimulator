@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int productQuantity = 1;
 
+	// Sets the order being delivered.
+	void SetOrderBeingDelivered(FString order);
+
 protected:
 	///////////////////////////////////// LENGTH PRODUCT BUTTON PROPERTIES ////////////////////////////////
 	// Section for Length product characteristic buttons.
@@ -90,5 +93,12 @@ protected:
 	// Set Confirm button logic for orders.
 	UFUNCTION()
 	void SetConfirmLogic();
+
+	///////////////////////////////////// STORE RAW PRODUCT ORDERS PROPERTIES ////////////////////////////////
+	// Sections to store the orders by the player to show on widget.
+
+	// Holds the code order being delivered.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString orderBeingDelivered;
 
 };

@@ -7,6 +7,7 @@
 #include "BaseStorage.h" // To access Enums and Struct
 #include "StorageManager.generated.h"
 
+DECLARE_DELEGATE(FOrderDelivered)
 DECLARE_DELEGATE_TwoParams(FOrderStored, FString, bool)
 DECLARE_DELEGATE_OneParam(FOrderOfTheDayStatusOnStock, TArray<FOrderInfo>)
 
@@ -104,6 +105,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Delegate event to signal an order has been delivered.
+	FOrderDelivered orderDelivered;
 
 	// Delegate event to Spawn order.
 	FOnOrderProcessed orderToProcess;

@@ -103,6 +103,8 @@ void AStorageManager::SpawnProductOrder()
 	{
 		if (ordersToSpawn[0].quantity == 0)
 		{
+			orderDelivered.ExecuteIfBound(); // Tells the ProductionComputer when an order is full delivered.
+
 			ordersToSpawn.RemoveAt(0);
 			if (ordersToSpawn.Num() == 0)
 			{

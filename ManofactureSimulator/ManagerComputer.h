@@ -191,7 +191,7 @@ protected:
 	// For the moment, this class holds the money interaction in game.
 
 	// Holds the value of the current manufactory money.
-	float currentMoney = 500.0f;
+	float currentMoney = 850.0f;
 
 	// Holds the value of the losses through out the day.
 	float lossMoney;

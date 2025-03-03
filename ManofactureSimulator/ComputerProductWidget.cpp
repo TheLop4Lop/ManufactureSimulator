@@ -101,3 +101,13 @@ void UComputerProductWidget::SetConfirmLogic()
     confirmEvent.ExecuteIfBound(materialType + sizeType + lengthType, productQuantity);
 
 }
+
+///////////////////////////////////// STORE RAW PRODUCT ORDERS PROPERTIES ////////////////////////////////
+// Sections to store the orders by the player to show on widget.
+
+// Sets the order being delivered.
+void UComputerProductWidget::SetOrderBeingDelivered(FString order)
+{
+    orderBeingDelivered = order;
+
+}
