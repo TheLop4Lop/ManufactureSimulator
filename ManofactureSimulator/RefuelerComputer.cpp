@@ -31,6 +31,12 @@ void ARefuelerComputer::Tick(float DeltaTime)
 
         float lubricantLevel = ((float)refuelerMachine->GetLubricantDepositLeve()/(float)refuelerMachine->GetMaxLubricantDepositLeve());
         computerWidget->SetLubricantBarLevel(lubricantLevel);
+
+        oilCostToBuy = ((float)refuelerMachine->GetMaxOilDepositLevel() - (float)refuelerMachine->GetOilDepositLevel()) * oilCost;
+        computerWidget->SetOilCost(oilCostToBuy);
+
+        lubricantCostToBuy = ((float)refuelerMachine->GetMaxLubricantDepositLeve() - (float)refuelerMachine->GetLubricantDepositLeve()) * lubricantCost;
+        computerWidget->SetLubricantCost(lubricantCostToBuy);
     }
 
 }
@@ -50,6 +56,9 @@ void ARefuelerComputer::AddWidgetFromComputer(ACharacterController* CharacterCon
         computerWidget->doorAction.BindUObject(this, &ARefuelerComputer::CallsSecurityDoorAction);
 		computerWidget->oilRefuelAction.BindUObject(this, &ARefuelerComputer::CallsOilRefuel);
 		computerWidget->lubricantRefuelAction.BindUObject(this, &ARefuelerComputer::CallsLubricantRefuel);
+
+        computerWidget->buyOil.BindUObject(this, &ARefuelerComputer::BuyOilFromSupplier);
+        computerWidget->buyLubricant.BindUObject(this, &ARefuelerComputer::BuyLubricantFromSupplier);
 	}
 
 }
@@ -107,5 +116,52 @@ void ARefuelerComputer::CallsLubricantRefuel()
     {
         refuelerMachine->LubricantActionButton();
     }
+
+}
+
+///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+// Section for oil and Lubricant supply.
+
+// Calculates the price of oil and buy it from ManagerComputer into Refueler.
+void ARefuelerComputer::BuyOilFromSupplier()
+{
+    if(refuelerMachine)
+    {
+        oilCostAmount.ExecuteIfBound(oilCostToBuy);
+        if(canBuyOil)
+        {
+            refuelerMachine->ResetUpTheOilDeposit();
+        }
+    }
+    canBuyOil = false; // Reset value.
+
+}
+
+// Calculates the price of lubricant and buy it from ManagerComputer into Refueler.
+void ARefuelerComputer::BuyLubricantFromSupplier()
+{
+    if(refuelerMachine)
+    {
+        lubricantCostAmount.ExecuteIfBound(lubricantCostToBuy);
+        if(canBuyLubricant)
+        {
+            refuelerMachine->ResetUpTheLubricantDeposit();
+        }
+    }
+    canBuyLubricant = false; // Reset value.
+
+}
+
+// Sets boolean condition to buy oil.
+void ARefuelerComputer::SetOilTransaction(bool oilTransationStatus)
+{
+    canBuyOil = oilTransationStatus;
+
+}
+
+// Sets boolean condition to buy lubricant.
+void ARefuelerComputer::SetLubricantTransaction(bool lubricantTransationStatus)
+{
+    canBuyLubricant = lubricantTransationStatus;
 
 }

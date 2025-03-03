@@ -8,12 +8,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "CharacterController.h"
+#include "InformationScreen.h"
 #include "ManagerComputer.h"
 #include "CanisterWidget.h"
 #include "Interactable.h"
 #include "BaseComputer.h"
 #include "BaseCanister.h"
 #include "BaseProduct.h"
+#include "ExitDoor.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -46,6 +48,7 @@ void ABaseCharacter::BeginPlay()
 	{
 		computerManager = Cast<AManagerComputer>(actorsInWorld[0]);
 		computerManager->ordersForMonitor.BindUObject(this, &ABaseCharacter::GetOrderOfTheDayStatus);
+		computerManager->currentMoneyStatus.BindUObject(this, &ABaseCharacter::GetCurrentEarnings);
 	}
 	
 }
@@ -61,11 +64,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 	if(holdedCanister && canisterWidget)
 	{
 		canisterWidget->SetIndicatorCanisterLevel((float)holdedCanister->GetCanisterCurrentLevel()/(float)holdedCanister->GetCanisterMaxCapacity());
-	}
-
-	if(computerManager && monitorWidget)
-	{
-		UE_LOG(LogTemp, Display, TEXT("SHOW SOMETHING SOMETHING"));
 	}
 
 }
@@ -111,6 +109,9 @@ void ABaseCharacter::ResetMoveInput()
 {
 	this->GetMovementComponent()->Activate();
 	bIsWidgetDisplayed = false;
+
+	Computer = nullptr;
+	infoScreen = nullptr;
 
 }
 
@@ -165,7 +166,21 @@ void ABaseCharacter::InteractionOnSight()
 	//Checks if the controller isn't nullptr and if there's a actor in Character sight
 	if(actorInSight != nullptr && DoOnceWidget)
 	{
-		if(actorInSight->IsA(ABaseComputer::StaticClass()))
+		if(actorInSight->IsA(AExitDoor::StaticClass()))
+		{
+			exitDoor = Cast<AExitDoor>(actorInSight);
+			SetInteractionWidget(exitDoorWidgetClass);
+			
+			canPlaceObject = false;
+			DoOnceWidget = false;
+		}else if(actorInSight->IsA(AInformationScreen::StaticClass())) 
+		{
+			infoScreen = Cast<AInformationScreen>(actorInSight);
+			SetInteractionWidget(informationScreenWidgetClass);
+
+			canPlaceObject = false;
+			DoOnceWidget = false;
+		}else if(actorInSight->IsA(ABaseComputer::StaticClass()))
 		{
 			Computer = Cast<ABaseComputer>(actorInSight);
 
@@ -210,6 +225,20 @@ void ABaseCharacter::ComputerInteraction()
 		if(CharacterController != nullptr && Computer != nullptr && Computer->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
 		{
 			Computer->AddWidgetFromComputer(CharacterController);
+			this->GetMovementComponent()->Deactivate();
+			CharacterController->SetMovement(true);
+
+			bIsWidgetDisplayed = true;
+		}else if(CharacterController != nullptr && exitDoor != nullptr && exitDoor->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
+		{
+			exitDoor->AddWidgetFromComputer(CharacterController);
+			this->GetMovementComponent()->Deactivate();
+			CharacterController->SetMovement(true);
+
+			bIsWidgetDisplayed = true;
+		}else if(CharacterController != nullptr && infoScreen != nullptr && infoScreen->GetComputerWidgetClass() != nullptr && !bIsWidgetDisplayed)
+		{
+			infoScreen->AddWidgetFromComputer(CharacterController);
 			this->GetMovementComponent()->Deactivate();
 			CharacterController->SetMovement(true);
 
@@ -323,8 +352,10 @@ void ABaseCharacter::SetMonitorWidget()
 			{
 				monitorWidget->AddToViewport();
 				isMonitorWidgetSet = true;
+				monitorWidget->SetEarnings(currentEarings);
 				if(ordersOfTheDay.Num() > 0 && ordersOfTheDayStatus.Num() > 0)
 				{
+					UE_LOG(LogTemp, Display, TEXT("ordersOfTheDay: %i. ordersOfTheDayStatus: %i."), ordersOfTheDay.Num(), ordersOfTheDayStatus.Num());
 					monitorWidget->SetOrderOTDsStatus(ordersOfTheDay, ordersOfTheDayStatus);
 				}
 			}
@@ -341,11 +372,24 @@ void ABaseCharacter::SetMonitorWidget()
 // Get an struct array with the orders status from stock.
 void ABaseCharacter::GetOrderOfTheDayStatus(TArray<FString> orders, TArray<FOrderOTD> ordersStatus)
 {
+	ordersOfTheDay.Empty();
+	ordersOfTheDayStatus.Empty();
 	for(int i = 0; i < orders.Num(); i++)
 	{
 		ordersOfTheDay.Add(orders[i]);
 		ordersOfTheDayStatus.Add(ordersStatus[i]);
 		UE_LOG(LogTemp, Display, TEXT("TOTAL ORDER STATUS: %i"), ordersOfTheDayStatus[i].canProduceByStock);
+	}
+
+}
+
+// Get The current earning to be displayed on Monitor.
+void ABaseCharacter::GetCurrentEarnings(float earnigns)
+{
+	currentEarings = earnigns;
+	if(monitorWidget)
+	{
+		monitorWidget->SetEarnings(currentEarings);
 	}
 
 }

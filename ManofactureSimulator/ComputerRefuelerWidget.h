@@ -11,6 +11,9 @@ DECLARE_DELEGATE(FSecurityDoorEvent);
 DECLARE_DELEGATE(FStartOilRefuel);
 DECLARE_DELEGATE(FStartLubricantRefuel);
 
+DECLARE_DELEGATE(FBuyOil);
+DECLARE_DELEGATE(FBuyLubricant);
+
 /**
  * 
  */
@@ -35,6 +38,12 @@ public:
 	// Delegate event to fill lubricant canister event.
 	FStartLubricantRefuel lubricantRefuelAction;
 
+	// Delegate event to buy oil from supplier.
+	FBuyOil buyOil;
+
+	// Delegate event to buy lubricant from supplier.
+	FBuyLubricant buyLubricant;
+
 	// Sets the color of the Power Button Light.
 	void SetPowerLight(bool bMachinePower);
 
@@ -44,9 +53,15 @@ public:
 	// Sets value of Lubricant Bar.
 	void SetLubricantBarLevel(float lubricantLevel);
 
+	// Sets the oil cost on Widget.
+	void SetOilCost(float oilResetCost);
+
+	// Sets the lubricant cost on Widget.
+	void SetLubricantCost(float lubricantResetCost);
+
 protected:
-///////////////////////////////////// COMPUTER REFUELER PROPERTIES ////////////////////////////////
-// Section for Computer Refueler buttons.
+	///////////////////////////////////// COMPUTER REFUELER PROPERTIES ////////////////////////////////
+	// Section for Computer Refueler buttons.
 
 	// Power machine button.
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
@@ -94,5 +109,35 @@ protected:
 	// Sets lubricantCanister button logic implementation.
 	UFUNCTION()
 	void SetlubricantCanisterButtonLogic();
+
+	///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+	// Section for oil and Lubricant supply.
+
+	// Buys oil from supplier.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UButton* buyOilButton;
+
+	// Buys lubricant from supplier.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UButton* buyLubricantButton;
+
+	// Holds the informatin of oil cost.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* oilCost;
+
+	// Holds the informatin of oil cost.
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* lubricantCost;
+
+	// Set buy buttons events.
+	void SetBuyButtonsEvents();
+
+	// Set Buy oil Button Logic.
+	UFUNCTION()
+	void SetBuyOilButtonLogic();
+
+	// Set Buy lubricant Button Logic.
+	UFUNCTION()
+	void SetBuyLubricantButtonLogic();
 
 };

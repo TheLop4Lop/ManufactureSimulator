@@ -14,7 +14,11 @@ void AProductionComputer::BeginPlay()
 
 	TArray<AActor*> actorsInWorld;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStorageManager::StaticClass(), actorsInWorld);
-	if(actorsInWorld.IsValidIndex(0)) storageManager = Cast<AStorageManager>(actorsInWorld[0]);	
+	if(actorsInWorld.IsValidIndex(0))
+	{
+		storageManager = Cast<AStorageManager>(actorsInWorld[0]);
+		storageManager->orderDelivered.BindUObject(this, &AProductionComputer::UpdateDeliverOrders);
+	}
 	
 }
 
@@ -29,6 +33,11 @@ void AProductionComputer::AddWidgetFromComputer(ACharacterController* CharacterC
 		computerWidget->AddToViewport();
 		computerWidget->confirmEvent.BindUObject(this, &AProductionComputer::WidgetBindProductOrder);
 		computerWidget->exitButtonEvent.BindUObject(this, &AProductionComputer::PublicWidgetBindResetController);
+
+		if(ordersToDeliver.Num() > 0)
+		{
+			computerWidget->SetOrderBeingDelivered(ordersToDeliver[0]);
+		}
 	}
 
 }
@@ -38,7 +47,18 @@ void AProductionComputer::WidgetBindProductOrder(FString productCode, int rawPro
 {
 	if(storageManager)
 	{
-		storageManager->CanProduceProductOrder(productCode, rawProductQUantity);
+		FString producedCode;
+		if(storageManager->CanProduceProductOrder(productCode, rawProductQUantity) == EStorageProductionStatus::CAN_PRODUCE)
+		{
+			producedCode = FString::FromInt(rawProductQUantity) + " x " + productCode;
+
+			ordersToDeliver.Add(producedCode);
+			computerWidget->SetOrderBeingDelivered(ordersToDeliver[0]);
+		}else
+		{
+			producedCode = "NOT IN STOCK";
+			computerWidget->SetOrderBeingDelivered(producedCode);
+		}
 	}
 
 }
@@ -46,5 +66,21 @@ void AProductionComputer::WidgetBindProductOrder(FString productCode, int rawPro
 void AProductionComputer::PublicWidgetBindResetController()
 {
     WidgetBindResetController();
+
+}
+
+///////////////////////////////////// STORE RAW PRODUCT ORDERS PROPERTIES ////////////////////////////////
+// Sections to store the orders by the player to show on widget.
+
+// Called when the StorageManager Delegate fires after deliver a production order.
+void AProductionComputer::UpdateDeliverOrders()
+{
+	if(ordersToDeliver.Num() > 0)
+	{
+		ordersDelivered.Add(ordersToDeliver[0]);
+		ordersToDeliver.RemoveAt(0);
+
+		if(computerWidget) computerWidget->SetOrderBeingDelivered(ordersToDeliver[0]);
+	}
 
 }

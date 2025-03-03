@@ -7,6 +7,7 @@
 #include "ManagerSupplierWidget.generated.h"
 
 DECLARE_DELEGATE_TwoParams(FSelectionOrders, TArray<int>, int);
+DECLARE_DELEGATE(FResetOrdersOfTheDay)
 
 USTRUCT(BlueprintType)
 struct FOrderSelection
@@ -38,6 +39,9 @@ protected:
 public:
 	// Delegate executed on confimr button to pass index selection to ManagerComputer.
 	FSelectionOrders ordersSelectedDelegate;
+
+	// Delegate excecured to ask new orders to the manager computer.
+	FResetOrdersOfTheDay askNewOrders;
 
 	// Sets the value of qualityMaterialCost.
 	void SetValueofCurrentMoney(float money);
@@ -240,15 +244,15 @@ protected:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* resetOrdersButton;
 
-	// Holds the value of reset cost.
-	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess))
-	float resetCost;
-
-	// Holds the value of the penalty due quantity of reset and customers penalty.
-	float penaltyPerReset;
-
 	// Holds the quantity of resets.
 	int penaltyPerResetCnt;
+
+	// Implements Reset button logic interction.
+	void ImplementResetButton();
+
+	// Set logic for Reset button.
+	UFUNCTION()
+	void SetResetButtonLogic();
 
 	///////////////////////////////////// ORDER SELECTED PROPERTIES ////////////////////////////////
 	// Section for orders selected to produce.

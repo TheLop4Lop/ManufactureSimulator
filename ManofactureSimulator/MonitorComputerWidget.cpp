@@ -8,6 +8,7 @@
 // Method to recieve data from player to show information on widget.
 void UMonitorComputerWidget::SetOrderOTDsStatus(TArray<FString> ordersOTD, TArray<FOrderOTD> ordersOTDStatus)
 {
+    UE_LOG(LogTemp, Display, TEXT("ordersOTD: %i. ordersOTDStatus: %i."), ordersOTD.Num(), ordersOTDStatus.Num());
     UImage* orderImages[6] = {ImageIndex0, ImageIndex1, ImageIndex2, ImageIndex3, ImageIndex4, ImageIndex5};
 
     UTextBlock* orderNames[6] = {orderIndex0, orderIndex1, orderIndex2, orderIndex3, orderIndex4, orderIndex5};
@@ -32,5 +33,12 @@ void UMonitorComputerWidget::SetOrderOTDsStatus(TArray<FString> ordersOTD, TArra
         orderL2s[i]->SetText(FText::FromString(FString::FromInt(ordersOTDStatus[i].lxProperties[1]))); // index 1 correspond to L1s in the array.
         orderL3s[i]->SetText(FText::FromString(FString::FromInt(ordersOTDStatus[i].lxProperties[2]))); // index 2 correspond to L1s in the array.
     }
+
+}
+
+// Set the amount of money produced by the factory.
+void UMonitorComputerWidget::UMonitorComputerWidget::SetEarnings(float money)
+{
+    playerMoney->SetText(FText::AsNumber(money));
 
 }

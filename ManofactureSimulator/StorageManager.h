@@ -7,7 +7,8 @@
 #include "BaseStorage.h" // To access Enums and Struct
 #include "StorageManager.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOrderStored, FString)
+DECLARE_DELEGATE(FOrderDelivered)
+DECLARE_DELEGATE_TwoParams(FOrderStored, FString, bool)
 DECLARE_DELEGATE_OneParam(FOrderOfTheDayStatusOnStock, TArray<FOrderInfo>)
 
 UENUM(BlueprintType)
@@ -105,6 +106,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Delegate event to signal an order has been delivered.
+	FOrderDelivered orderDelivered;
+
 	// Delegate event to Spawn order.
 	FOnOrderProcessed orderToProcess;
 
@@ -125,6 +129,9 @@ public:
 
 	// Gets the orders of the day for production follow up.
 	void GetOrdersOfTheDay(TArray<FOrdersForProduction> ordersSelectedDay);
+
+	// Get the Max produced code by the player.
+	FString GetMaxProducedCode();
 
 protected:
 	///////////////////////////////////// STORAGE/SPAWNER REFERENCES ////////////////////////////////

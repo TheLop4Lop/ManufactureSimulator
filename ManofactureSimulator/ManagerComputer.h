@@ -8,6 +8,29 @@
 #include "ManagerComputer.generated.h"
 
 DECLARE_DELEGATE_TwoParams(FOFTDStatus, TArray<FString>, TArray<FOrderOTD>)
+DECLARE_DELEGATE_OneParam(FMoneyStatus, float)
+
+USTRUCT(BlueprintType)
+struct FExitSimulationInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float timeSimulated;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int totalProducts;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString mostProduced;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float totalEarnings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float lostMoney;
+
+};
 
 /**
  * 
@@ -31,8 +54,14 @@ public:
 	// Delegate to pass on the orders to the character.
 	FOFTDStatus ordersForMonitor;
 
+	// Delegate to pass on tick the current money, to keep track of production and looses.
+	FMoneyStatus currentMoneyStatus;
+
 	// Adds widget and assign the player controller to it.
 	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);
+
+	// Gather all the information to pass on to Exit Door.
+	FExitSimulationInfo GetExitDoorInformation();
 
 protected:
 	///////////////////////////////////// MANAGER PROPERTIES ////////////////////////////////
@@ -129,7 +158,7 @@ protected:
 	float CalculateColorProductionCostByString(FString colorCode);
 
 	// Updates the current earnings produced to dislay,
-	void UpdateCurrentEarnings(FString productCode);
+	void UpdateCurrentEarnings(FString productCode, bool isOnOotD);
 
 	// Updates the data on Stock.
 	void UpdateOrdersDataOnStock(TArray<struct FOrderInfo> updatedStockStatus);
@@ -155,11 +184,17 @@ protected:
 	// Holds the total amount of current earnings produced.
 	int currentEarnings;
 
+	// Holds the value of the initial amout of money.
+	float initialMoney;
+
 	///////////////////////////////////// GAMEPLAY MONEY LOGIC PROPERTIES ////////////////////////////////
 	// For the moment, this class holds the money interaction in game.
 
 	// Holds the value of the current manufactory money.
-	float currentMoney = 500.0f;
+	float currentMoney = 850.0f;
+
+	// Holds the value of the losses through out the day.
+	float lossMoney;
 
 	// Value needed to buy the selected order.
 	float orderCost;
@@ -183,5 +218,36 @@ protected:
 
 	// Updates the order status on screen, this is based on the order being produced on the production line.
 	void UpdateOrderProductionStatusOnScreen(FString orderInProduction);
+
+	///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+	// Section for oil and Lubricant supply.
+
+	// Holds reference to the only Machine computer: Refueler Computer.
+	class ARefuelerComputer* refuelerComputer;
+
+	// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+	void CalculateOilTransaction(float oilCost);
+
+	// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+	void CalculateLubricantTransaction(float lubricantCost);
+
+	///////////////////////////////////// RESET SELECTION ORDERS COST PROPERTIES ////////////////////////////////
+	// Section for reset orders options and cost.
+
+	// Holds the value of reset cost.
+	UPROPERTY(EditAnywhere, Category = "Regenerate Orders", meta = (AllowPrivateAccess))
+	float resetCost = 50.0f;
+
+	// By a Reset button in Widget Supplier ask for new codes to select.
+	void RegenerateTheOrdersToSelect();
+
+	///////////////////////////////////// EXIT SIMULATION INFO PROPERTIES ////////////////////////////////
+	// Section for data recovering to display on Exit Door Widget.
+
+	// Holds the initial seconds to track the time passed between the begining of the simulation and door interaction.
+	float initialSeconds;
+
+	// Holds a struct to pass on wit all the information.
+	FExitSimulationInfo exitPlayerInfo;
 
 };

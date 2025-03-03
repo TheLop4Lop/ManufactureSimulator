@@ -3,6 +3,7 @@
 
 #include "ComputerRefuelerWidget.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 
@@ -11,6 +12,7 @@ void UComputerRefuelerWidget::NativeConstruct()
     Super::NativeConstruct();
 
     SetButtonsLogicEvents();
+    SetBuyButtonsEvents();
 
 }
 
@@ -90,5 +92,51 @@ void UComputerRefuelerWidget::SetOilCanisterButtonLogic()
 void UComputerRefuelerWidget::SetlubricantCanisterButtonLogic()
 {
     lubricantRefuelAction.ExecuteIfBound();
+
+}
+
+///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+// Section for oil and Lubricant supply.
+
+// Set buy buttons events.
+void UComputerRefuelerWidget::SetBuyButtonsEvents()
+{
+    if(buyOilButton)
+    {
+        buyOilButton->OnClicked.AddDynamic(this, &UComputerRefuelerWidget::SetBuyOilButtonLogic);
+    }
+
+    if(buyLubricantButton)
+    {
+        buyLubricantButton->OnClicked.AddDynamic(this, &UComputerRefuelerWidget::SetBuyLubricantButtonLogic);
+    }
+
+}
+
+// Set Buy oil Button Logic.
+void UComputerRefuelerWidget::SetBuyOilButtonLogic()
+{
+    buyOil.ExecuteIfBound();
+
+}
+
+// Set Buy lubricant Button Logic.
+void UComputerRefuelerWidget::SetBuyLubricantButtonLogic()
+{
+    buyLubricant.ExecuteIfBound();
+
+}
+
+// Sets the oil cost on Widget.
+void UComputerRefuelerWidget::SetOilCost(float oilResetCost)
+{
+    oilCost->SetText(FText::AsNumber(oilResetCost));
+
+}
+
+// Sets the lubricant cost on Widget.
+void UComputerRefuelerWidget::SetLubricantCost(float lubricantResetCost)
+{
+    lubricantCost->SetText(FText::AsNumber(lubricantResetCost));
 
 }

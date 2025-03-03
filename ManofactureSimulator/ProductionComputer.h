@@ -35,5 +35,17 @@ protected:
 
 	// Gett the product order for pass it on to Storage manager.
 	void WidgetBindProductOrder(FString productCode, int rawProductQUantity);
+
+	///////////////////////////////////// STORE RAW PRODUCT ORDERS PROPERTIES ////////////////////////////////
+	// Sections to store the orders by the player to show on widget.
+
+	// Stores the orders to ask for the Storage Manager.
+	TArray<FString> ordersToDeliver;
+
+	// Stores the orders already delivered by the Storage Manager.
+	TArray<FString> ordersDelivered;
+
+	// Called when the StorageManager Delegate fires after deliver a production order.
+	void UpdateDeliverOrders();
 	
 };

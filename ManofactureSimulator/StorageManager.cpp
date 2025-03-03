@@ -103,6 +103,8 @@ void AStorageManager::SpawnProductOrder()
 	{
 		if (ordersToSpawn[0].quantity == 0)
 		{
+			orderDelivered.ExecuteIfBound(); // Tells the ProductionComputer when an order is full delivered.
+
 			ordersToSpawn.RemoveAt(0);
 			if (ordersToSpawn.Num() == 0)
 			{
@@ -170,6 +172,7 @@ void AStorageManager::UpdateOrdersOfTheDayOnStock()
     const int piecesPerL2 = 5; // 5 is the quantity amout of pieces the Cutter Machine can cut from an L2 initial log.
     const int piecesPerL1 = 3; // 3 is the quantity amout of pieces the Cutter Machine can cut from an L1 initial log.
 
+	ordersOfTheDayInfo.Empty();
 	for(int i = 0; i < ordersOfTheDay.Num(); i++)
 	{
 		FOrdersInLengthMaterial orderLengthStock = ConvertQuantityProductionOrderToStock(ordersOfTheDay[i].orderForProductionQuantity);
@@ -211,9 +214,11 @@ void AStorageManager::CheckOrderInOrdersOfTheDay(FString storedOrder)
 	{
 		if(singleOrder.orderForProductionCode.Equals(storedOrder))
 		{
-			orderStored.ExecuteIfBound(storedOrder);
+			orderStored.ExecuteIfBound(storedOrder, true);
+			return;
 		}
 	}
+	orderStored.ExecuteIfBound(storedOrder, false);
 
 }
 
@@ -345,5 +350,20 @@ void AStorageManager::SetOrderInfo(FOrdersInLengthMaterial orderQuantityAsked, F
 		orderInfo->orderLenghtsInfo.l2Quantity += lengthMaterialsInStock.l2Quantity;
 		orderInfo->orderLenghtsInfo.l3Quantity += lengthMaterialsInStock.l3Quantity;
 	}
+
+}
+
+///////////////////////////////////// PLAYERS RESULT ////////////////////////////////
+// Section for the getting the players stats.
+
+// Get the Max produced code by the player.
+FString AStorageManager::GetMaxProducedCode()
+{
+	if(finalStorage)
+	{
+		return finalStorage->GetMostProducedCode();
+	}
+
+	return "";
 
 }

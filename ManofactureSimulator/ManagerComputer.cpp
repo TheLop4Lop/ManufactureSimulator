@@ -6,6 +6,7 @@
 #include "ManagerSupplierWidget.h"
 #include "EProductProperties.h"
 #include "ProductionScreen.h"
+#include "RefuelerComputer.h"
 #include "StorageManager.h"
 #include "SupplierCost.h"
 #include "OrderScreen.h"
@@ -34,6 +35,19 @@ void AManagerComputer::BeginPlay()
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProductionScreen::StaticClass(), actorInWorld);
     if(actorInWorld.IsValidIndex(0)) productionScreen = Cast<AProductionScreen>(actorInWorld[0]);
 
+    actorInWorld.Empty();
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARefuelerComputer::StaticClass(), actorInWorld);
+    if(actorInWorld.IsValidIndex(0))
+    {
+        refuelerComputer = Cast<ARefuelerComputer>(actorInWorld[0]);
+        if(refuelerComputer)
+        {
+            UE_LOG(LogTemp, Display, TEXT("REFUELER COMPUTER FOUND!"));
+            refuelerComputer->oilCostAmount.BindUObject(this, &AManagerComputer::CalculateOilTransaction);
+            refuelerComputer->lubricantCostAmount.BindUObject(this, &AManagerComputer::CalculateLubricantTransaction);
+        }
+    }
+
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOrderScreen::StaticClass(), actorInWorld);
     for(AActor* singleActor : actorInWorld)
     {
@@ -48,6 +62,7 @@ void AManagerComputer::BeginPlay()
     }
 
     GenerateOrdersForTheDay(); // Generates random orders.
+    initialMoney = currentEarnings;
 
 }
 
@@ -65,6 +80,7 @@ void AManagerComputer::Tick(float DeltaTime)
     {
         computerWidget->SetValueofCurrentMoney(currentMoney);
     }
+    currentMoneyStatus.ExecuteIfBound(currentMoney); // Initilices the money for player display.
 
 }
 
@@ -80,6 +96,7 @@ void AManagerComputer::AddWidgetFromComputer(ACharacterController* CharacterCont
 		computerWidget->confirmEvent.BindUObject(this, &AManagerComputer::ReplenishRawMaterialInStorage);
 		computerWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::PublicWidgetBindResetController);
         
+        computerWidget->askNewOrders.BindUObject(this, &AManagerComputer::RegenerateTheOrdersToSelect);
         computerWidget->ordersSelectedDelegate.BindUObject(this, &AManagerComputer::StoreSelectedOrders);
         computerWidget->SetOrdersToSelect(gneratedOrders);
 
@@ -219,20 +236,22 @@ float AManagerComputer::CalculateColorProductionCostByString(FString colorCode)
 }
 
 // Updates the current earnings produced to dislay,
-void AManagerComputer::UpdateCurrentEarnings(FString productCode)
+void AManagerComputer::UpdateCurrentEarnings(FString productCode, bool isOnOotD) ////////////////////////////////
 {
-    UpdateOrderProductionStatusOnScreen(productCode);
-    UE_LOG(LogTemp, Display, TEXT("STORED CODE: %s"), *productCode);
+    if(isOnOotD)
+    {
+        UpdateOrderProductionStatusOnScreen(productCode);
 
-    UE_LOG(LogTemp, Display, TEXT("STORED MATERIAL COST: %f"), CalculateMaterialProductionCostByString(productCode.Left(2)));
-    UE_LOG(LogTemp, Display, TEXT("STORED SIZE COST: %f"), CalculateSizeProductionCostByString(productCode.Mid(2, 2)));
-    UE_LOG(LogTemp, Display, TEXT("STORED FORM COST: %f"), CalculateFormProductionCostByString(productCode.Mid(4, 2)));
-    UE_LOG(LogTemp, Display, TEXT("STORED COLOR COST: %f"), CalculateColorProductionCostByString(productCode.Right(2)));
+        currentEarnings += (int)(CalculateMaterialProductionCostByString(productCode.Left(2)) + CalculateSizeProductionCostByString(productCode.Mid(2, 2)) + 
+                                CalculateFormProductionCostByString(productCode.Mid(4, 2)) + CalculateColorProductionCostByString(productCode.Right(2)));
 
-    currentEarnings += (int)(CalculateMaterialProductionCostByString(productCode.Left(2)) + CalculateSizeProductionCostByString(productCode.Mid(2, 2)) + 
-                            CalculateFormProductionCostByString(productCode.Mid(4, 2)) + CalculateColorProductionCostByString(productCode.Right(2)));
-
-    currentMoney += (float)currentEarnings;
+        currentMoney += (float)currentEarnings;
+        currentMoneyStatus.ExecuteIfBound(currentMoney);
+    }else
+    {
+        lossMoney += (int)(CalculateMaterialProductionCostByString(productCode.Left(2)) + CalculateSizeProductionCostByString(productCode.Mid(2, 2)) + 
+                                CalculateFormProductionCostByString(productCode.Mid(4, 2)) + CalculateColorProductionCostByString(productCode.Right(2)));
+    }
     
 }
 
@@ -240,6 +259,7 @@ void AManagerComputer::UpdateCurrentEarnings(FString productCode)
 void AManagerComputer::UpdateOrdersDataOnStock(TArray<FOrderInfo> updatedStockStatus)
 {
     TArray<FOrderOTD> ordersStatus;
+    ordersStatus.Empty();
     for(int i = 0 ; i < updatedStockStatus.Num(); i++)
     {
         FOrderOTD singleOrder;
@@ -279,6 +299,8 @@ void AManagerComputer::UpdateOrdersDataOnStock(TArray<FOrderInfo> updatedStockSt
 // Generates 10 random orders for selection.
 void AManagerComputer::GenerateOrdersForTheDay()
 {
+    gneratedOrders.Empty();
+    
     for(int i = 0; i < 10; i++)
     {
         int randomIndex = (int)FMath::RandRange(1, 3);
@@ -406,6 +428,7 @@ void AManagerComputer::StoreSelectedOrders(TArray<int> selectedOrders, int expec
     {
         storageManager->GetOrdersOfTheDay(ordersForDayProduction);
     }
+    initialSeconds = GetWorld()->GetDeltaSeconds();
 
 }
 
@@ -420,5 +443,79 @@ void AManagerComputer::UpdateOrderProductionStatusOnScreen(FString orderInProduc
         lastOrderScreen->SetProductionOrderOnScreen(currentOrderScreen->GetProductionOrderOnScreen());
         currentOrderScreen->SetProductionOrderOnScreen(orderInProduction);
     }
+
+}
+
+///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+// Section for oil and Lubricant supply.
+
+// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+void AManagerComputer::CalculateOilTransaction(float oilCost)
+{
+    UE_LOG(LogTemp, Display, TEXT("ASKING OIL"));
+    if((currentMoney - oilCost) >= 0)
+    {
+        UE_LOG(LogTemp, Display, TEXT("MONEY AFTER ASKING OIL: %f"), currentMoney - oilCost);
+        if(refuelerComputer)
+        {
+            UE_LOG(LogTemp, Display, TEXT("BUYING OIL"));
+            refuelerComputer->SetOilTransaction(true);
+        }
+        currentMoney -= oilCost;
+    }
+
+}
+
+// Calculates the current money and then if enough, set boolenan to buy on Refueler Computer.
+void AManagerComputer::CalculateLubricantTransaction(float lubricantCost)
+{
+    UE_LOG(LogTemp, Display, TEXT("ASKING LUBRICANT"));
+    if((currentMoney - lubricantCost) >= 0)
+    {
+        UE_LOG(LogTemp, Display, TEXT("MONEY AFTER ASKING LUBRICANT: %f"), currentMoney - lubricantCost);
+        if(refuelerComputer)
+        {
+            UE_LOG(LogTemp, Display, TEXT("BUYING LUBRICANT"));
+            refuelerComputer->SetOilTransaction(true);
+        }
+        currentMoney -= lubricantCost;
+    }
+
+}
+
+///////////////////////////////////// RESET SELECTION ORDERS COST PROPERTIES ////////////////////////////////
+// Section for reset orders options and cost.
+
+// By a Reset button in Widget Supplier ask for new codes to select.
+void AManagerComputer::RegenerateTheOrdersToSelect()
+{
+    if((currentMoney - resetCost >= 0) && computerWidget)
+    {
+        currentMoney -= resetCost;
+        GenerateOrdersForTheDay();
+        computerWidget->SetOrdersToSelect(gneratedOrders);
+    }
+    
+}
+
+///////////////////////////////////// EXIT SIMULATION INFO PROPERTIES ////////////////////////////////
+// Section for data recovering to display on Exit Door Widget.
+
+// Gather all the information to pass on to Exit Door.
+FExitSimulationInfo AManagerComputer::GetExitDoorInformation()
+{
+    if(storageManager)
+    {
+        exitPlayerInfo.timeSimulated = GetWorld()->GetDeltaSeconds() - initialSeconds;
+
+        exitPlayerInfo.totalProducts = storageManager->GetTotalAmountOfProducedProducts();
+
+        exitPlayerInfo.mostProduced = storageManager->GetMaxProducedCode();
+
+        exitPlayerInfo.totalEarnings = currentMoney - initialMoney;
+
+        exitPlayerInfo.lostMoney = lossMoney;
+    }
+    return exitPlayerInfo;
 
 }

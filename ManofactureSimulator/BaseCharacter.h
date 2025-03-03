@@ -136,7 +136,7 @@ private:
 	UPrimitiveComponent* HitComponent;
 
 	// Use to get values of cannister to update value on widget.
-	ABaseCanister* holdedCanister;
+	class ABaseCanister* holdedCanister;
 
 	// Holds value if an object can be placed on a boxComponent.
 	bool canPlaceObject;
@@ -177,10 +177,36 @@ private:
 	// Get an struct array with the orders status from stock.
 	void GetOrderOfTheDayStatus(TArray<FString> orders, TArray<struct FOrderOTD> ordersStatus);
 
+	// Get The current earning to be displayed on Monitor.
+	void GetCurrentEarnings(float earnigns);
+
+	// Holds the current earnings.
+	float currentEarings;
+
 	// Holds the ordes of the day.
 	TArray<FString> ordersOfTheDay;
 
 	// Hold the order status from storage.
 	TArray<struct FOrderOTD> ordersOfTheDayStatus;
+
+	///////////////////////////////////// INFORMATION SCREEN WIDGET PROPERTIES ////////////////////////////////
+	// Interaction with Information Screens.
+
+	// Information Screen interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Monitor Widget", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> informationScreenWidgetClass;
+
+	// Holds the a reference to Information Screens infront of player.
+	class AInformationScreen* infoScreen;
+
+	///////////////////////////////////// EXIT DOOR WIDGET PROPERTIES ////////////////////////////////
+	// Interaction with exit door.
+
+	// Exit Door interaction widget.
+	UPROPERTY(EditAnywhere, Category = "Exit Widget", meta = (AllowPrivateAccess))
+	TSubclassOf<class UUserWidget> exitDoorWidgetClass;
+
+	// Holds the a reference to Exit Door widget info.
+	class AExitDoor* exitDoor;
 
 };

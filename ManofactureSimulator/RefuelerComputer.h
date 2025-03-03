@@ -6,6 +6,9 @@
 #include "BaseComputer.h"
 #include "RefuelerComputer.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOilBuy, float)
+DECLARE_DELEGATE_OneParam(FLubricantBuy, float)
+
 /**
  * 
  */
@@ -23,6 +26,18 @@ public:
 
 	// Adds widget and assign the player controller to it.
 	virtual void AddWidgetFromComputer(class ACharacterController* CharacterController);
+
+	// Delegate to ask money quantity to buy oil.
+	FOilBuy oilCostAmount;
+
+	// Delegate to ask money quantity to buy lubricant.
+	FLubricantBuy lubricantCostAmount;
+
+	// Sets boolean condition to buy oil.
+	void SetOilTransaction(bool oilTransationStatus);
+
+	// Sets boolean condition to buy lubricant.
+	void SetLubricantTransaction(bool lubricantTransationStatus);
 
 protected:
 	///////////////////////////////////// BASE COMPUTER PROPERTIES ////////////////////////////////
@@ -51,5 +66,34 @@ protected:
 
 	// Calls interaction for lubricant supply
 	void CallsLubricantRefuel();
+
+	///////////////////////////////////// OIL & LUBRICANT SUPPLY PROPERTIES ////////////////////////////////
+	// Section for oil and Lubricant supply.
+
+	// Holds the value of Oil Cost.
+	UPROPERTY(EditAnywhere, Category = "Liquids Cost", meta = (AllowPrivateAccess))
+	float oilCost = 1.5f;
+
+	// Holds the value of Lubricant Cost.
+	UPROPERTY(EditAnywhere, Category = "Liquids Cost", meta = (AllowPrivateAccess))
+	float lubricantCost = 0.5f;
+
+	// Holds the calculated oil cost.
+	float oilCostToBuy;
+
+	// Holds the calculated lubricant cost.
+	float lubricantCostToBuy;
+
+	// Boolean to keep track of oil transaction.
+	bool canBuyOil;
+
+	// Boolean to keep track of lubricant transaction.
+	bool canBuyLubricant;
+
+	// Calculates the price of oil and buy it from ManagerComputer into Refueler.
+	void BuyOilFromSupplier();
+
+	// Calculates the price of lubricant and buy it from ManagerComputer into Refueler.
+	void BuyLubricantFromSupplier();
 	
 };
