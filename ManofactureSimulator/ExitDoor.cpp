@@ -12,14 +12,7 @@ void AExitDoor::BeginPlay()
 
 	TArray<AActor*> allActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AManagerComputer::StaticClass(), allActors);
-	if(allActors.IsValidIndex(0))
-	{
-		managerComputer = Cast<AManagerComputer>(allActors[0]);
-		if(managerComputer)
-		{
-			GetExitDoorInfo(managerComputer->GetExitDoorInformation());
-		}
-	}
+	if(allActors.IsValidIndex(0)) managerComputer = Cast<AManagerComputer>(allActors[0]);
 
 }
 
@@ -33,6 +26,11 @@ void AExitDoor::AddWidgetFromComputer(ACharacterController* CharacterController)
 	{
 		exitDoorWidget->AddToViewport();
 		exitDoorWidget->exitButtonEvent.BindUObject(this, &ABaseComputer::PublicWidgetBindResetController);
+
+		if(managerComputer)
+		{
+			GetExitDoorInfo(managerComputer->GetExitDoorInformation());
+		}
 	}
 
 }
@@ -40,7 +38,7 @@ void AExitDoor::AddWidgetFromComputer(ACharacterController* CharacterController)
 // Called when the data is obtain for display.
 void AExitDoor::GetExitDoorInfo(FExitSimulationInfo exitInfo)
 {
-	if(managerComputer && exitDoorWidget)
+	if(exitDoorWidget)
 	{
 		exitDoorWidget->SetPlayerTimeInProduction(exitInfo.timeSimulated);
 		exitDoorWidget->SetTotalProductsProduced(exitInfo.totalProducts);

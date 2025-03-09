@@ -428,7 +428,7 @@ void AManagerComputer::StoreSelectedOrders(TArray<int> selectedOrders, int expec
     {
         storageManager->GetOrdersOfTheDay(ordersForDayProduction);
     }
-    initialSeconds = GetWorld()->GetDeltaSeconds();
+    initialSeconds = GetWorld()->GetTimeSeconds();
 
 }
 
@@ -506,7 +506,7 @@ FExitSimulationInfo AManagerComputer::GetExitDoorInformation()
 {
     if(storageManager)
     {
-        exitPlayerInfo.timeSimulated = GetWorld()->GetDeltaSeconds() - initialSeconds;
+        exitPlayerInfo.timeSimulated = GetWorld()->GetTimeSeconds() - initialSeconds;
 
         exitPlayerInfo.totalProducts = storageManager->GetTotalAmountOfProducedProducts();
 

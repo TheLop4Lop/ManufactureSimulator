@@ -80,7 +80,7 @@ void AProductionComputer::UpdateDeliverOrders()
 		ordersDelivered.Add(ordersToDeliver[0]);
 		ordersToDeliver.RemoveAt(0);
 
-		if(computerWidget) computerWidget->SetOrderBeingDelivered(ordersToDeliver[0]);
+		if(computerWidget && ordersToDeliver.IsValidIndex(0)) computerWidget->SetOrderBeingDelivered(ordersToDeliver[0]);
 	}
 
 }
